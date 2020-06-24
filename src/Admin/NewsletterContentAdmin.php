@@ -138,7 +138,7 @@ final class NewsletterContentAdmin extends AbstractAdmin
                         'label'       => false,
                         'field_type' => SimpleFormatterType::class,
                         'format'           => 'richhtml',
-                        'ckeditor_context' => $options['ckeditor_context'] ?? 'default',
+                        'ckeditor_context' => 'cms_page',
                         'required'         => false,
                         'auto_initialize'  => false
                      ];

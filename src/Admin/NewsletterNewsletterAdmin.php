@@ -78,6 +78,9 @@ class NewsletterNewsletterAdmin extends AbstractAdmin
             ->add('model', null, [
                 'label' => 'Modèle',
             ])
+            ->add('groups', null, [
+                'label' => 'Destinataires',
+            ])
             ->add('sender', null, [
                 'label' => "Nom de l'expéditeur",
             ])

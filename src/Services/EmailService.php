@@ -121,7 +121,7 @@ class EmailService
             }
 
             $users = $qb->getQuery()->getResult();
-            
+
             foreach ($users as $u) {
                 $locale = method_exists($u, 'getLocale') ? $u->getLocale() :  'fr';
                 $locale = $locale !== '' && $locale !== null ? $locale : 'fr';
@@ -144,5 +144,13 @@ class EmailService
             $emails[$locale] = array_unique($emails[$locale]);
         }
         return $emails;
+    }
+    
+    public function countEmails($email_list){
+        $total = 0;
+        foreach ($email_list as $locale => $emails) {
+            $total += empty($emails) ? 0 : count($emails);
+        }
+        return $total;
     }
 }
