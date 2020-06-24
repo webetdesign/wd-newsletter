@@ -25,7 +25,7 @@ services:
       - { name: sonata.admin, manager_type: orm, group: newsletter, label: Newsletter }
     public: true
     calls:
-      - [setTemplate, ['show', 'NewsletterBundle:admin/newsletter:show.html.twig']]
+      - [setTemplate, ['show', 'WDNewsletterBundle:admin/newsletter:show.html.twig']]
 
   WebEtDesign\NewsletterBundle\Controller\Admin\NewsletterAdminController:
     arguments:

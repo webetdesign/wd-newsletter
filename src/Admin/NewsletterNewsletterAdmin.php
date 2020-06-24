@@ -87,7 +87,7 @@ class NewsletterNewsletterAdmin extends AbstractAdmin
                     'show'   => [],
                     'edit'   => [],
                     'send' => [
-                        'template' => 'NewsletterBundle:admin/newsletter:list__action_send.html.twig'
+                        'template' => 'WDNewsletterBundle:admin/newsletter:list__action_send.html.twig'
                     ],
                     'delete' => [],
                 ],
@@ -100,7 +100,7 @@ class NewsletterNewsletterAdmin extends AbstractAdmin
         $object = $this->getSubject();
 
         $this->setFormTheme(array_merge($this->getFormTheme(), [
-            'NewsletterBundle:form:newsletter_contents_type.html.twig'
+            'WDNewsletterBundle:form:newsletter_contents_type.html.twig'
         ]));
 
         $roleAdmin = $this->canManageContent();

@@ -29,7 +29,7 @@ final class NewsletterContentAdmin extends AbstractAdmin
     /**
      * @var ModelProvider
      */
-    private $pageProvider;
+    private $modelProvider;
     /**
      * @var array
      */
@@ -42,7 +42,7 @@ final class NewsletterContentAdmin extends AbstractAdmin
      * @param string $baseControllerName
      * @param EntityManager $em
      * @param string $media_class
-     * @param ModelProvider $pageProvider
+     * @param ModelProvider $modelProvider
      * @param array $locales
      */
     public function __construct(
@@ -51,12 +51,12 @@ final class NewsletterContentAdmin extends AbstractAdmin
         string $baseControllerName,
         EntityManager $em,
         string $media_class,
-        ModelProvider $pageProvider,
+        ModelProvider $modelProvider,
         array $locales
     ) {
         $this->em             = $em;
         $this->media_class    = $media_class;
-        $this->pageProvider   = $pageProvider;
+        $this->modelProvider   = $modelProvider;
 
         parent::__construct($code, $class, $baseControllerName);
         $this->locales = $locales;
@@ -98,7 +98,7 @@ final class NewsletterContentAdmin extends AbstractAdmin
         /** @var Content $subject */
         $subject = $formMapper->getAdmin()->getSubject();
 
-        $configs = $this->pageProvider->getConfigurationFor($subject->getNewsletter()->getModel());
+        $configs = $this->modelProvider->getConfigurationFor($subject->getNewsletter()->getModel());
 
         $fields = [];
 

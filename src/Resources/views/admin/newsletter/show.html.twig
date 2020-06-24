@@ -1,5 +1,9 @@
 {% extends "SonataAdminBundle:CRUD:show.html.twig" %}
 
+{% if locale is not defined %}
+    {% set locale = 'fr' %}
+
+{% endif %}
 {% block show %}
     {% include 'newsletters/' ~ object.model ~ '.html.twig' %}
 {% endblock %}

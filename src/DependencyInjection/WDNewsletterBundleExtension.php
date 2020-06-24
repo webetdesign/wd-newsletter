@@ -18,7 +18,7 @@ use WebEtDesign\NewsletterBundle\Admin\NewsletterNewsletterAdmin;
 use WebEtDesign\NewsletterBundle\Entity\Content;
 use WebEtDesign\NewsletterBundle\Entity\Newsletter;
 
-class NewsletterBundleExtension extends Extension
+class WDNewsletterBundleExtension extends Extension
 {
     public function load(array $configs, ContainerBuilder $container)
     {
@@ -49,6 +49,6 @@ class NewsletterBundleExtension extends Extension
 
     public function getAlias()
     {
-        return 'newsletter';
+        return 'wd-newsletter';
     }
 }

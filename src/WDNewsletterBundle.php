@@ -3,7 +3,7 @@
 namespace WebEtDesign\NewsletterBundle;
 
 use Symfony\Component\HttpKernel\Bundle\Bundle;
-use WebEtDesign\NewsletterBundle\DependencyInjection\NewsletterBundleExtension;
+use WebEtDesign\NewsletterBundle\DependencyInjection\WDNewsletterBundleExtension;
 
 /**
  * References:
@@ -11,8 +11,9 @@ use WebEtDesign\NewsletterBundle\DependencyInjection\NewsletterBundleExtension;
  */
 class WDNewsletterBundle extends Bundle
 {
-    protected function getContainerExtensionClass()
+    public function getContainerExtension()
     {
-        return NewsletterBundleExtension::class;
+        return new WDNewsletterBundleExtension();
     }
+
 }
