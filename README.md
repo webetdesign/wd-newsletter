@@ -24,31 +24,61 @@
 2° Add this lines to config/Bundles.php file : 
 ```php
     ...
-    WebEtDesign\AnalyticsBundle\WDAdminAnalyticsBundle::class => ['all' => true],
-    MediaFigaro\GoogleAnalyticsApi\GoogleAnalyticsApi::class => ['all' => true],
+    WebEtDesign\AnalyticsBundle\WDNewsletterBundle::class => ['all' => true],
     ...
 ```
-3° Create File wd_admin_analytics.yaml : 
+3° Create File wd-newsletter.yaml : 
 ```yaml
-        wd_admin_analytics:
-              parameters:
-                     view_ids: [000000000]
-                     view_names: ['name']
-                     map_key: your-map-key
-                     
-        # 000000000 = profile id that you can find in the analytics URL, p000000000 :
-        #https://analytics.google.com/analytics/web/?hl=en&pli=1#management/Settings/a222222222w1111111111p000000000/   
+        wd-newsletter:
+          class:
+            media: App\Entity\Media
+          roles:
+            - {name: Administrateur, value: ROLE_ADMIN}
+            - {name: Utilisateur, value: ROLE_USER}
+          noreply: 'noreply@your-site.fr'
+          locales: [fr, en]
+          models:
+            defaut:
+              title: 'title'
+              name: 'defaut'
+              sender: 'sender'
+              email: 'email'
+              template: 'newsletters/defaut.html.twig'
+              txt: 'newsletters/defaut.txt.twig'
+              contents:
+                - {code: 'main_color', label: 'Couleur principale', type: COLOR}
+                - {code: 'main_picture', label: 'Image de la newsletter', type: MEDIA}
+                - {code: 'picture_margin', label: "Marge de l'image", help: "Marge de l'image à gauche et à droite" ,type: TEXT}        
+                - {code: 'title', label: 'Titre',type: WYSYWYG}
 ```
- map_key use for Countries Chart "your-key" 
-         [Get Api Key](https://developers.google.com/maps/documentation/javascript/get-api-key#step-1-get-an-api-key), 
-         [Enable Api Key](https://cloud.google.com/maps-platform/#get-started)
-         
-#### If you don't specify a mapKey the map block will be rendered as chart bar
-         
-4° Add routes :
-```yaml
-[config/routes.yaml]
 
-wd_admin_analytics.data_api:
-  resource: "@WDAdminAnalyticsBundle/Resources/config/routing.yaml"
-```       
+## Models : 
+
+#### Paramèters
+
+- title : title of the email 
+- name : name of the model
+- sender : name of the people who send the newsletter
+- email : email who send the newsletter
+- template : html of template of the model.
+- txt : txt of template of the model.
+- contents :
+    - code : use to find and render the content
+    - label : name display in the admin
+    - type : on of them --> [COLOR, MEDIA, WYSYWYG, TEXT]
+
+#### Traductions
+
+All of contents except MEDIA type will be translated in all of the locales provided in the locales config field.    
+
+## Admin : 
+
+```yaml
+#config/packages/sonata_admin.yaml
+groups:
+    [...]
+    newsletter:
+        label: Newsletters
+        on_top: true
+        icon: '<i class="fa fa-send"></i>'
+```
