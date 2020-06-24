@@ -93,34 +93,40 @@ class EmailService
             return $a->getEmail();
         }, $this->em->getRepository(Unsubscribe::class)->findAll());
 
-        /** @var QueryBuilder $qb */
-        $qb = $this->em->getRepository(User::class)->createQueryBuilder('u');
-
-        $or = '(';
-        $cpt = 0;
-        foreach ($newsletter->getReceiver() as $receiver) {
-            $or .= 'u.roles LIKE :role_' . $cpt . ' OR ';
-            $qb->setParameter('role_' .$cpt, '%"'.$receiver.'"%');
-            $cpt ++;
-        }
-        $or = substr($or, 0, strlen($or) - 3) . ')';
-
-        $qb->andWhere($or);
-
-        if (!empty($unsubcribe)){
-            $qb->andWhere(
-                $qb->expr()->notIn('u.email', ':unsub')
-            )
-                ->setParameter('unsub', $unsubcribe);
-        }
-
-        $users = $qb->getQuery()->getResult();
         $emails = [];
 
-        foreach ($users as $u) {
-            $locale = method_exists($u, 'getLocale') ? $u->getLocale() :  'fr';
-            $locale = $locale !== '' && $locale !== null ? $locale : 'fr';
-            $emails[$locale][] = $u->getEmail();
+
+        if ($newsletter->getGroups()->count() > 0){
+            /** @var QueryBuilder $qb */
+            $qb = $this->em->getRepository(User::class)->createQueryBuilder('u');
+
+            $or = '(';
+            $cpt = 0;
+            foreach ($newsletter->getGroups() as $group) {
+                $or .= ':group_' . $cpt . ' MEMBER OF u.groups OR ';
+                $qb->setParameter('group_' . $cpt, $group);
+                $cpt ++;
+            }
+            $or = substr($or, 0, strlen($or) - 3) . ')';
+
+            if (strlen($or) > 5){
+                $qb->andWhere($or);
+            }
+
+            if (!empty($unsubcribe)){
+                $qb->andWhere(
+                    $qb->expr()->notIn('u.email', ':unsub')
+                )
+                    ->setParameter('unsub', $unsubcribe);
+            }
+
+            $users = $qb->getQuery()->getResult();
+            
+            foreach ($users as $u) {
+                $locale = method_exists($u, 'getLocale') ? $u->getLocale() :  'fr';
+                $locale = $locale !== '' && $locale !== null ? $locale : 'fr';
+                $emails[$locale][] = $u->getEmail();
+            }
         }
 
         $more = $newsletter->getEmailsMoreArray();

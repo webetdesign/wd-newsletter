@@ -6,7 +6,6 @@ use WebEtDesign\NewsletterBundle\Repository\NewsletterRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-
 /**
  * @ORM\Entity(repositoryClass=NewsletterRepository::class)
  * @ORM\Table(name="newsletter__newsletter")
@@ -52,10 +51,9 @@ class Newsletter
     private $emailsMore;
 
     /**
-     * @var string|null $receiver
-     * @ORM\Column(type="text", nullable=true)
+     * @ORM\ManyToMany(targetEntity=App\Entity\Group::class)
      */
-    private $receiver;
+    private $groups;
 
     public function __toString()
     {
@@ -65,6 +63,7 @@ class Newsletter
     public function __construct()
     {
         $this->contents = new ArrayCollection();
+        $this->groups = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -194,36 +193,29 @@ class Newsletter
     }
 
     /**
-     * @return array|null
+     * @return ArrayCollection
      */
-    public function getReceiver()
+    public function getGroups()
     {
-        return explode(',', $this->receiver);
+        return $this->groups;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getReceiverStr()
-    {
-        return $this->receiver;
-    }
 
-    /**
-     * @param string|null $receiver
-     */
-    public function setReceiver($receiver): void
+    public function addGroup(Group $group): self
     {
-        if (is_array($receiver)){
-            $this->receiver = '';
-            foreach ($receiver as $item) {
-                $this->receiver .= $item . ",";
-            }
-            $this->receiver = substr($this->receiver, 0, strlen($this->receiver) - 1);
-        }else{
-            $this->receiver = $receiver;
+        if (!$this->groups->contains($group)) {
+            $this->groups[] = $group;
         }
+
+        return $this;
     }
 
+    public function removeGroup(Group $group): self
+    {
+        if ($this->groups->contains($group)) {
+            $this->groups->removeElement($group);
+        }
 
+        return $this;
+    }
 }

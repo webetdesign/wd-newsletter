@@ -32,9 +32,6 @@
         wd-newsletter:
           class:
             media: App\Entity\Media
-          roles:
-            - {name: Administrateur, value: ROLE_ADMIN}
-            - {name: Utilisateur, value: ROLE_USER}
           noreply: 'noreply@your-site.fr'
           locales: [fr, en]
           models:

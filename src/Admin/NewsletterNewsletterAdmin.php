@@ -2,6 +2,7 @@
 
 namespace WebEtDesign\NewsletterBundle\Admin;
 
+use App\Entity\Group;
 use Doctrine\ORM\EntityManager;
 use Sonata\AdminBundle\Admin\AbstractAdmin;
 use Sonata\AdminBundle\Datagrid\DatagridMapper;
@@ -9,6 +10,7 @@ use Sonata\AdminBundle\Datagrid\ListMapper;
 use Sonata\AdminBundle\Form\FormMapper;
 use Sonata\AdminBundle\Route\RouteCollection;
 use Sonata\AdminBundle\Show\ShowMapper;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
@@ -137,12 +139,12 @@ class NewsletterNewsletterAdmin extends AbstractAdmin
 
             $formMapper
                 ->with('', ['box_class' => 'header_none'])
-                ->add('receiver', ChoiceType::class, [
+                ->add('groups', EntityType::class, [
                     'label' => "Destinataires",
+                    'class' => Group::class,
                     'required' => false,
                     'expanded' => true,
-                    'multiple' => true,
-                    'choices' => $this->provider->getRoleList(),
+                    'multiple' => true
                 ])
                 ->add('emailsMore', TextareaType::class, [
                     'label' => "Liste d'e-mails complémentaires",
