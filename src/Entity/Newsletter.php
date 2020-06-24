@@ -2,6 +2,7 @@
 
 namespace WebEtDesign\NewsletterBundle\Entity;
 
+use App\Entity\Group;
 use WebEtDesign\NewsletterBundle\Repository\NewsletterRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
