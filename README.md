@@ -69,7 +69,8 @@
 
 #### Traductions
 
-All of contents except MEDIA type will be translated in all of the locales provided in the locales config field.    
+- All of contents except MEDIA type will be translated in all of the locales provided in the locales config field.
+- If a locale property  exist in user the mail will be sent in the defined locale. Else, it will be sent in french    
 
 ## Admin : 
 

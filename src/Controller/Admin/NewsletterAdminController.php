@@ -47,7 +47,7 @@ class NewsletterAdminController extends CRUDController
             throw $this->createNotFoundException(sprintf('unable to find the object with id: %s', $id));
         }
 
-        $emails =  $this->getEmails();
+        $emails = $this->emailService->getEmails($this->newsletter);
         try {
             $res = $this->emailService->sendNewsletter($this->newsletter,$emails);
         } catch (\Exception $e) {
@@ -55,10 +55,8 @@ class NewsletterAdminController extends CRUDController
             $this->addFlash('error', $e->getMessage());
         }
 
-        $nbEmails = is_array($emails) ? count($emails) : 0;
-
         if ($res){
-            $this->addFlash('success', 'La newsletter a été envoyée à ' . $nbEmails . ' email(s)');
+            $this->addFlash('success', 'La newsletter a été envoyée à ' . $res . ' email(s)');
         }else{
             $this->addFlash('error', "La newsletter n'a pas été envoyée");
         }
@@ -66,35 +64,5 @@ class NewsletterAdminController extends CRUDController
         return $this->redirect($this->admin->generateObjectUrl('list', null, []));
     }
 
-    private function getEmails(){
-        $unsubcribe = array_map(function(Unsubscribe $a){
-            return $a->getEmail();
-        }, $this->em->getRepository(Unsubscribe::class)->findAll());
 
-        /** @var QueryBuilder $qb */
-        $qb = $this->em->getRepository(User::class)->createQueryBuilder('u');
-
-        foreach ($this->newsletter->getReceiver() as $receiver) {
-            $qb->orWhere('u.roles LIKE :role')
-                ->setParameter('role', '%"'.$receiver.'"%');
-        }
-
-       if (!empty($unsubcribe)){
-           $qb->andWhere('u.email NOT IN (:unsub)')
-               ->setParameter('unsub', $unsubcribe);
-       }
-
-       $users = $qb->getQuery()->getResult();
-       $emails = [];
-
-        foreach ($users as $u) {
-            $locale = method_exists($u, 'getLocale') ? $u->getLocale() :  'fr';
-            $locale = $locale !== '' && $locale !== null ? $locale : 'fr';
-            $emails[$locale][] = $u->getEmail();
-       }
-
-        $emails = array_merge_recursive($emails, $this->newsletter->getEmailsMoreArray());
-
-        return $emails;
-    }
 }

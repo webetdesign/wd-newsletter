@@ -35,6 +35,9 @@ services:
       - { name: twig.extension }
     public: true
     autowire: true
+    arguments:
+      - '@newsletter.email_service'
+
   newsletter.newsletter_repository:
     class: WebEtDesign\NewsletterBundle\Repository\NewsletterRepository
     autowire: true
@@ -47,6 +50,7 @@ services:
       - '@swiftmailer.mailer'
       - '@templating'
       - '@newsletter.newsletter_provider'
+      - '@doctrine.orm.default_entity_manager'
       - '%wd_newsletter.noreply%'
 
   newsletter.content_creator_service:

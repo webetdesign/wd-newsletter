@@ -16,6 +16,7 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use WebEtDesign\NewsletterBundle\Entity\Newsletter;
 use WebEtDesign\NewsletterBundle\Form\NewsletterModelType;
 use WebEtDesign\NewsletterBundle\Form\NewsletterContentsType;
+use WebEtDesign\NewsletterBundle\Services\EmailService;
 use WebEtDesign\NewsletterBundle\Services\RoleProvider;
 
 class NewsletterNewsletterAdmin extends AbstractAdmin
@@ -68,7 +69,6 @@ class NewsletterNewsletterAdmin extends AbstractAdmin
     protected function configureListFields(ListMapper $listMapper)
     {
         unset($this->listModes['mosaic']);
-
         $listMapper
             ->add('title', null, [
                 'label' => 'Titre',

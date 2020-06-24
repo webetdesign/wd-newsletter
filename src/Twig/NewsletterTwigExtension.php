@@ -10,6 +10,7 @@ use Twig\TwigFunction;
 use WebEtDesign\NewsletterBundle\Entity\Content;
 use WebEtDesign\NewsletterBundle\Entity\Newsletter;
 use WebEtDesign\NewsletterBundle\Entity\NewsletterContentTypeEnum;
+use WebEtDesign\NewsletterBundle\Services\EmailService;
 
 class NewsletterTwigExtension extends AbstractExtension
 {
@@ -22,15 +23,19 @@ class NewsletterTwigExtension extends AbstractExtension
      */
     private $requestStack;
 
+    /** @var EmailService $emailService */
+    private $emailService;
+
     /**
      * NewsletterTwigExtension constructor.
      * @param ContainerInterface $container
      * @param RequestStack $requestStack
      */
-    public function __construct(ContainerInterface $container, RequestStack $requestStack)
+    public function __construct(EmailService $emailService, ContainerInterface $container, RequestStack $requestStack)
     {
         $this->container = $container;
         $this->requestStack = $requestStack;
+        $this->emailService = $emailService;
     }
 
     public function getFunctions(): array
@@ -39,6 +44,8 @@ class NewsletterTwigExtension extends AbstractExtension
             new TwigFunction('newsletter_render_content', [$this, 'renderContent'],
                 ['is_safe' => ['html']]),
             new TwigFunction('newsletter_render_media', [$this, 'renderMedia'],
+                ['is_safe' => ['html']]),
+            new TwigFunction('count_users', [$this, 'countUsers'],
                 ['is_safe' => ['html']]),
         ];
     }
@@ -78,6 +85,19 @@ class NewsletterTwigExtension extends AbstractExtension
         }
 
         return null;
+    }
+
+    public function countUsers($object){
+        $total = 0;
+
+        if ($object instanceof Newsletter){
+            $emails = $this->emailService->getEmails($object);
+            foreach ($emails as $locale) {
+                $total += count($locale);
+            }
+        }
+
+        return $total;
 
     }
 

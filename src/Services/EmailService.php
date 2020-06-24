@@ -3,9 +3,13 @@
 namespace WebEtDesign\NewsletterBundle\Services;
 
 
+use App\Entity\User;
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\QueryBuilder;
 use Exception;
 use Symfony\Component\Templating\EngineInterface;
 use WebEtDesign\NewsletterBundle\Entity\Newsletter;
+use WebEtDesign\NewsletterBundle\Entity\Unsubscribe;
 
 class EmailService
 {
@@ -26,6 +30,9 @@ class EmailService
      */
     private $from;
 
+    /** @var EntityManagerInterface $em */
+    private $em;
+
     /**
      * EmailService constructor.
      * @param \Swift_Mailer $mailer
@@ -37,6 +44,7 @@ class EmailService
         \Swift_Mailer $mailer,
         EngineInterface $templating,
         ModelProvider $modelProvider,
+        EntityManagerInterface $em,
         string $from
 
     ) {
@@ -44,6 +52,7 @@ class EmailService
         $this->templating = $templating;
         $this->modelProvider = $modelProvider;
         $this->from = $from;
+        $this->em = $em;
     }
 
     /**
@@ -77,5 +86,57 @@ class EmailService
         }
 
         return $res;
+    }
+
+    public function getEmails(Newsletter $newsletter){
+        $unsubcribe = array_map(function(Unsubscribe $a){
+            return $a->getEmail();
+        }, $this->em->getRepository(Unsubscribe::class)->findAll());
+
+        /** @var QueryBuilder $qb */
+        $qb = $this->em->getRepository(User::class)->createQueryBuilder('u');
+
+        $or = '(';
+        $cpt = 0;
+        foreach ($newsletter->getReceiver() as $receiver) {
+            $or .= 'u.roles LIKE :role_' . $cpt . ' OR ';
+            $qb->setParameter('role_' .$cpt, '%"'.$receiver.'"%');
+            $cpt ++;
+        }
+        $or = substr($or, 0, strlen($or) - 3) . ')';
+
+        $qb->andWhere($or);
+
+        if (!empty($unsubcribe)){
+            $qb->andWhere(
+                $qb->expr()->notIn('u.email', ':unsub')
+            )
+                ->setParameter('unsub', $unsubcribe);
+        }
+
+        $users = $qb->getQuery()->getResult();
+        $emails = [];
+
+        foreach ($users as $u) {
+            $locale = method_exists($u, 'getLocale') ? $u->getLocale() :  'fr';
+            $locale = $locale !== '' && $locale !== null ? $locale : 'fr';
+            $emails[$locale][] = $u->getEmail();
+        }
+
+        $more = $newsletter->getEmailsMoreArray();
+        if (!empty($more)){
+
+            foreach ($more['fr'] as $key => $item) {
+                if (in_array($item, $unsubcribe)){
+                    unset($more['fr'][$key]);
+                }
+            }
+        }
+
+        $emails = array_merge_recursive($emails, $more);
+        foreach ($emails as $locale => $email) {
+            $emails[$locale] = array_unique($emails[$locale]);
+        }
+        return $emails;
     }
 }
