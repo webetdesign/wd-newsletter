@@ -1,0 +1,16 @@
+<a
+    href="{{ admin.generateObjectUrl('send', object, actions.link_parameters|default([])) }}"
+    class="btn btn-sm btn-default"
+    title="{{ 'action_edit'|trans({}, 'SonataAdminBundle') }}"
+    onclick="showloader({{ object.id }})"
+    id="send-{{ object.id }}"
+>
+    <i class="fa fa-send" aria-hidden="true"></i>
+    Envoyer
+</a>
+<script type="text/javascript">
+   function showloader(id){
+       document.getElementById('send-' + id).innerHTML = '    <i class="fa fa-spinner fa-spin fa-fw" aria-hidden="true"></i>\n' +
+           '    Envoi en cours'
+   }
+</script>

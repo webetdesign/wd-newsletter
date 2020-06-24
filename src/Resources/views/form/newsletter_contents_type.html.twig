@@ -1,0 +1,44 @@
+{% block newsletter_contents_widget %}
+    <div class="panel-group" id="contents_collapse" role="tablist" aria-multiselectable="true">
+        {% for item in form.children %}
+            <div class="panel">
+                <div class="panel-heading" role="tab" id="heading_{{ loop.index }}">
+                    <div class="align-left">
+                        <h4 class="panel-title">
+                            <a role="button" data-toggle="collapse" data-parent="#contents_collapse" href="#collapse_{{ loop.index }}" aria-expanded="true" aria-controls="collapse_{{ loop.index }}">
+                                {{ item.vars.value.label }}
+                            </a>
+                            {% if item.vars.value.help is not empty %}
+                                <i class="fa fa-info-circle" data-toggle="tooltip" data-placement="top" title="{{ item.vars.value.help }}"></i>
+                            {% endif %}
+                        </h4>
+                    </div>
+                    <div class="align-right">
+                        {% if role_admin %}
+                            <div class="info">
+                                {{ item.vars.value.type }}
+                                <code>{{ item.vars.value.code }}</code>
+                            </div>
+                        {% endif %}
+                        <div class="btn_arrow">
+                            <button type="button" class="class btn btn-default btn-sm collapsed" data-toggle="collapse" data-parent="#contents_collapse" data-target="#collapse_{{ loop.index }}" aria-expanded="true" aria-controls="collapse_{{ loop.index }}">
+                                <i class="glyphicon glyphicon-menu-up"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div id="collapse_{{ loop.index }}" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading_{{ loop.index }}">
+                    <div class="panel-body">
+                        {% if  item.vars.value.type != 'MEDIA'%}
+                            {{ form_widget(item.translations) }}
+                        {% else %}
+                            {% if item.media is defined %}
+                                {{ form_widget(item.media) }}
+                            {% endif %}
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %}

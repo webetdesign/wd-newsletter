@@ -1,0 +1,58 @@
+services:
+  newsletter.newsletter_provider:
+    class: WebEtDesign\NewsletterBundle\Services\ModelProvider
+    public: true
+    arguments: ['%wd_newsletter.models%']
+
+  newsletter.role_provider:
+    class: WebEtDesign\NewsletterBundle\Services\RoleProvider
+    public: true
+    arguments: ['%wd_newsletter.roles%']
+
+  WebEtDesign\NewsletterBundle\:
+    resource: '../../*'
+    exclude: '../../{DependencyInjection,Entity,Admin}'
+
+  WebEtDesign\NewsletterBundle\Controller\TestController:
+    public: true
+    autowire: true
+    tags: ['controller.service_arguments']
+
+  WebEtDesign\NewsletterBundle\Repository\:
+    resource: '../../Repository'
+    autowire: true
+    tags: ['doctrine.repository_service']
+
+  WebEtDesign\NewsletterBundle\Form\NewsletterModelType:
+    arguments:
+      - '@newsletter.newsletter_provider'
+    tags:
+      - { name: form.type }
+
+  newsletter.twig.extension:
+    class: WebEtDesign\NewsletterBundle\Twig\NewsletterTwigExtension
+    tags:
+      - { name: twig.extension }
+    public: true
+    autowire: true
+  newsletter.newsletter_repository:
+    class: WebEtDesign\NewsletterBundle\Repository\NewsletterRepository
+    autowire: true
+    public: true
+
+  newsletter.email_service:
+    class: WebEtDesign\NewsletterBundle\Services\EmailService
+    public: true
+    arguments:
+      - '@swiftmailer.mailer'
+      - '@templating'
+      - '@newsletter.newsletter_provider'
+      - '%wd_newsletter.noreply%'
+
+  newsletter.content_creator_service:
+    class: WebEtDesign\NewsletterBundle\Services\NewsletterContentCreatorService
+    public: true
+    arguments:
+      - '%wd_newsletter.locales%'
+      - '@doctrine.orm.default_entity_manager'
+

@@ -1,0 +1,8 @@
+services:
+  newsletter.admin.newsletter_listener:
+    class: WebEtDesign\NewsletterBundle\EventListener\NewsletterAdminListener
+    arguments:
+      - '@newsletter.newsletter_provider'
+      - '@newsletter.content_creator_service'
+    tags:
+      - { name: doctrine.event_listener, event: prePersist }

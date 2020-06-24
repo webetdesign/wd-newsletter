@@ -1,0 +1,34 @@
+services:
+  newsletter.admin.content:
+    class: WebEtDesign\NewsletterBundle\Admin\NewsletterContentAdmin
+    arguments:
+      - ~
+      - WebEtDesign\NewsletterBundle\Entity\Content
+      - ~
+      - '@doctrine.orm.default_entity_manager'
+      - '%wd_newsletter.entity.media%'
+      - '@newsletter.newsletter_provider'
+      - '%wd_newsletter.locales%'
+    tags:
+      - { name: sonata.admin, manager_type: orm, group: NEWSLETTER, label: Content, show_in_dashboard: false }
+    public: true
+
+  newsletter.admin.newsletter:
+    class: WebEtDesign\NewsletterBundle\Admin\NewsletterNewsletterAdmin
+    arguments:
+      - ~
+      - '%wd_newsletter.entity.newsletter%'
+      - WebEtDesign\NewsletterBundle\Controller\Admin\NewsletterAdminController
+      - '@doctrine.orm.default_entity_manager'
+      - '@newsletter.role_provider'
+    tags:
+      - { name: sonata.admin, manager_type: orm, group: newsletter, label: Newsletter }
+    public: true
+    calls:
+      - [setTemplate, ['show', 'NewsletterBundle:admin/newsletter:show.html.twig']]
+
+  WebEtDesign\NewsletterBundle\Controller\Admin\NewsletterAdminController:
+    arguments:
+      - '@newsletter.email_service'
+      - '@doctrine.orm.default_entity_manager'
+    tags: ['controller.service_arguments']

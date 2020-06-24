@@ -1,0 +1,3 @@
+newsletter:
+  resource: '../lib/NewsletterBundle'
+  type: annotation

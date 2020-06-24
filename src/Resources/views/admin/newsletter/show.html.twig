@@ -1,0 +1,5 @@
+{% extends "SonataAdminBundle:CRUD:show.html.twig" %}
+
+{% block show %}
+    {% include 'newsletters/' ~ object.model ~ '.html.twig' %}
+{% endblock %}
