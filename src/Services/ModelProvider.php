@@ -27,7 +27,7 @@ class ModelProvider
     {
         $list = [];
         foreach ($this->config as $key => $template) {
-            $list[$template['title']] = $key;
+            $list[$template['name']] = $key;
 
         }
 

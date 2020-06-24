@@ -75,7 +75,7 @@ class NewsletterTwigExtension extends AbstractExtension
         if ($object instanceof Newsletter){
             /** @var Content|null $content */
             $content = $object->getContent($content_code);
-            if (!$content || $content->getType() !== NewsletterContentTypeEnum::MEDIA){
+            if (!$content || $content->getType() !== NewsletterContentTypeEnum::MEDIA || !$content->getMedia()){
                 return null;
             }
 

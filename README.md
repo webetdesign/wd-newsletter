@@ -37,11 +37,10 @@
           models:
             defaut:
               title: 'title'
-              name: 'defaut'
               sender: 'sender'
               email: 'email'
-              template: 'newsletters/defaut.html.twig'
-              txt: 'newsletters/defaut.txt.twig'
+              template: 'newsletters/default.html.twig'
+              txt: 'newsletters/default.txt.twig'
               contents:
                 - {code: 'main_color', label: 'Couleur principale', type: COLOR}
                 - {code: 'main_picture', label: 'Image de la newsletter', type: MEDIA}
@@ -53,10 +52,9 @@
 
 #### Paramèters
 
-- title : title of the email 
-- name : name of the model
+- name : title of the model 
 - sender : name of the people who send the newsletter
-- email : email who send the newsletter
+- email : email to reply 
 - template : html of template of the model.
 - txt : txt of template of the model.
 - contents :

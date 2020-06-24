@@ -39,8 +39,11 @@ class NewsletterAdminListener
         if (!$newsletter instanceof Newsletter) {
             return;
         }
+        $config = $this->provider->getConfigurationFor($newsletter->getModel());
+        $newsletter->setSender($config['sender'])
+            ->setEmail($config['email']);
 
-        $newsletter = $this->contentCreatorService->createNewsletterContents($this->provider->getConfigurationFor($newsletter->getModel()), $newsletter);
+        $newsletter = $this->contentCreatorService->createNewsletterContents($config, $newsletter);
 
     }
 

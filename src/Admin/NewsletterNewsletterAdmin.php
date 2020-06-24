@@ -121,14 +121,18 @@ class NewsletterNewsletterAdmin extends AbstractAdmin
             ])
             ->add('model', NewsletterModelType::class, [
                 'label' => 'Modèle',
-            ])
-            ->add('sender', TextType::class, [
-                'label' => "Nom de l'expéditeur",
-            ])
-            ->add('email', EmailType::class, [
-                'label' => 'Email de retour',
-            ])
-        ;
+            ]);
+
+        if ($this->isCurrentRoute('edit') || $this->getRequest()->isXmlHttpRequest()) {
+            $formMapper
+                ->add('sender', TextType::class, [
+                    'label' => "Nom de l'expéditeur",
+                ])
+                ->add('email', EmailType::class, [
+                    'label' => 'Email de retour',
+                ])
+            ;
+        }
         $formMapper
             ->end()
             ->end();

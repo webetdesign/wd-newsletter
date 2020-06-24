@@ -51,7 +51,6 @@ class Configuration implements ConfigurationInterface
                 ->arrayNode('models')
                     ->arrayPrototype()
                         ->children()
-                            ->scalarNode('title')->cannotBeEmpty()->end()
                             ->scalarNode('name')->cannotBeEmpty()->end()
                             ->scalarNode('sender')->cannotBeEmpty()->end()
                             ->scalarNode('email')->cannotBeEmpty()->end()
