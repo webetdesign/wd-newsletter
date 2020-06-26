@@ -47,7 +47,33 @@
                 - {code: 'picture_margin', label: "Marge de l'image", help: "Marge de l'image à gauche et à droite" ,type: TEXT}        
                 - {code: 'title', label: 'Titre',type: WYSYWYG}
 ```
+4° Add token to User
 
+```php
+<?php 
+
+class User {
+
+
+    /**
+     * @ORM\Column(type="text", nullable=true)
+     */
+    private $newsletterToken;
+    
+    public function getNewsletterToken(): ?string
+    {
+        return $this->newsletterToken;
+    }
+
+    public function setNewsletterToken(?string $newsletterToken): self
+    {
+        $this->newsletterToken = $newsletterToken;
+
+        return $this;
+    }
+
+}
+```
 ## Models : 
 
 #### Paramèters
