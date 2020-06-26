@@ -1,7 +1,7 @@
 {% set total = count_users(object) %}
 <a
     href="{{ admin.generateObjectUrl('send', object, actions.link_parameters|default([])) }}"
-    class="btn btn-sm btn-default js-send-newsletter"
+    class="btn btn-sm btn-default"
     title="{{ 'action_edit'|trans({}, 'SonataAdminBundle') }}"
     data-id="{{ object.id }}"
     data-total="{{ total }}"
@@ -11,7 +11,6 @@
     Envoyer ({{total}})
 </a>
 <script type="text/javascript">
-    var elems = document.getElementsByClassName('js-send-newsletter');
     var confirmIt = function showloader(e) {
         if (confirm('Êtes vous sûr de vouloir envoyer cette newsletter à ' + e.target.dataset.total + ' email(s) ? ')) {
             document.getElementById('send-' + e.target.dataset.id).innerHTML = '    <i class="fa fa-spinner fa-spin fa-fw" aria-hidden="true"></i>\n' +
@@ -20,8 +19,6 @@
             e.preventDefault()
         }
     }
-    for (var i = 0, l = elems.length; i < l; i++) {
-        elems[i].addEventListener('click', confirmIt);
-    }
+    document.getElementById('send-{{ object.id }}').addEventListener('click', confirmIt);
 
 </script>

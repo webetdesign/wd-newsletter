@@ -56,7 +56,7 @@ class NewsletterAdminController extends CRUDController
         }
 
         if ($res){
-            $this->addFlash('success', 'La newsletter a été envoyée à ' . $this->emailService->countEmails($emails) . ' email(s)');
+            $this->addFlash('success', 'La newsletter va être envoyée à ' . $this->emailService->countEmails($emails) . ' email(s)');
         }else{
             $this->addFlash('error', "La newsletter n'a pas été envoyée");
         }

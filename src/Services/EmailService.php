@@ -67,7 +67,8 @@ class EmailService
         foreach ($email_list as $locale => $emails) {
             $message = (new \Swift_Message($newsletter->getTitle()))
                 ->setFrom([$this->from => $newsletter->getSender()])
-                ->setTo($emails)
+                ->setTo($newsletter->getEmail())
+                ->setBcc($emails)
                 ->setReplyTo($newsletter->getEmail())
                 ->setBody(
                     $this->templating->render($this->modelProvider->getTemplate($newsletter->getModel()), [
@@ -145,7 +146,7 @@ class EmailService
         }
         return $emails;
     }
-    
+
     public function countEmails($email_list){
         $total = 0;
         foreach ($email_list as $locale => $emails) {
