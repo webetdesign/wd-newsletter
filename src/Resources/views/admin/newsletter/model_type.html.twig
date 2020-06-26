@@ -1,0 +1,5 @@
+{% extends '@SonataAdmin/CRUD/list_string.html.twig' %}
+
+{% block field %}
+    {{ get_model_title(object.model) }}
+{% endblock %}

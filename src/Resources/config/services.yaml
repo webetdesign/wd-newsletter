@@ -55,6 +55,7 @@ services:
       - '@newsletter.newsletter_provider'
       - '@doctrine.orm.default_entity_manager'
       - '%wd_newsletter.noreply%'
+      - '@router'
 
   newsletter.content_creator_service:
     class: WebEtDesign\NewsletterBundle\Services\NewsletterContentCreatorService

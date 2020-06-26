@@ -56,6 +56,11 @@ class Newsletter
      */
     private $groups;
 
+    /**
+     * @ORM\Column(type="boolean", nullable=true)
+     */
+    private $isSent = false;
+
     public function __toString()
     {
         return $this->getTitle();
@@ -219,4 +224,22 @@ class Newsletter
 
         return $this;
     }
+
+    /**
+     * @return mixed
+     */
+    public function getIsSent()
+    {
+        return $this->isSent;
+    }
+
+    /**
+     * @param mixed $isSent
+     */
+    public function setIsSent($isSent): void
+    {
+        $this->isSent = $isSent;
+    }
+
+
 }

@@ -77,9 +77,13 @@ class NewsletterNewsletterAdmin extends AbstractAdmin
             ])
             ->add('model', null, [
                 'label' => 'Modèle',
+                'template' => 'WDNewsletterBundle:admin/newsletter:model_type.html.twig'
             ])
             ->add('groups', null, [
                 'label' => 'Destinataires',
+            ])
+            ->add('isSent', null, [
+                'label' => 'Envoyée'
             ])
             ->add('sender', null, [
                 'label' => "Nom de l'expéditeur",

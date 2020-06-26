@@ -38,7 +38,7 @@ class UnsubController extends AbstractController
      * @Route(path="/newsletter/unsub/{token}", name="newsletter_unsub")
      * @return \Symfony\Component\HttpFoundation\RedirectResponse
      */
-    public function __invoke(Request $request, string $token)
+    public function token(Request $request, string $token)
     {
         /** @var User $user */
         $user = $this->em->getRepository(User::class)->findOneBy([
@@ -55,11 +55,19 @@ class UnsubController extends AbstractController
             }
             $user->setNewsletterToken(null);
 
-//            $this->em->flush();
+            $this->em->flush();
 
             $this->addFlash('success', "Vous avez été supprimé de notre liste de diffusion.");
         }
 
+        return $this->redirectToRoute($this->home);
+    }
+
+    /**
+     * @Route(path="/newsletter/unsub/auto", name="newsletter_unsub_auto")
+     */
+    public function auto(){
+        $this->addFlash('error', "Vous avez ajouté par l'administrateur à cette newsletter, vous n'êtes pas sur notre liste de diffusion.");
         return $this->redirectToRoute($this->home);
     }
 

@@ -48,6 +48,7 @@ class NewsletterAdminController extends CRUDController
         }
 
         $emails = $this->emailService->getEmails($this->newsletter);
+
         try {
             $res = $this->emailService->sendNewsletter($this->newsletter,$emails);
         } catch (\Exception $e) {
@@ -57,9 +58,13 @@ class NewsletterAdminController extends CRUDController
 
         if ($res){
             $this->addFlash('success', 'La newsletter va être envoyée à ' . $this->emailService->countEmails($emails) . ' email(s)');
+            $this->newsletter->setIsSent(true);
         }else{
             $this->addFlash('error', "La newsletter n'a pas été envoyée");
+            $this->newsletter->setIsSent(false);
         }
+
+        $this->em->flush();
 
         return $this->redirect($this->admin->generateObjectUrl('list', null, []));
     }

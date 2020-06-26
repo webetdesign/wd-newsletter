@@ -28,6 +28,7 @@ class NewsletterTwigExtension extends AbstractExtension
 
     /**
      * NewsletterTwigExtension constructor.
+     * @param EmailService $emailService
      * @param ContainerInterface $container
      * @param RequestStack $requestStack
      */
@@ -46,6 +47,8 @@ class NewsletterTwigExtension extends AbstractExtension
             new TwigFunction('newsletter_render_media', [$this, 'renderMedia'],
                 ['is_safe' => ['html']]),
             new TwigFunction('count_users', [$this, 'countUsers'],
+                ['is_safe' => ['html']]),
+            new TwigFunction('get_model_title', [$this, 'getModelTitle'],
                 ['is_safe' => ['html']]),
         ];
     }
@@ -98,7 +101,11 @@ class NewsletterTwigExtension extends AbstractExtension
         }
 
         return $total;
+    }
 
+    public function getModelTitle($model){
+        $models = $this->container->getParameter('wd_newsletter.models');
+        return isset($models[$model]) ? $models[$model]['name'] : $model;
     }
 
 }

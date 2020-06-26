@@ -7,6 +7,7 @@ use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\QueryBuilder;
 use Exception;
+use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Templating\EngineInterface;
 use WebEtDesign\NewsletterBundle\Entity\Newsletter;
 use WebEtDesign\NewsletterBundle\Entity\Unsubscribe;
@@ -32,12 +33,18 @@ class EmailService
 
     /** @var EntityManagerInterface $em */
     private $em;
+    /**
+     * @var RouterInterface
+     */
+    private $router;
 
     /**
      * EmailService constructor.
      * @param \Swift_Mailer $mailer
      * @param EngineInterface $templating
      * @param ModelProvider $modelProvider
+     * @param EntityManagerInterface $em
+     * @param RouterInterface $router
      * @param string $from
      */
     public function __construct(
@@ -45,7 +52,8 @@ class EmailService
         EngineInterface $templating,
         ModelProvider $modelProvider,
         EntityManagerInterface $em,
-        string $from
+        string $from,
+        RouterInterface $router
 
     ) {
         $this->mailer       = $mailer;
@@ -53,6 +61,7 @@ class EmailService
         $this->modelProvider = $modelProvider;
         $this->from = $from;
         $this->em = $em;
+        $this->router = $router;
     }
 
     /**
@@ -66,8 +75,7 @@ class EmailService
         $res = -1;
         foreach ($email_list as $locale => $emails) {
             foreach ($emails as $token => $email) {
-                $token = is_numeric($token) ? null : $token;
-
+                $link = is_numeric($token) ? $this->router->generate('newsletter_unsub_auto', [], $this->router::ABSOLUTE_URL) : $this->router->generate('newsletter_unsub', ['token' => $token], $this->router::ABSOLUTE_URL);
                 $message = (new \Swift_Message($newsletter->getTitle()))
                     ->setFrom([$this->from => $newsletter->getSender()])
                     ->setTo($email)
@@ -76,14 +84,14 @@ class EmailService
                         $this->templating->render($this->modelProvider->getTemplate($newsletter->getModel()), [
                             'object' => $newsletter,
                             'locale' => $locale,
-                            'token' => $token
+                            'unsub' => $link
                         ]), 'text/html'
                     )
                     ->addPart(
                         $this->templating->render($this->modelProvider->getTxt($newsletter->getModel()), [
                             'object' => $newsletter,
                             'locale' => $locale,
-                            'token' => $token
+                            'unsub' => $link
                         ]), 'text/plain'
                     );
 
