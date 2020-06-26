@@ -65,25 +65,30 @@ class EmailService
     {
         $res = -1;
         foreach ($email_list as $locale => $emails) {
-            $message = (new \Swift_Message($newsletter->getTitle()))
-                ->setFrom([$this->from => $newsletter->getSender()])
-                ->setTo($newsletter->getEmail())
-                ->setBcc($emails)
-                ->setReplyTo($newsletter->getEmail())
-                ->setBody(
-                    $this->templating->render($this->modelProvider->getTemplate($newsletter->getModel()), [
-                        'object' => $newsletter,
-                        'locale' => $locale
-                    ]), 'text/html'
-                )
-                ->addPart(
-                    $this->templating->render($this->modelProvider->getTxt($newsletter->getModel()), [
-                        'object' => $newsletter,
-                        'locale' => $locale
-                    ]), 'text/plain'
-                );
+            foreach ($emails as $token => $email) {
+                $token = is_numeric($token) ? null : $token;
 
-            $res = $this->mailer->send($message);
+                $message = (new \Swift_Message($newsletter->getTitle()))
+                    ->setFrom([$this->from => $newsletter->getSender()])
+                    ->setTo($email)
+                    ->setReplyTo($newsletter->getEmail())
+                    ->setBody(
+                        $this->templating->render($this->modelProvider->getTemplate($newsletter->getModel()), [
+                            'object' => $newsletter,
+                            'locale' => $locale,
+                            'token' => $token
+                        ]), 'text/html'
+                    )
+                    ->addPart(
+                        $this->templating->render($this->modelProvider->getTxt($newsletter->getModel()), [
+                            'object' => $newsletter,
+                            'locale' => $locale,
+                            'token' => $token
+                        ]), 'text/plain'
+                    );
+
+                $res = $this->mailer->send($message);
+           }
         }
 
         return $res;
@@ -123,11 +128,16 @@ class EmailService
 
             $users = $qb->getQuery()->getResult();
 
+            /** @var User $u */
             foreach ($users as $u) {
+                if (!$u->getNewsletterToken()){
+                    $u->setNewsletterToken(md5(uniqid()));
+                }
                 $locale = method_exists($u, 'getLocale') ? $u->getLocale() :  'fr';
                 $locale = $locale !== '' && $locale !== null ? $locale : 'fr';
-                $emails[$locale][] = $u->getEmail();
+                $emails[$locale]['token_' . $u->getNewsletterToken()] = $u->getEmail();
             }
+            $this->em->flush();
         }
 
         $more = $newsletter->getEmailsMoreArray();
@@ -144,6 +154,7 @@ class EmailService
         foreach ($emails as $locale => $email) {
             $emails[$locale] = array_unique($emails[$locale]);
         }
+
         return $emails;
     }
 

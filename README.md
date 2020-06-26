@@ -30,6 +30,8 @@
 3° Create File wd-newsletter.yaml : 
 ```yaml
         wd-newsletter:
+          routes:
+            home: fr_home
           class:
             media: App\Entity\Media
           noreply: 'noreply@your-site.fr'
@@ -74,6 +76,14 @@ class User {
 
 }
 ```
+5° Add routes
+````yaml
+#config/packages/routes.yaml
+
+newsletter.routes:
+  resource: "@WDNewsletterBundle/Resources/config/routing.yaml"
+
+````
 ## Models : 
 
 #### Paramèters
@@ -104,3 +114,8 @@ groups:
         on_top: true
         icon: '<i class="fa fa-send"></i>'
 ```
+
+
+## Note :
+
+When you subscribe to the newsletter, don't forget to remove it from the unsub list 

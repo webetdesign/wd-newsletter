@@ -13,9 +13,12 @@ services:
     resource: '../../*'
     exclude: '../../{DependencyInjection,Entity,Admin}'
 
-  WebEtDesign\NewsletterBundle\Controller\TestController:
+  WebEtDesign\NewsletterBundle\Controller\UnsubController:
     public: true
-    autowire: true
+    arguments:
+      - '@doctrine.orm.default_entity_manager'
+      - '%wd_newsletter.routes%'
+
     tags: ['controller.service_arguments']
 
   WebEtDesign\NewsletterBundle\Repository\:
