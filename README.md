@@ -84,6 +84,38 @@ newsletter.routes:
   resource: "@WDNewsletterBundle/Resources/config/routing.yaml"
 
 ````
+
+6° add ckeditor config
+```yaml
+newsletter:
+    toolbar:
+      <<: *default_toolbar
+    allowedContent: true
+    filebrowserUploadMethod: form
+    filebrowserBrowseRoute: admin_app_media_ckeditor_browser
+    filebrowserImageBrowseRoute: admin_app_media_ckeditor_browser
+    # Display images by default when clicking the image dialog browse button
+    filebrowserImageBrowseRouteParameters:
+      provider: sonata.media.provider.image
+      context: cms_page
+    # Upload file as image when sending a file from the image dialog
+    filebrowserImageUploadRoute: admin_app_media_ckeditor_upload
+    filebrowserBrowseRouteType: 0
+    filebrowserImageUploadRouteParameters:
+      provider: sonata.media.provider.image
+      context: cms_page # Optional, to upload in a custom context
+      format: big # Optional, media format or original size returned to editor
+```
+
+7° add sonata_media config
+```yaml
+    newsletter:
+      providers:
+        - sonata.media.provider.image
+      formats:
+        small: { width: 100 , quality: 70}
+        big:   { width: 900 , quality: 70}
+```
 ## Models : 
 
 #### Paramèters

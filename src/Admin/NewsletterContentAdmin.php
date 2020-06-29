@@ -8,6 +8,7 @@ use Doctrine\ORM\EntityManager;
 use Sonata\AdminBundle\Form\Type\ModelListType;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\Extension\Core\Type\ColorType;
+use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use WebEtDesign\NewsletterBundle\Entity\Content;
 use WebEtDesign\NewsletterBundle\Entity\NewsletterContentTypeEnum;
@@ -138,9 +139,9 @@ final class NewsletterContentAdmin extends AbstractAdmin
                         'label'       => false,
                         'field_type' => SimpleFormatterType::class,
                         'format'           => 'richhtml',
-                        'ckeditor_context' => 'cms_page',
+                        'ckeditor_context' => 'newsletter',
                         'required'         => false,
-                        'auto_initialize'  => false
+                        'auto_initialize'  => false,
                      ];
                     break;
 
