@@ -64,6 +64,7 @@ class Configuration implements ConfigurationInterface
                             ->arrayNode('contents')
                                 ->arrayPrototype()
                                     ->children()
+                                        ->scalarNode('translate')->defaultTrue()->end()
                                         ->scalarNode('code')->isRequired()->cannotBeEmpty()->end()
                                         ->scalarNode('label')->cannotBeEmpty()->end()
                                         ->scalarNode('help')->defaultNull()->end()

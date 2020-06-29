@@ -36,8 +36,16 @@ class NewsletterContentCreatorService
                 $newsletterContent->setLabel($content['label'] ? $content['label'] : $content['code']);
                 $newsletterContent->setType($content['type']);
                 $newsletterContent->setCode($content['code']);
-                if ($newsletterContent->getType() !== NewsletterContentTypeEnum::MEDIA){
-                    foreach ($this->locales as $locale) {
+                $newsletterContent->setCanTranslate($content['translate']);
+
+                if ($newsletterContent->getType() !== NewsletterContentTypeEnum::MEDIA ){
+                    if ($content['translate']){
+                        $locales = $this->locales;
+                    }else{
+                        $locales = ['fr'];
+                    }
+
+                    foreach ($locales as $locale) {
                         $newsletterContent_trans = new ContentTranslation();
                         $newsletterContent_trans->setLocale($locale);
                         $newsletterContent_trans->setTranslatable($newsletterContent);

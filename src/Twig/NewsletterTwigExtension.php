@@ -66,6 +66,9 @@ class NewsletterTwigExtension extends AbstractExtension
                 case NewsletterContentTypeEnum::TEXT;
                 case NewsletterContentTypeEnum::TEXTAREA;
                 case NewsletterContentTypeEnum::COLOR;
+                    if (!$content->getCanTranslate()){
+                        $locale = 'fr';
+                    }
                     return $content->translate($locale)->getValue();
             }
 

@@ -29,11 +29,14 @@
                 </div>
                 <div id="collapse_{{ loop.index }}" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading_{{ loop.index }}">
                     <div class="panel-body">
-                        {% if  item.vars.value.type != 'MEDIA'%}
+                        {% if  item.vars.value.type != 'MEDIA' and item.vars.value.canTranslate %}
                             {{ form_widget(item.translations) }}
                         {% else %}
                             {% if item.media is defined %}
                                 {{ form_widget(item.media) }}
+                            {% endif %}
+                            {% if item.translations is defined %}
+                                {{ form_widget(item.translations.fr) }}
                             {% endif %}
                         {% endif %}
                     </div>

@@ -59,6 +59,11 @@ class Content implements TranslatableInterface
      */
     private $media;
 
+    /**
+     * @ORM\Column(type="text", nullable=true)
+     */
+    private $canTranslate;
+
 
     public function getMedia(): ?Media
     {
@@ -149,6 +154,22 @@ class Content implements TranslatableInterface
         $this->code = $code;
 
         return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getCanTranslate()
+    {
+        return $this->canTranslate;
+    }
+
+    /**
+     * @param mixed $canTranslate
+     */
+    public function setCanTranslate($canTranslate): void
+    {
+        $this->canTranslate = $canTranslate;
     }
 
 
