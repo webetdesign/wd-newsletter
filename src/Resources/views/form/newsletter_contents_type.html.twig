@@ -34,8 +34,7 @@
                         {% else %}
                             {% if item.media is defined %}
                                 {{ form_widget(item.media) }}
-                            {% endif %}
-                            {% if item.translations is defined %}
+                            {% elseif item.translations is defined %}
                                 {{ form_widget(item.translations.fr) }}
                             {% endif %}
                         {% endif %}
