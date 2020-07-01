@@ -87,8 +87,8 @@ class NewsletterNewsletterAdmin extends AbstractAdmin
             ->add('isSent', null, [
                 'label' => 'Envoyée'
             ])
-            ->add('sendedAt', null, [
-                'label' => 'Date d\'envoie',
+            ->add('sendedAtFormated', null, [
+                'label' => 'Date d\'envoi',
             ])
             ->add('sender', null, [
                 'label' => "Nom de l'expéditeur",
@@ -103,10 +103,10 @@ class NewsletterNewsletterAdmin extends AbstractAdmin
                     'copy'   => [
                         'template' => 'WDNewsletterBundle:admin/newsletter:list__action_copy.html.twig'
                     ],
+                    'delete' => [],
                     'send' => [
                         'template' => 'WDNewsletterBundle:admin/newsletter:list__action_send.html.twig'
                     ],
-                    'delete' => [],
                 ]
             ]);
     }

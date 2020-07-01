@@ -261,6 +261,10 @@ class Newsletter
     {
         $this->sendedAt = $sendedAt;
     }
+    
+    public function sendedAtFormated(){
+        return $this->sendedAt ? $this->sendedAt->format('d/m/Y H:m:i') : null;   
+    }
 
     
 }

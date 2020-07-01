@@ -95,6 +95,7 @@ class NewsletterAdminController extends CRUDController
             $this->em->persist($new_content);
         }
 
+        $new->setTitle($new->getTitle() . ' - Copie');
         $new->setIsSent(false);
         $new->setSendedAt(null);
         $this->em->persist($new);
