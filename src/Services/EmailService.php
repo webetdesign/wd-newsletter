@@ -143,7 +143,7 @@ class EmailService
                 }
                 $locale = method_exists($u, 'getLocale') ? $u->getLocale() :  'fr';
                 $locale = $locale !== '' && $locale !== null ? $locale : 'fr';
-                $emails[$locale]['token_' . $u->getNewsletterToken()] = $u->getEmail();
+                $emails[$locale][$u->getNewsletterToken()] = $u->getEmail();
             }
             $this->em->flush();
         }

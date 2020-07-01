@@ -1,0 +1,21 @@
+{% set total = count_users(object) %}
+<a
+    href="{{ admin.generateObjectUrl('copy', object, actions.link_parameters|default([])) }}"
+    class="btn btn-sm btn-default"
+    title="{{ 'action_edit'|trans({}, 'SonataAdminBundle') }}"
+    data-id="{{ object.id }}"
+    id="copy-{{ object.id }}"
+>
+    <i class="fa fa-copy" aria-hidden="true"></i>
+    Copier
+</a>
+<script type="text/javascript">
+    var confirmIt = function showloader(e) {
+        if (!confirm('Êtes vous sûr de vouloir dupliquer cette newsletter ? ')) {
+            e.preventDefault();
+        }
+    };
+    document.getElementById('copy-{{ object.id }}').addEventListener('click', confirmIt);
+
+</script>
+

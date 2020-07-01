@@ -64,6 +64,7 @@ class NewsletterNewsletterAdmin extends AbstractAdmin
     protected function configureRoutes(RouteCollection $collection)
     {
         $collection->add('send', 'send/{id}', ['id' => null], ['id' => '\d*']);
+        $collection->add('copy', 'copy/{id}', ['id' => null], ['id' => '\d*']);
 
         parent::configureRoutes($collection);
     }
@@ -71,6 +72,7 @@ class NewsletterNewsletterAdmin extends AbstractAdmin
     protected function configureListFields(ListMapper $listMapper)
     {
         unset($this->listModes['mosaic']);
+
         $listMapper
             ->add('title', null, [
                 'label' => 'Titre',
@@ -85,6 +87,9 @@ class NewsletterNewsletterAdmin extends AbstractAdmin
             ->add('isSent', null, [
                 'label' => 'Envoyée'
             ])
+            ->add('sendedAt', null, [
+                'label' => 'Date d\'envoie',
+            ])
             ->add('sender', null, [
                 'label' => "Nom de l'expéditeur",
             ])
@@ -95,11 +100,14 @@ class NewsletterNewsletterAdmin extends AbstractAdmin
                 'actions' => [
                     'show'   => [],
                     'edit'   => [],
+                    'copy'   => [
+                        'template' => 'WDNewsletterBundle:admin/newsletter:list__action_copy.html.twig'
+                    ],
                     'send' => [
                         'template' => 'WDNewsletterBundle:admin/newsletter:list__action_send.html.twig'
                     ],
                     'delete' => [],
-                ],
+                ]
             ]);
     }
 

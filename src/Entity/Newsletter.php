@@ -61,6 +61,11 @@ class Newsletter
      */
     private $isSent = false;
 
+    /**
+     * @ORM\Column(type="datetime", nullable=true)
+     */
+    protected $sendedAt;
+
     public function __toString()
     {
         return $this->getTitle();
@@ -241,5 +246,21 @@ class Newsletter
         $this->isSent = $isSent;
     }
 
+    /**
+     * @return mixed
+     */
+    public function getSendedAt()
+    {
+        return $this->sendedAt;
+    }
 
+    /**
+     * @param mixed $sendedAt
+     */
+    public function setSendedAt($sendedAt): void
+    {
+        $this->sendedAt = $sendedAt;
+    }
+
+    
 }
