@@ -11,6 +11,7 @@ use WebEtDesign\NewsletterBundle\Entity\Content;
 use WebEtDesign\NewsletterBundle\Entity\Newsletter;
 use WebEtDesign\NewsletterBundle\Entity\NewsletterContentTypeEnum;
 use WebEtDesign\NewsletterBundle\Services\EmailService;
+use WebEtDesign\NewsletterBundle\Services\ModelProvider;
 
 class NewsletterTwigExtension extends AbstractExtension
 {
@@ -26,6 +27,9 @@ class NewsletterTwigExtension extends AbstractExtension
     /** @var EmailService $emailService */
     private $emailService;
 
+    /** @var ModelProvider $modelProvider */
+    private $modelProvider;
+
     /**
      * NewsletterTwigExtension constructor.
      * @param EmailService $emailService
@@ -37,6 +41,8 @@ class NewsletterTwigExtension extends AbstractExtension
         $this->container = $container;
         $this->requestStack = $requestStack;
         $this->emailService = $emailService;
+        // pb injection
+        $this->modelProvider = new ModelProvider($this->container->getParameter('wd_newsletter.models'));
     }
 
     public function getFunctions(): array
@@ -49,6 +55,8 @@ class NewsletterTwigExtension extends AbstractExtension
             new TwigFunction('count_users', [$this, 'countUsers'],
                 ['is_safe' => ['html']]),
             new TwigFunction('get_model_title', [$this, 'getModelTitle'],
+                ['is_safe' => ['html']]),
+            new TwigFunction('get_model_template', [$this, 'getTemplate'],
                 ['is_safe' => ['html']]),
         ];
     }
@@ -109,6 +117,10 @@ class NewsletterTwigExtension extends AbstractExtension
     public function getModelTitle($model){
         $models = $this->container->getParameter('wd_newsletter.models');
         return isset($models[$model]) ? $models[$model]['name'] : $model;
+    }
+
+    public function getTemplate($model){
+        return $this->modelProvider->getTemplate($model);
     }
 
 }

@@ -5,5 +5,5 @@
 
 {% endif %}
 {% block show %}
-    {% include 'newsletters/' ~ object.model ~ '.html.twig' %}
+    {% include get_model_template(object.model) %}
 {% endblock %}
