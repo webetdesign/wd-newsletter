@@ -34,6 +34,7 @@ class WDNewsletterBundleExtension extends Extension
         $loader->load('command.yaml');
 
 
+        $container->setParameter('wd_newsletter.mailer', $config['mailer']);
         $container->setParameter('wd_newsletter.models', $config['models']);
         $container->setParameter('wd_newsletter.routes', $config['routes']);
         $container->setParameter('wd_newsletter.roles', $config['roles']);

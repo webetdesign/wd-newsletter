@@ -29,25 +29,26 @@
 ```
 3° Create File wd-newsletter.yaml : 
 ```yaml
-        wd-newsletter:
-          routes:
-            home: fr_home
-          class:
-            media: App\Entity\Media
-          noreply: 'noreply@your-site.fr'
-          locales: [fr, en]
-          models:
-            defaut:
-              title: 'title'
-              sender: 'sender'
-              email: 'email'
-              template: 'newsletters/default.html.twig'
-              txt: 'newsletters/default.txt.twig'
-              contents:
-                - {code: 'main_color', label: 'Couleur principale', type: COLOR}
-                - {code: 'main_picture', label: 'Image de la newsletter', type: MEDIA}
-                - {code: 'picture_margin', label: "Marge de l'image", help: "Marge de l'image à gauche et à droite" ,type: TEXT}        
-                - {code: 'title', label: 'Titre',type: WYSYWYG}
+wd-newsletter:
+  mailer: 'swiftmailer.mailer.spool_mailer'
+  routes:
+    home: fr_home
+  class:
+    media: App\Entity\Media
+  noreply: 'noreply@your-site.fr'
+  locales: [fr, en]
+  models:
+    defaut:
+      title: 'title'
+      sender: 'sender'
+      email: 'email'
+      template: 'newsletters/default.html.twig'
+      txt: 'newsletters/default.txt.twig'
+      contents:
+        - {code: 'main_color', label: 'Couleur principale', type: COLOR}
+        - {code: 'main_picture', label: 'Image de la newsletter', type: MEDIA}
+        - {code: 'picture_margin', label: "Marge de l'image", help: "Marge de l'image à gauche et à droite" ,type: TEXT}        
+        - {code: 'title', label: 'Titre',type: WYSYWYG}
 ```
 4° Add token to User
 
@@ -116,6 +117,23 @@ newsletter:
         small: { width: 100 , quality: 70}
         big:   { width: 900 , quality: 70}
 ```
+
+8° swiftmailer configuration
+```yaml
+#config/packages/swiftmailer.yaml
+swiftmailer:
+    default_mailer: direct_mailer
+    mailers:
+        direct_mailer:
+            url: '%env(MAILER_URL)%'
+        spool_mailer:
+            url: '%env(MAILER_URL)%'
+            spool:
+                type: 'file'
+                path: '%kernel.project_dir%/var/spool'
+
+```
+
 ## Models : 
 
 #### Paramèters

@@ -34,21 +34,23 @@ class NewsletterAdminController extends CRUDController
      */
     public function __construct(EmailService $emailService, EntityManagerInterface $em)
     {
-        $this->em            = $em;
+        $this->em           = $em;
         $this->emailService = $emailService;
     }
 
-    public function sendAction($id = null){
+    public function sendAction($id = null)
+    {
         $request = $this->getRequest();
 
-        $id = $request->get($this->admin->getIdParameter());
+        $id               = $request->get($this->admin->getIdParameter());
         $this->newsletter = $this->admin->getObject($id);
 
         if (!$this->newsletter) {
-            throw $this->createNotFoundException(sprintf('unable to find the object with id: %s', $id));
+            throw $this->createNotFoundException(sprintf('unable to find the object with id: %s',
+                $id));
         }
 
-        if ($this->newsletter->getIsSent()){
+        if ($this->newsletter->getIsSent()) {
             $this->addFlash('error', "La newsletter a déjà été envoyée");
             return $this->redirect($this->admin->generateObjectUrl('list', null, []));
         }
@@ -56,17 +58,18 @@ class NewsletterAdminController extends CRUDController
         $emails = $this->emailService->getEmails($this->newsletter);
 
         try {
-            $res = $this->emailService->sendNewsletter($this->newsletter,$emails);
+            $res = $this->emailService->sendNewsletter($this->newsletter, $emails);
         } catch (\Exception $e) {
             $res = 0;
             $this->addFlash('error', $e->getMessage());
         }
 
-        if ($res){
-            $this->addFlash('success', 'La newsletter va être envoyée à ' . $this->emailService->countEmails($emails) . ' email(s)');
+        if ($res) {
+            $this->addFlash('success',
+                'La newsletter va être envoyée à ' . $this->emailService->countEmails($emails) . ' email(s)');
             $this->newsletter->setIsSent(true);
             $this->newsletter->setSendedAt(new \DateTime('now'));
-        }else{
+        } else {
             $this->addFlash('error', "La newsletter n'a pas été envoyée");
             $this->newsletter->setIsSent(false);
         }
@@ -76,14 +79,16 @@ class NewsletterAdminController extends CRUDController
         return $this->redirect($this->admin->generateObjectUrl('list', null, []));
     }
 
-    public function copyAction($id = null){
+    public function copyAction($id = null)
+    {
         $request = $this->getRequest();
 
-        $id = $request->get($this->admin->getIdParameter());
+        $id         = $request->get($this->admin->getIdParameter());
         $newsletter = $this->admin->getObject($id);
 
         if (!$newsletter) {
-            throw $this->createNotFoundException(sprintf('unable to find the object with id: %s', $id));
+            throw $this->createNotFoundException(sprintf('unable to find the object with id: %s',
+                $id));
         }
 
         /** @var Newsletter $new */
@@ -102,7 +107,8 @@ class NewsletterAdminController extends CRUDController
         $this->em->flush();
 
         $this->addFlash('success', "La newsletter a été copiée");
-        return $this->redirect($this->admin->generateObjectUrl('edit', $new, ["id" => $new->getId()]));
+        return $this->redirect($this->admin->generateObjectUrl('edit', $new,
+            ["id" => $new->getId()]));
 
     }
 
