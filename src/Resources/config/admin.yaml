@@ -28,6 +28,7 @@ services:
       - [setTemplate, ['show', 'WDNewsletterBundle:admin/newsletter:show.html.twig']]
 
   WebEtDesign\NewsletterBundle\Controller\Admin\NewsletterAdminController:
+    autowire: true
     arguments:
       - '@newsletter.email_service'
       - '@doctrine.orm.default_entity_manager'

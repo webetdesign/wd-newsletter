@@ -63,4 +63,3 @@ services:
     arguments:
       - '%wd_newsletter.locales%'
       - '@doctrine.orm.default_entity_manager'
-

@@ -6,6 +6,7 @@ use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\QueryBuilder;
 use Sonata\AdminBundle\Controller\CRUDController;
+use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 use WebEtDesign\CmsBundle\Entity\CmsPage;
 use WebEtDesign\NewsletterBundle\Entity\Content;
 use WebEtDesign\NewsletterBundle\Entity\Newsletter;
@@ -32,10 +33,11 @@ class NewsletterAdminController extends CRUDController
      * @param EmailService $emailService
      * @param EntityManagerInterface $em
      */
-    public function __construct(EmailService $emailService, EntityManagerInterface $em)
+    public function __construct(EmailService $emailService, EntityManagerInterface $em, FlashBagInterface $flashBag)
     {
         $this->em           = $em;
         $this->emailService = $emailService;
+        $this->flashBag = $flashBag;
     }
 
     public function sendAction($id = null)
@@ -58,7 +60,7 @@ class NewsletterAdminController extends CRUDController
         $emails = $this->emailService->getEmails($this->newsletter);
 
         try {
-            $res = $this->emailService->sendNewsletter($this->newsletter, $emails);
+            $res = $this->emailService->sendNewsletter($this->newsletter, $emails, $this->flashBag);
         } catch (\Exception $e) {
             $res = 0;
             $this->addFlash('error', $e->getMessage());
@@ -66,7 +68,7 @@ class NewsletterAdminController extends CRUDController
 
         if ($res) {
             $this->addFlash('success',
-                'La newsletter va être envoyée à ' . $this->emailService->countEmails($emails) . ' email(s)');
+                'La newsletter va être envoyée');
             $this->newsletter->setIsSent(true);
             $this->newsletter->setSendedAt(new \DateTime('now'));
         } else {

@@ -7,6 +7,7 @@ use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\QueryBuilder;
 use Exception;
+use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Templating\EngineInterface;
 use WebEtDesign\NewsletterBundle\Entity\Newsletter;
@@ -70,32 +71,38 @@ class EmailService
      * @return int
      * @throws Exception
      */
-    public function sendNewsletter(Newsletter $newsletter,  $email_list): int
+    public function sendNewsletter(Newsletter $newsletter,  $email_list, FlashBagInterface $flashBag = null): int
     {
         $res = -1;
         foreach ($email_list as $locale => $emails) {
             foreach ($emails as $token => $email) {
-                $link = is_numeric($token) ? $this->router->generate('newsletter_unsub_auto', [], $this->router::ABSOLUTE_URL) : $this->router->generate('newsletter_unsub', ['token' => $token], $this->router::ABSOLUTE_URL);
-                $message = (new \Swift_Message($newsletter->getTitle()))
-                    ->setFrom([$this->from => $newsletter->getSender()])
-                    ->setTo($email)
-                    ->setReplyTo($newsletter->getEmail())
-                    ->setBody(
-                        $this->templating->render($this->modelProvider->getTemplate($newsletter->getModel()), [
-                            'object' => $newsletter,
-                            'locale' => $locale,
-                            'unsub' => $link
-                        ]), 'text/html'
-                    )
-                    ->addPart(
-                        $this->templating->render($this->modelProvider->getTxt($newsletter->getModel()), [
-                            'object' => $newsletter,
-                            'locale' => $locale,
-                            'unsub' => $link
-                        ]), 'text/plain'
-                    );
+                try{
+                    $link = is_numeric($token) ? $this->router->generate('newsletter_unsub_auto', [], $this->router::ABSOLUTE_URL) : $this->router->generate('newsletter_unsub', ['token' => $token], $this->router::ABSOLUTE_URL);
+                    $message = (new \Swift_Message($newsletter->getTitle()))
+                        ->setFrom([$this->from => $newsletter->getSender()])
+                        ->setTo($email)
+                        ->setReplyTo($newsletter->getEmail())
+                        ->setBody(
+                            $this->templating->render($this->modelProvider->getTemplate($newsletter->getModel()), [
+                                'object' => $newsletter,
+                                'locale' => $locale,
+                                'unsub' => $link
+                            ]), 'text/html'
+                        )
+                        ->addPart(
+                            $this->templating->render($this->modelProvider->getTxt($newsletter->getModel()), [
+                                'object' => $newsletter,
+                                'locale' => $locale,
+                                'unsub' => $link
+                            ]), 'text/plain'
+                        );
 
-                $res = $this->mailer->send($message);
+                    $res = $this->mailer->send($message);
+                }catch (Exception $e){
+                    if ($flashBag){
+                        $flashBag->add('error', "Le mail à l'adresse " . $email . "n'a pas été envoyé suite à une erreur");
+                    }
+                }
            }
         }
 
