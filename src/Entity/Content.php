@@ -89,9 +89,11 @@ class Content implements TranslatableInterface
     /**
      * @param string|null $help
      */
-    public function setHelp(?string $help): void
+    public function setHelp(?string $help): self
     {
         $this->help = $help;
+
+        return $this;
     }
     public function __call($method, $arguments)
     {
@@ -167,9 +169,11 @@ class Content implements TranslatableInterface
     /**
      * @param mixed $canTranslate
      */
-    public function setCanTranslate($canTranslate): void
+    public function setCanTranslate($canTranslate): self
     {
         $this->canTranslate = $canTranslate;
+
+        return $this;
     }
 
 

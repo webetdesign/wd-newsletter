@@ -183,9 +183,11 @@ class Newsletter
     /**
      * @param string|null $emailsMore
      */
-    public function setEmailsMore(?string $emailsMore): void
+    public function setEmailsMore(?string $emailsMore): self
     {
         $this->emailsMore = $emailsMore;
+
+        return $this;
     }
 
     public function getEmailsMoreArray(){
@@ -240,10 +242,12 @@ class Newsletter
 
     /**
      * @param mixed $isSent
+     * @return Newsletter
      */
-    public function setIsSent($isSent): void
+    public function setIsSent($isSent): self
     {
         $this->isSent = $isSent;
+        return $this;
     }
 
     /**
@@ -261,10 +265,10 @@ class Newsletter
     {
         $this->sendedAt = $sendedAt;
     }
-    
+
     public function sendedAtFormated(){
-        return $this->sendedAt ? $this->sendedAt->format('d/m/Y H:m:i') : null;   
+        return $this->sendedAt ? $this->sendedAt->format('d/m/Y H:m:i') : null;
     }
 
-    
+
 }

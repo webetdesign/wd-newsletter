@@ -3,12 +3,15 @@
 namespace WebEtDesign\NewsletterBundle\Controller\Admin;
 
 use App\Entity\User;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\QueryBuilder;
+use Gedmo\Tree\Strategy\ORM\Nested;
 use Sonata\AdminBundle\Controller\CRUDController;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 use WebEtDesign\CmsBundle\Entity\CmsPage;
 use WebEtDesign\NewsletterBundle\Entity\Content;
+use WebEtDesign\NewsletterBundle\Entity\ContentTranslation;
 use WebEtDesign\NewsletterBundle\Entity\Newsletter;
 use WebEtDesign\NewsletterBundle\Entity\Unsubscribe;
 use WebEtDesign\NewsletterBundle\Services\EmailService;
@@ -86,26 +89,58 @@ class NewsletterAdminController extends CRUDController
         $request = $this->getRequest();
 
         $id         = $request->get($this->admin->getIdParameter());
-        $newsletter = $this->admin->getObject($id);
+        /** @var Newsletter $old */
+        $old = $this->admin->getObject($id);
 
-        if (!$newsletter) {
+        if (!$old) {
             throw $this->createNotFoundException(sprintf('unable to find the object with id: %s',
                 $id));
         }
 
         /** @var Newsletter $new */
-        $new = clone $newsletter;
-        foreach ($newsletter->getContents() as $content) {
+        $new = new Newsletter();
+        $new
+            ->setTitle($old->getTitle() . ' - Copie')
+            ->setModel($old->getModel())
+            ->setSender($old->getSender())
+            ->setEmail($old->getEmail())
+            ->setEmailsMore($old->getEmailsMore())
+            ->setIsSent(false)
+        ;
+        $this->em->persist($new);
+        $this->em->flush();
+        foreach ($new->getContents() as $item) {
+            $new->removeContent($item);
+            $this->em->remove($item);
+        }
+        /** @var Content $content */
+        foreach ($old->getContents() as $old_content) {
             /** @var Content $new_content */
-            $new_content = clone $content;
-            $new_content->setNewsletter($new);
+            $new_content = new Content();
+            $new_content
+                ->setNewsletter($new)
+                ->setType($old_content->getType())
+                ->setMedia($old_content->getMedia())
+                ->setLabel($old_content->getLabel())
+                ->setHelp($old_content->getHelp())
+                ->setCode($old_content->getCode())
+                ->setCanTranslate($old_content->getCanTranslate())
+                ->setTranslations(new ArrayCollection())
+            ;
             $this->em->persist($new_content);
+
+            /** @var ContentTranslation $old_translation */
+            foreach ($old_content->getTranslations() as $old_translation) {
+                $new_translation = new ContentTranslation();
+                $new_translation->setTranslatable($new_content);
+                $new_translation->setValue($old_translation->getValue());
+                $new_translation->setLocale($old_translation->getLocale());
+                $this->em->persist($new_translation);
+                $new_content->addTranslation($new_translation);
+            }
+            $new->addContent($new_content);
         }
 
-        $new->setTitle($new->getTitle() . ' - Copie');
-        $new->setIsSent(false);
-        $new->setSendedAt(null);
-        $this->em->persist($new);
         $this->em->flush();
 
         $this->addFlash('success', "La newsletter a été copiée");
