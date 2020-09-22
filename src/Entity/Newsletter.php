@@ -195,7 +195,7 @@ class Newsletter
         $more = ['fr' => []];
         $cpt = 0;
 
-        $emails = str_replace( ['<br>', '<br />', "\n", "\r"], [',', ',', ',', ','], $this->getEmailsMore() );
+        $emails = preg_replace('/[\s\r\n]/', ',', $this->getEmailsMore());
 
         foreach (explode(',', $emails) as $email) {
            if ($email){
