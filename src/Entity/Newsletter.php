@@ -8,7 +8,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 /**
- * @ORM\Entity(repositoryClass=NewsletterRepository::class)
+ * @ORM\Entity(repositoryClass="WebEtDesign\NewsletterBundle\Repository\NewsletterRepository", repositoryClass=NewsletterRepository::class)
  * @ORM\Table(name="newsletter__newsletter")
  */
 class Newsletter
@@ -195,7 +195,9 @@ class Newsletter
         $more = ['fr' => []];
         $cpt = 0;
 
-        foreach (explode(',', str_replace(' ', '', $this->getEmailsMore())) as $email) {
+        $emails = str_replace( ['<br>', '<br />', "\n", "\r"], [',', ',', ',', ','], $this->getEmailsMore() );
+
+        foreach (explode(',', $emails) as $email) {
            if ($email){
                $more['fr'][] = $email;
                $cpt++;
@@ -267,7 +269,7 @@ class Newsletter
     }
 
     public function sendedAtFormated(){
-        return $this->sendedAt ? $this->sendedAt->format('d/m/Y H:m:i') : null;
+        return $this->sendedAt ? $this->sendedAt->format('d/m/Y H:i:s') : null;
     }
 
 
