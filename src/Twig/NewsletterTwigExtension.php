@@ -58,12 +58,13 @@ class NewsletterTwigExtension extends AbstractExtension
                 ['is_safe' => ['html']]),
             new TwigFunction('get_model_template', [$this, 'getTemplate'],
                 ['is_safe' => ['html']]),
+            new TwigFunction('get_locales', [$this, 'getLocales'],
+                ['is_safe' => ['html']]),
         ];
     }
 
     public function renderContent($object, $content_code, $locale = 'fr'){
         if ($object instanceof Newsletter){
-
             /** @var Content|null $content */
             $content = $object->getContent($content_code);
             if (!$content){
@@ -77,6 +78,7 @@ class NewsletterTwigExtension extends AbstractExtension
                     if (!$content->getCanTranslate()){
                         $locale = 'fr';
                     }
+
                     return $content->translate($locale)->getValue();
             }
 
@@ -121,6 +123,10 @@ class NewsletterTwigExtension extends AbstractExtension
 
     public function getTemplate($model){
         return $this->modelProvider->getTemplate($model);
+    }
+
+    public function getLocales(){
+        return $this->container->getParameter('wd_newsletter.locales');
     }
 
 }

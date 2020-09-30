@@ -62,6 +62,11 @@ class Newsletter
     private $isSent = false;
 
     /**
+     * @ORM\Column(type="boolean", nullable=true)
+     */
+    private $sendInAllLocales = false;
+
+    /**
      * @ORM\Column(type="datetime", nullable=true)
      */
     protected $sendedAt;
@@ -272,5 +277,20 @@ class Newsletter
         return $this->sendedAt ? $this->sendedAt->format('d/m/Y H:i:s') : null;
     }
 
+    /**
+     * @return bool
+     */
+    public function isSendInAllLocales(): bool
+    {
+        return $this->sendInAllLocales !== null ? $this->sendInAllLocales : false;
+    }
+
+    /**
+     * @param bool $sendInAllLocales
+     */
+    public function setSendInAllLocales(bool $sendInAllLocales): void
+    {
+        $this->sendInAllLocales = $sendInAllLocales;
+    }
 
 }

@@ -11,6 +11,7 @@ use Sonata\AdminBundle\Form\FormMapper;
 use Sonata\AdminBundle\Route\RouteCollection;
 use Sonata\AdminBundle\Show\ShowMapper;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
@@ -167,6 +168,10 @@ class NewsletterNewsletterAdmin extends AbstractAdmin
                 ])
                 ->add('emailsMore', TextareaType::class, [
                     'label' => "Liste d'e-mails complémentaires",
+                    'required' => false,
+                ])
+                ->add('sendInAllLocales', CheckboxType::class, [
+                    'label' => "Envoyer dans toutes les langues",
                     'required' => false,
                 ])
 

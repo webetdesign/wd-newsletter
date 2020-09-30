@@ -1,9 +1,11 @@
 {% extends "SonataAdminBundle:CRUD:show.html.twig" %}
 
-{% if locale is not defined %}
-    {% set locale = 'fr' %}
-
+{% if object.sendInAllLocales %}
+    {% set locale = get_locales() %}
+{% else %}
+    {% set locale = ['fr'] %}
 {% endif %}
+
 {% block show %}
     {% include get_model_template(object.model) %}
 {% endblock %}

@@ -103,6 +103,8 @@ final class NewsletterContentAdmin extends AbstractAdmin
 
         $fields = [];
 
+        $locales = $this->locales;
+
         if ($subject && $subject->getId()) {
             switch ($subject->getType()) {
                 case NewsletterContentTypeEnum::TEXT:
@@ -160,16 +162,20 @@ final class NewsletterContentAdmin extends AbstractAdmin
                         'field_type' => ColorType::class,
                         'required'        => false,
                     ];
+                    $locales = ['fr'];
                     break;
             }
 
         }
+
+        if (isset($fields['value'])){
             $formMapper->add('translations', TranslationsType::class, [
                 'label'          => false,
-                'locales'        => $this->locales,
+                'locales'        => $locales,
                 'fields'         => $fields,
                 'excluded_fields' => ['code', 'label', 'help'],
             ]);
+        }
     }
 
     protected function configureShowFields(ShowMapper $showMapper)

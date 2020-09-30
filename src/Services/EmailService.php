@@ -38,6 +38,10 @@ class EmailService
      * @var RouterInterface
      */
     private $router;
+    /**
+     * @var array
+     */
+    private $locales;
 
     /**
      * EmailService constructor.
@@ -45,8 +49,10 @@ class EmailService
      * @param EngineInterface $templating
      * @param ModelProvider $modelProvider
      * @param EntityManagerInterface $em
-     * @param RouterInterface $router
      * @param string $from
+     * @param RouterInterface $router
+     * @param bool $allLocales
+     * @param array $locales
      */
     public function __construct(
         \Swift_Mailer $mailer,
@@ -54,7 +60,8 @@ class EmailService
         ModelProvider $modelProvider,
         EntityManagerInterface $em,
         string $from,
-        RouterInterface $router
+        RouterInterface $router,
+        array $locales
 
     ) {
         $this->mailer       = $mailer;
@@ -63,6 +70,7 @@ class EmailService
         $this->from = $from;
         $this->em = $em;
         $this->router = $router;
+        $this->locales = $locales;
     }
 
     /**
@@ -85,14 +93,14 @@ class EmailService
                         ->setBody(
                             $this->templating->render($this->modelProvider->getTemplate($newsletter->getModel()), [
                                 'object' => $newsletter,
-                                'locale' => $locale,
+                                'locale' => $newsletter->isSendInAllLocales() ? $this->locales : [$locale],
                                 'unsub' => $link
                             ]), 'text/html'
                         )
                         ->addPart(
                             $this->templating->render($this->modelProvider->getTxt($newsletter->getModel()), [
                                 'object' => $newsletter,
-                                'locale' => $locale,
+                                'locale' => $newsletter->isSendInAllLocales() ? $this->locales : [$locale],
                                 'unsub' => $link
                             ]), 'text/plain'
                         );
@@ -100,8 +108,9 @@ class EmailService
                     $res = $this->mailer->send($message);
                 }catch (Exception $e){
                     if ($flashBag){
-                        $flashBag->add('error', "Le mail à l'adresse " . $email . "n'a pas été envoyé suite à une erreur");
+                        $flashBag->add('error', "Le mail à l'adresse " . $email . "n'a pas été envoyé suite à une erreur. (" . $e->getMessage() . ')');
                     }
+                    $res = -1;
                 }
            }
         }

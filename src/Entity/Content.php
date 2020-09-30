@@ -168,6 +168,7 @@ class Content implements TranslatableInterface
 
     /**
      * @param mixed $canTranslate
+     * @return Content
      */
     public function setCanTranslate($canTranslate): self
     {
