@@ -107,6 +107,7 @@ class NewsletterAdminController extends CRUDController
             ->setEmailsMore($old->getEmailsMore())
             ->setIsSent(false)
         ;
+
         $this->em->persist($new);
         $this->em->flush();
         foreach ($new->getContents() as $item) {
