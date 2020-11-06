@@ -26,6 +26,7 @@ services:
     public: true
     calls:
       - [setTemplate, ['show', 'WDNewsletterBundle:admin/newsletter:show.html.twig']]
+      - [setFormContractor, ['@cms.sonata.form_contractor.bridge']]
 
   WebEtDesign\NewsletterBundle\Controller\Admin\NewsletterAdminController:
     autowire: true
