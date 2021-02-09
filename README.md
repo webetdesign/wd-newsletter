@@ -161,7 +161,6 @@ groups:
     [...]
     newsletter:
         label: Newsletters
-        on_top: true
         icon: '<i class="fa fa-send"></i>'
 ```
 
