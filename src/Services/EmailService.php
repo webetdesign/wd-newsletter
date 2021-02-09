@@ -85,7 +85,8 @@ class EmailService
         foreach ($email_list as $locale => $emails) {
             foreach ($emails as $token => $email) {
                 try{
-                    $link = is_numeric($token) ? $this->router->generate('newsletter_unsub_auto', [], $this->router::ABSOLUTE_URL) : $this->router->generate('newsletter_unsub', ['token' => $token], $this->router::ABSOLUTE_URL);
+                    $link = $token ? $this->router->generate('newsletter_unsub', ['token' => $token], $this->router::ABSOLUTE_URL) : $this->router->generate('newsletter_unsub_auto', [], $this->router::ABSOLUTE_URL) ;
+
                     $message = (new \Swift_Message($newsletter->getTitle()))
                         ->setFrom([$this->from => $newsletter->getSender()])
                         ->setTo($email)

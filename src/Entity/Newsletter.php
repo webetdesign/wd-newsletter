@@ -187,6 +187,7 @@ class Newsletter
 
     /**
      * @param string|null $emailsMore
+     * @return Newsletter
      */
     public function setEmailsMore(?string $emailsMore): self
     {
@@ -204,7 +205,7 @@ class Newsletter
 
         foreach (explode(',', $emails) as $email) {
            if ($email){
-               $more['fr'][] = $email;
+               $more['fr'][$this->id . '_' .$email] = $email;
                $cpt++;
            }
         }

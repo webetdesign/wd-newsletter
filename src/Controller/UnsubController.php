@@ -8,6 +8,7 @@ use Doctrine\ORM\EntityManagerInterface as EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request as Request;
 use Symfony\Component\Routing\Annotation\Route;
+use WebEtDesign\NewsletterBundle\Entity\Newsletter;
 use WebEtDesign\NewsletterBundle\Entity\Unsubscribe;
 
 class UnsubController extends AbstractController
@@ -40,25 +41,35 @@ class UnsubController extends AbstractController
      */
     public function token(Request $request, string $token)
     {
-        /** @var User $user */
-        $user = $this->em->getRepository(User::class)->findOneBy([
-            'newsletterToken' => $token
-        ]);
+        $matches = [];
+        $done = false;
+        preg_match('/([0-9]{1,})(_)([a-zA-Z1-9@\.\-\_]{1,})/', $token, $matches);
 
-        if (!$user) {
-            $this->addFlash('error', "Vous n'êtes pas inscrit dans notre liste de diffusion");
-        } else {
-            if (!$this->em->getRepository(Unsubscribe::class)->findOneBy(['email' => $user->getEmail()])){
-                $unsub = new Unsubscribe();
-                $unsub->setEmail($user->getEmail());
-                $this->em->persist($unsub);
+        if (count($matches) === 4 && $matches[0] === $token){
+            $news = $this->em->getRepository(Newsletter::class)->findOneById($matches[1]);
+            $email = $matches[3];
+            if ($email && $news){
+                $this->makeUnsub($email);
+                $done = true;
             }
-            $user->setNewsletterToken(null);
+        }else{
+            /** @var User $user */
+            $user = $this->em->getRepository(User::class)->findOneBy([
+                'newsletterToken' => $token
+            ]);
 
-            $this->em->flush();
-
-            $this->addFlash('success', "Vous avez été supprimé de notre liste de diffusion.");
+            if ($user) {
+                $this->makeUnsub($user->getEmail());
+                $user->setNewsletterToken(null);
+                $done = true;
+            }
         }
+
+        if (!$done){
+            $this->addFlash('error', "Vous n'êtes pas inscrit dans notre liste de diffusion");
+        }
+
+        $this->em->flush();
 
         return $this->redirectToRoute($this->home);
     }
@@ -69,6 +80,19 @@ class UnsubController extends AbstractController
     public function auto(){
         $this->addFlash('error', "Vous avez ajouté par l'administrateur à cette newsletter, vous n'êtes pas sur notre liste de diffusion.");
         return $this->redirectToRoute($this->home);
+    }
+
+    /**
+     * @param string $email
+     */
+    private function makeUnsub(string $email){
+        if (!$this->em->getRepository(Unsubscribe::class)->findOneBy(['email' => $email])){
+            $unsub = new Unsubscribe();
+            $unsub->setEmail($email);
+            $this->em->persist($unsub);
+        }
+
+        $this->addFlash('success', "Vous avez été supprimé de notre liste de diffusion.");
     }
 
 }

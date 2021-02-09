@@ -85,9 +85,20 @@ class NewsletterNewsletterAdmin extends AbstractAdmin
             ->add('groups', null, [
                 'label' => 'Destinataires',
             ])
-            ->add('isSent', null, [
-                'label' => 'Envoyée'
-            ])
+        ;
+
+        if ($this->canManageContent()){
+            $listMapper->add('isSent', null, [
+                'label' => 'Envoyée',
+                'editable' => true
+            ]);
+        }else{
+            $listMapper ->add('isSent', null, [
+                'label' => 'Envoyée',
+                'editable' => false
+            ]);
+        }
+        $listMapper
             ->add('sendedAtFormated', null, [
                 'label' => 'Date d\'envoi',
             ])
