@@ -49,7 +49,7 @@ class EmailService
      * @param EngineInterface $templating
      * @param ModelProvider $modelProvider
      * @param EntityManagerInterface $em
-     * @param string $from
+     * @param null|string $from
      * @param RouterInterface $router
      * @param bool $allLocales
      * @param array $locales
@@ -59,7 +59,7 @@ class EmailService
         EngineInterface $templating,
         ModelProvider $modelProvider,
         EntityManagerInterface $em,
-        string $from,
+        ?string $from,
         RouterInterface $router,
         array $locales
 
@@ -88,7 +88,7 @@ class EmailService
                     $link = $token ? $this->router->generate('newsletter_unsub', ['token' => $token], $this->router::ABSOLUTE_URL) : $this->router->generate('newsletter_unsub_auto', [], $this->router::ABSOLUTE_URL) ;
 
                     $message = (new \Swift_Message($newsletter->getTitle()))
-                        ->setFrom([$this->from => $newsletter->getSender()])
+                        ->setFrom([$this->from ? $this->from : $newsletter->getEmail() => $newsletter->getSender()])
                         ->setTo($email)
                         ->setReplyTo($newsletter->getEmail())
                         ->setBody(

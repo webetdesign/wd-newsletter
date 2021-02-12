@@ -53,7 +53,7 @@ class Configuration implements ConfigurationInterface
                         ->end()
                     ->end()
                 ->end()
-                ->scalarNode('noreply')->cannotBeEmpty()->end()
+                ->scalarNode('noreply')->defaultNull()->end()
                 ->arrayNode('models')
                     ->arrayPrototype()
                         ->children()
