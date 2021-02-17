@@ -57,6 +57,7 @@ services:
       - '%wd_newsletter.noreply%'
       - '@router'
       - '%wd_newsletter.locales%'
+      - '%kernel.project_dir%'
 
   newsletter.content_creator_service:
     class: WebEtDesign\NewsletterBundle\Services\NewsletterContentCreatorService

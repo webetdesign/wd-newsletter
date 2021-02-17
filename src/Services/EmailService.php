@@ -7,6 +7,8 @@ use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\QueryBuilder;
 use Exception;
+use Monolog\Handler\StreamHandler;
+use Monolog\Logger;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Templating\EngineInterface;
@@ -42,6 +44,10 @@ class EmailService
      * @var array
      */
     private $locales;
+    /**
+     * @var string
+     */
+    private $rootDir;
 
     /**
      * EmailService constructor.
@@ -51,8 +57,8 @@ class EmailService
      * @param EntityManagerInterface $em
      * @param null|string $from
      * @param RouterInterface $router
-     * @param bool $allLocales
      * @param array $locales
+     * @param string $rootDir
      */
     public function __construct(
         \Swift_Mailer $mailer,
@@ -61,7 +67,8 @@ class EmailService
         EntityManagerInterface $em,
         ?string $from,
         RouterInterface $router,
-        array $locales
+        array $locales,
+        string $rootDir
 
     ) {
         $this->mailer       = $mailer;
@@ -71,6 +78,7 @@ class EmailService
         $this->em = $em;
         $this->router = $router;
         $this->locales = $locales;
+        $this->rootDir = $rootDir;
     }
 
     /**
@@ -81,10 +89,14 @@ class EmailService
      */
     public function sendNewsletter(Newsletter $newsletter,  $email_list, FlashBagInterface $flashBag = null): int
     {
+        $log = new Logger('mailer');
+        $log->pushHandler(new StreamHandler($this->rootDir . '/var/log/mailer.log', Logger::DEBUG));
+
         $res = -1;
         foreach ($email_list as $locale => $emails) {
             foreach ($emails as $token => $email) {
                 try{
+                    $log->info('Mail to ' . $email . ' created');
                     $link = $token ? $this->router->generate('newsletter_unsub', ['token' => $token], $this->router::ABSOLUTE_URL) : $this->router->generate('newsletter_unsub_auto', [], $this->router::ABSOLUTE_URL) ;
 
                     $message = (new \Swift_Message($newsletter->getTitle()))
@@ -108,6 +120,7 @@ class EmailService
 
                     $res = $this->mailer->send($message);
                 }catch (Exception $e){
+                    $log->error('Mail to ' . $email . ' error');
                     if ($flashBag){
                         $flashBag->add('error', "Le mail à l'adresse " . $email . "n'a pas été envoyé suite à une erreur. (" . $e->getMessage() . ')');
                     }
