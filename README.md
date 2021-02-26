@@ -12,7 +12,7 @@
 ```json
 {
   "require": {
-    "webetdesign/wd-newsletter": "^1"
+    "webetdesign/wd-newsletter": "^1.0.0"
   }
 }
 ```
@@ -24,7 +24,7 @@
 2° Add this lines to config/Bundles.php file : 
 ```php
     ...
-    WebEtDesign\AnalyticsBundle\WDNewsletterBundle::class => ['all' => true],
+    WebEtDesign\NewsletterBundle\WDNewsletterBundle::class => ['all' => true],
     ...
 ```
 3° Create File wd-newsletter.yaml : 
@@ -39,7 +39,7 @@ wd-newsletter:
   locales: [fr, en]
   models:
     defaut:
-      title: 'title'
+      name: 'name'
       sender: 'sender'
       email: 'email'
       template: 'newsletters/default.html.twig'
@@ -55,25 +55,11 @@ wd-newsletter:
 ```php
 <?php 
 
+use WebEtDesign\NewsletterBundle\Entity\NewsletterTrait;
+
 class User {
 
-
-    /**
-     * @ORM\Column(type="text", nullable=true)
-     */
-    private $newsletterToken;
-    
-    public function getNewsletterToken(): ?string
-    {
-        return $this->newsletterToken;
-    }
-
-    public function setNewsletterToken(?string $newsletterToken): self
-    {
-        $this->newsletterToken = $newsletterToken;
-
-        return $this;
-    }
+    use NewsletterTrait;
 
 }
 ```
@@ -88,28 +74,35 @@ newsletter.routes:
 
 6° add ckeditor config
 ```yaml
-newsletter:
-    toolbar:
-      <<: *default_toolbar
-    allowedContent: true
-    filebrowserUploadMethod: form
-    filebrowserBrowseRoute: admin_app_media_ckeditor_browser
-    filebrowserImageBrowseRoute: admin_app_media_ckeditor_browser
-    # Display images by default when clicking the image dialog browse button
-    filebrowserImageBrowseRouteParameters:
-      provider: sonata.media.provider.image
-      context: cms_page
-    # Upload file as image when sending a file from the image dialog
-    filebrowserImageUploadRoute: admin_app_media_ckeditor_upload
-    filebrowserBrowseRouteType: 0
-    filebrowserImageUploadRouteParameters:
-      provider: sonata.media.provider.image
-      context: cms_page # Optional, to upload in a custom context
-      format: big # Optional, media format or original size returned to editor
+# config/packages/fos_ck_editor.yaml
+fos_ck_editor:
+  default_config: default
+  configs:
+    newsletter:
+        toolbar:
+          <<: *default_toolbar
+        allowedContent: true
+        filebrowserUploadMethod: form
+        filebrowserBrowseRoute: admin_app_media_ckeditor_browser
+        filebrowserImageBrowseRoute: admin_app_media_ckeditor_browser
+        # Display images by default when clicking the image dialog browse button
+        filebrowserImageBrowseRouteParameters:
+          provider: sonata.media.provider.image
+          context: cms_page
+        # Upload file as image when sending a file from the image dialog
+        filebrowserImageUploadRoute: admin_app_media_ckeditor_upload
+        filebrowserBrowseRouteType: 0
+        filebrowserImageUploadRouteParameters:
+          provider: sonata.media.provider.image
+          context: cms_page # Optional, to upload in a custom context
+          format: big # Optional, media format or original size returned to editor
 ```
 
 7° add sonata_media config
 ```yaml
+# config/packages/sonata_media.yaml
+sonata_media:
+  contexts:
     newsletter:
       providers:
         - sonata.media.provider.image
@@ -157,9 +150,10 @@ swiftmailer:
 
 ```yaml
 #config/packages/sonata_admin.yaml
-groups:
-    [...]
-    newsletter:
+sonata_admin:
+  dashboard:
+    groups:
+      newsletter:
         label: Newsletters
         icon: '<i class="fa fa-send"></i>'
 ```
