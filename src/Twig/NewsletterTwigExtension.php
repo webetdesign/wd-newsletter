@@ -79,7 +79,9 @@ class NewsletterTwigExtension extends AbstractExtension
                         $locale = 'fr';
                     }
 
-                    return $content->translate($locale)->getValue();
+                    $base = $this->requestStack->getCurrentRequest()->getSchemeAndHttpHost();
+
+                    return preg_replace('~(?:src|action|href)=[\'"]\K/(?!/)[^\'"]*~',"$base$0", $content->translate($locale)->getValue());
             }
 
         }
