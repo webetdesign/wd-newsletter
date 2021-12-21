@@ -38,6 +38,8 @@ class Configuration implements ConfigurationInterface
                 ->arrayNode('class')->addDefaultsIfNotSet()
                     ->children()
                         ->scalarNode('media')->cannotBeEmpty()->end()
+                        ->scalarNode('document')->defaultNull()->end()
+                        ->scalarNode('actuality')->defaultNull()->end()
                     ->end()
                 ->end()
                 ->arrayNode('routes')->addDefaultsIfNotSet()

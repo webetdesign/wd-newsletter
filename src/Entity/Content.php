@@ -53,7 +53,6 @@ class Content implements TranslatableInterface
      */
     private $help;
 
-
     /**
      * @ORM\ManyToOne(targetEntity=Media::class)
      */

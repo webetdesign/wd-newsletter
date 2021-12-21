@@ -16,6 +16,8 @@ class NewsletterContentTypeEnum
     const WYSYWYG                 = 'WYSYWYG';
     const MEDIA                   = 'MEDIA';
     const COLOR                   = "COLOR";
+    const DOCUMENTS               = "DOCUMENTS";
+    const ACTUALITIES             = "ACTUALITIES";
 
     /** @var array user friendly named type */
     protected static $typeName = [
@@ -23,14 +25,16 @@ class NewsletterContentTypeEnum
         self::TEXTAREA                => 'Textarea',
         self::WYSYWYG                 => 'WYSYWYG',
         self::MEDIA                   => 'Media',
-        self::COLOR                => 'Couleur',
+        self::COLOR                   => 'Couleur',
+        self::DOCUMENTS               => 'Documents',
+        self::ACTUALITIES             => 'Actualités',
     ];
 
     /**
      * @param string $typeShortName
      * @return string
      */
-    public static function getName($typeShortName)
+    public static function getName(string $typeShortName): string
     {
         if (!isset(static::$typeName[$typeShortName])) {
             return "Unknown type ($typeShortName)";
@@ -42,7 +46,7 @@ class NewsletterContentTypeEnum
     /**
      * @return array<string>
      */
-    public static function getAvailableTypes()
+    public static function getAvailableTypes(): array
     {
         return [
             self::TEXT,
@@ -50,10 +54,12 @@ class NewsletterContentTypeEnum
             self::WYSYWYG,
             self::MEDIA,
             self::COLOR,
+            self::DOCUMENTS,
+            self::ACTUALITIES
         ];
     }
 
-    public static function getChoices()
+    public static function getChoices(): array
     {
         $choices = [];
         foreach (self::getAvailableTypes() as $availableType) {

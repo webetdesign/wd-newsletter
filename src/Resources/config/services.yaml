@@ -18,8 +18,13 @@ services:
     arguments:
       - '@doctrine.orm.default_entity_manager'
       - '%wd_newsletter.routes%'
-
     tags: ['controller.service_arguments']
+
+  WebEtDesign\NewsletterBundle\Controller\NewsletterContentController:
+    public: true
+    arguments:
+      - '@doctrine.orm.default_entity_manager'
+    tags: [ 'controller.service_arguments' ]
 
   WebEtDesign\NewsletterBundle\Repository\:
     resource: '../../Repository'
@@ -29,6 +34,12 @@ services:
   WebEtDesign\NewsletterBundle\Form\NewsletterModelType:
     arguments:
       - '@newsletter.newsletter_provider'
+    tags:
+      - { name: form.type }
+
+  WebEtDesign\NewsletterBundle\Form\NewsletterContentCollectionType:
+    arguments:
+      - '@newsletter.content_collection_transformer'
     tags:
       - { name: form.type }
 
@@ -65,3 +76,8 @@ services:
     arguments:
       - '%wd_newsletter.locales%'
       - '@doctrine.orm.default_entity_manager'
+
+  newsletter.content_collection_transformer:
+    class: WebEtDesign\NewsletterBundle\Form\Transformer\ContentCollectionTransformer
+    public: true
+    autowire: true

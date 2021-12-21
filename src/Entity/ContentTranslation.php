@@ -28,13 +28,10 @@ class ContentTranslation implements TranslationInterface
      */
     private $value;
 
-
     public function getId(): ?int
     {
         return $this->id;
     }
-
-
 
     public function getValue(): ?string
     {

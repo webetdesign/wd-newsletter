@@ -46,6 +46,8 @@ class WDNewsletterBundleExtension extends Extension
         $container->setParameter('wd_newsletter.entity.content', Content::class);
         $container->setParameter('wd_newsletter.entity.newsletter', Newsletter::class);
         $container->setParameter('wd_newsletter.entity.media', $config['class']['media']);
+        $container->setParameter('wd_newsletter.entity.document', $config['class']['document']);
+        $container->setParameter('wd_newsletter.entity.actuality', $config['class']['actuality']);
 
     }
 

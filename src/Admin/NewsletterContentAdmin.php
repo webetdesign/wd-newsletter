@@ -3,10 +3,14 @@
 namespace WebEtDesign\NewsletterBundle\Admin;
 
 use A2lix\TranslationFormBundle\Form\Type\TranslationsType;
+use App\Entity\Document;
 use App\Entity\Media;
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\Mapping as ORM;
 use Sonata\AdminBundle\Form\Type\ModelListType;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
+use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\Form\Extension\Core\Type\ColorType;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
@@ -21,20 +25,17 @@ use Sonata\FormatterBundle\Form\Type\SimpleFormatterType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
+use WebEtDesign\NewsletterBundle\Form\NewsletterContentCollectionType;
 use WebEtDesign\NewsletterBundle\Services\ModelProvider;
 
 final class NewsletterContentAdmin extends AbstractAdmin
 {
     protected $em;
     protected $media_class;
-    /**
-     * @var ModelProvider
-     */
     private $modelProvider;
-    /**
-     * @var array
-     */
     private $locales;
+    private $document_class;
+    private $actuality_class;
 
     /**
      * NewsletterContentAdmin constructor.
@@ -45,6 +46,8 @@ final class NewsletterContentAdmin extends AbstractAdmin
      * @param string $media_class
      * @param ModelProvider $modelProvider
      * @param array $locales
+     * @param string|null $document_class
+     * @param string|null $actuality_class
      */
     public function __construct(
         string $code,
@@ -53,11 +56,15 @@ final class NewsletterContentAdmin extends AbstractAdmin
         EntityManager $em,
         string $media_class,
         ModelProvider $modelProvider,
-        array $locales
+        array $locales,
+        ?string $document_class,
+        ?string $actuality_class
     ) {
         $this->em             = $em;
         $this->media_class    = $media_class;
         $this->modelProvider   = $modelProvider;
+        $this->document_class = $document_class;
+        $this->actuality_class = $actuality_class;
 
         parent::__construct($code, $class, $baseControllerName);
         $this->locales = $locales;
@@ -163,6 +170,21 @@ final class NewsletterContentAdmin extends AbstractAdmin
                         'required'        => false,
                     ];
                     $locales = ['fr'];
+                    break;
+
+                case NewsletterContentTypeEnum::ACTUALITIES:
+                case NewsletterContentTypeEnum::DOCUMENTS:
+                    $fields['value'] = [
+                        'label'         => false,
+                        'field_type'    => NewsletterContentCollectionType::class,
+                        'class' => $subject->getType() === NewsletterContentTypeEnum::DOCUMENTS ? $this->document_class : $this->actuality_class,
+                        'required'      => false,
+                        'attr' => [
+                            'data-sonata-select2' => 'false',
+                            'data-custom-select2' => 'true',
+                            'data-class' => $subject->getType() === NewsletterContentTypeEnum::DOCUMENTS ? $this->document_class : $this->actuality_class
+                        ]
+                    ];
                     break;
             }
 
