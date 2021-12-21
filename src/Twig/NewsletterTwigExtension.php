@@ -2,6 +2,7 @@
 
 namespace WebEtDesign\NewsletterBundle\Twig;
 
+use Doctrine\ORM\EntityManagerInterface;
 use Sonata\MediaBundle\Provider\ImageProvider;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -29,6 +30,10 @@ class NewsletterTwigExtension extends AbstractExtension
 
     /** @var ModelProvider $modelProvider */
     private $modelProvider;
+    /**
+     * @var EntityManagerInterface
+     */
+    private $em;
 
     /**
      * NewsletterTwigExtension constructor.
@@ -36,13 +41,19 @@ class NewsletterTwigExtension extends AbstractExtension
      * @param ContainerInterface $container
      * @param RequestStack $requestStack
      */
-    public function __construct(EmailService $emailService, ContainerInterface $container, RequestStack $requestStack)
+    public function __construct(
+        EmailService $emailService,
+        ContainerInterface $container,
+        RequestStack $requestStack,
+        EntityManagerInterface $em
+    )
     {
         $this->container = $container;
         $this->requestStack = $requestStack;
         $this->emailService = $emailService;
         // pb injection
         $this->modelProvider = new ModelProvider($this->container->getParameter('wd_newsletter.models'));
+        $this->em = $em;
     }
 
     public function getFunctions(): array
@@ -82,6 +93,21 @@ class NewsletterTwigExtension extends AbstractExtension
                     $base = $this->requestStack->getCurrentRequest()->getSchemeAndHttpHost();
 
                     return preg_replace('~(?:src|action|href)=[\'"]\K/(?!/)[^\'"]*~',"$base$0", $content->translate($locale)->getValue());
+                case NewsletterContentTypeEnum::DOCUMENTS:
+                case NewsletterContentTypeEnum::ACTUALITIES:
+                $er = $this->em->getRepository(
+                    $content->getType() === NewsletterContentTypeEnum::ACTUALITIES ?
+                        $this->container->getParameter('wd_newsletter.entity.actuality') :
+                        $this->container->getParameter('wd_newsletter.entity.document')
+                );
+                $data = [];
+                foreach (explode(',', $content->translate($locale)->getValue()) as $id) {
+                    $object = $er->find($id);
+                    if ($object){
+                        $data[] = $object;
+                    }
+                }
+                return $data;
             }
 
         }
