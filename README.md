@@ -35,6 +35,8 @@ wd-newsletter:
     home: fr_home
   class:
     media: App\Entity\Media
+    document: App\Entity\Document # Pas obligatoire (Le repository doit implémenter ContentCollectionRepositoryInterface)
+    actuality: App\Entity\News # Pas obligatoire (Le repository doit implémenter ContentCollectionRepositoryInterface)
   noreply: 'noreply@your-site.fr'
   locales: [fr, en]
   models:
@@ -139,7 +141,7 @@ swiftmailer:
 - contents :
     - code : use to find and render the content
     - label : name display in the admin
-    - type : on of them --> [COLOR, MEDIA, WYSYWYG, TEXT]
+    - type : on of them --> [COLOR, MEDIA, WYSYWYG, TEXT, ACTUALITIES, DOCUMENTS]
 
 #### Traductions
 
