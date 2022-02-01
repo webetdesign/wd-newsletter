@@ -8,9 +8,6 @@ use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use WebEtDesign\NewsletterBundle\Entity\Content;
-use WebEtDesign\NewsletterBundle\Entity\ContentTranslation;
-use WebEtDesign\NewsletterBundle\Entity\NewsletterContentTypeEnum;
 use WebEtDesign\NewsletterBundle\Repository\NewsletterRepository;
 use WebEtDesign\NewsletterBundle\Services\ModelProvider;
 use WebEtDesign\NewsletterBundle\Services\NewsletterContentCreatorService;
@@ -19,26 +16,6 @@ class NewsletterSyncContentCommand extends Command
 {
     protected static $defaultName = 'newsletter:sync-contents';
 
-    /**
-     * @var EntityManagerInterface
-     */
-    private $em;
-    /**
-     * @var ModelProvider
-     */
-    private $templateProvider;
-    /**
-     * @var string|null
-     */
-    private $name;
-    /**
-     * @var NewsletterRepository
-     */
-    private $repository;
-    /**
-     * @var NewsletterContentCreatorService
-     */
-    private $contentCreatorService;
 
     /**
      * NewsletterSyncContentCommand constructor.
@@ -48,15 +25,15 @@ class NewsletterSyncContentCommand extends Command
      * @param ModelProvider $templateProvider
      * @param NewsletterContentCreatorService $contentCreatorService
      */
-    public function __construct(?string $name, EntityManagerInterface $em, NewsletterRepository $repository, ModelProvider $templateProvider, NewsletterContentCreatorService $contentCreatorService)
+    public function __construct(
+        ?string                                 $name,
+        private EntityManagerInterface          $em,
+        private NewsletterRepository            $repository,
+        private ModelProvider                   $templateProvider,
+        private NewsletterContentCreatorService $contentCreatorService
+    )
     {
         parent::__construct($name);
-
-        $this->em                    = $em;
-        $this->templateProvider      = $templateProvider;
-        $this->name                  = $name;
-        $this->repository            = $repository;
-        $this->contentCreatorService = $contentCreatorService;
     }
 
     protected function configure()
@@ -70,15 +47,17 @@ class NewsletterSyncContentCommand extends Command
         $io = new SymfonyStyle($input, $output);
 
         $newsletters = $this->repository->findAll();
-        $progress    = new ProgressBar($output, count($newsletters));
+        $progress = new ProgressBar($output, count($newsletters));
+
         foreach ($newsletters as $newsletter) {
             $progress->advance();
             try {
                 $config = $this->templateProvider->getConfigurationFor($newsletter->getModel());
                 if ($config && isset($config['contents'])) {
-                    $newsletter = $this->contentCreatorService->createNewsletterContents($config, $newsletter);
+                    $this->contentCreatorService->createNewsletterContents($config, $newsletter);
                 }
             } catch (\Exception $e) {
+                $io->error($e->getMessage());
             }
         }
 

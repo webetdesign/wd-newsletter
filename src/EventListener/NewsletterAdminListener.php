@@ -2,36 +2,21 @@
 
 namespace WebEtDesign\NewsletterBundle\EventListener;
 
-use Doctrine\ORM\EntityManagerInterface;
-use WebEtDesign\NewsletterBundle\Entity\Content;
-use WebEtDesign\NewsletterBundle\Entity\ContentTranslation;
-use WebEtDesign\NewsletterBundle\Entity\NewsletterContentTypeEnum;
+use Exception;
 use WebEtDesign\NewsletterBundle\Services\ModelProvider;
 use WebEtDesign\NewsletterBundle\Entity\Newsletter;
 use WebEtDesign\NewsletterBundle\Services\NewsletterContentCreatorService;
 
 class NewsletterAdminListener
 {
-    protected $provider;
-    /**
-     * @var NewsletterContentCreatorService
-     */
-    private $contentCreatorService;
-
-    /**
-     * NewsletterAdminListener constructor.
-     * @param ModelProvider $provider
-     * @param NewsletterContentCreatorService $contentCreatorService
-     */
     public function __construct(
-        ModelProvider $provider,
-        NewsletterContentCreatorService $contentCreatorService
-    ) {
-        $this->provider            = $provider;
-        $this->contentCreatorService = $contentCreatorService;
-    }
+        private ModelProvider $provider,
+        private NewsletterContentCreatorService $contentCreatorService
+    ) {}
 
-    // create model form template configuration
+    /**
+     * @throws Exception
+     */
     public function prePersist($event)
     {
         $newsletter = $event->getObject();
@@ -47,8 +32,7 @@ class NewsletterAdminListener
                 ->setEmail($config['email']);
         }
 
-        $newsletter = $this->contentCreatorService->createNewsletterContents($config, $newsletter);
-
+        $this->contentCreatorService->createNewsletterContents($config, $newsletter);
     }
 
 }

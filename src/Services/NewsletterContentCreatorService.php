@@ -10,30 +10,16 @@ use WebEtDesign\NewsletterBundle\Entity\NewsletterContentTypeEnum;
 
 class NewsletterContentCreatorService
 {
-    /** @var array $locales */
-    private $locales;
+    public function __construct(private array $locales, private EntityManagerInterface $em) {}
 
-    /** @var EntityManagerInterface $em */
-    private $em;
-
-    /**
-     * NewsletterContentCreatorService constructor.
-     * @param array $locales
-     * @param EntityManagerInterface $em
-     */
-    public function __construct(array $locales, EntityManagerInterface $em)
+    public function createNewsletterContents(array $config, Newsletter $newsletter): Newsletter
     {
-        $this->locales = $locales;
-        $this->em      = $em;
-    }
-
-    public function createNewsletterContents(array $config, Newsletter $newsletter){
         foreach ($config['contents'] as $content) {
             $newsletterContent = $newsletter->getContent($content['code']);
             if (!$newsletterContent){
                 $newsletterContent = new Content();
                 $newsletterContent->setHelp($content['help']);
-                $newsletterContent->setLabel($content['label'] ? $content['label'] : $content['code']);
+                $newsletterContent->setLabel($content['label'] ?: $content['code']);
                 $newsletterContent->setType($content['type']);
                 $newsletterContent->setCode($content['code']);
                 $newsletterContent->setCanTranslate($content['translate']);

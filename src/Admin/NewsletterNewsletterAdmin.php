@@ -3,7 +3,7 @@
 namespace WebEtDesign\NewsletterBundle\Admin;
 
 use App\Entity\Group;
-use Doctrine\ORM\EntityManager;
+use App\Entity\User;
 use Sonata\AdminBundle\Admin\AbstractAdmin;
 use Sonata\AdminBundle\Datagrid\DatagridMapper;
 use Sonata\AdminBundle\Datagrid\ListMapper;
@@ -12,52 +12,35 @@ use Sonata\AdminBundle\Route\RouteCollection;
 use Sonata\AdminBundle\Show\ShowMapper;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
-use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use WebEtDesign\NewsletterBundle\Entity\Newsletter;
 use WebEtDesign\NewsletterBundle\Form\NewsletterModelType;
 use WebEtDesign\NewsletterBundle\Form\NewsletterContentsType;
-use WebEtDesign\NewsletterBundle\Services\EmailService;
-use WebEtDesign\NewsletterBundle\Services\RoleProvider;
 
 class NewsletterNewsletterAdmin extends AbstractAdmin
 {
-    protected $em;
+    protected $datagridValues = [
+        '_page'       => 1,
+        '_sort_order' => 'ASC',
+        '_sort_by'    => 'createdAt',
+    ];
 
-    protected $datagridValues = [];
-    /**
-     * @var RoleProvider
-     */
-    private $provider;
-
-    /**
-     * NewsletterNewsletterAdmin constructor.
-     * @param string $code
-     * @param string $class
-     * @param string $baseControllerName
-     * @param EntityManager $em
-     * @param RoleProvider $provider
-     */
     public function __construct(
-        string $code,
-        string $class,
-        string $baseControllerName,
-        EntityManager $em,
-        RoleProvider $provider
-    ) {
-        $this->em               = $em;
-
+        string                        $code,
+        string                        $class,
+        string                        $baseControllerName,
+        private TokenStorageInterface $tokenStorage
+    )
+    {
         parent::__construct($code, $class, $baseControllerName);
-        $this->code = $code;
-        $this->provider = $provider;
     }
 
-
-    protected function configureDatagridFilters(DatagridMapper $datagridMapper)
+    protected function configureDatagridFilters(DatagridMapper $filter)
     {
-        $datagridMapper
+        $filter
             ->add('id')
             ->add('title');
     }
@@ -70,11 +53,11 @@ class NewsletterNewsletterAdmin extends AbstractAdmin
         parent::configureRoutes($collection);
     }
 
-    protected function configureListFields(ListMapper $listMapper)
+    protected function configureListFields(ListMapper $list)
     {
         unset($this->listModes['mosaic']);
 
-        $listMapper
+        $list
             ->add('title', null, [
                 'label' => 'Titre',
             ])
@@ -84,22 +67,22 @@ class NewsletterNewsletterAdmin extends AbstractAdmin
             ])
             ->add('groups', null, [
                 'label' => 'Destinataires',
-            ])
-        ;
+            ]);
 
-        if ($this->canManageContent()){
-            $listMapper->add('isSent', null, [
+        if ($this->canManageContent()) {
+            $list->add('isSent', null, [
                 'label' => 'Envoyée',
                 'editable' => true
             ]);
-        }else{
-            $listMapper ->add('isSent', null, [
+        } else {
+            $list->add('isSent', null, [
                 'label' => 'Envoyée',
                 'editable' => false
             ]);
         }
-        $listMapper
-            ->add('sendedAtFormated', null, [
+
+        $list
+            ->add('sentAtFormatted', null, [
                 'label' => 'Date d\'envoi',
             ])
             ->add('sender', null, [
@@ -110,9 +93,9 @@ class NewsletterNewsletterAdmin extends AbstractAdmin
             ])
             ->add('_action', null, [
                 'actions' => [
-                    'show'   => [],
-                    'edit'   => [],
-                    'copy'   => [
+                    'show' => [],
+                    'edit' => [],
+                    'copy' => [
                         'template' => 'WDNewsletterBundle:admin/newsletter:list__action_copy.html.twig'
                     ],
                     'delete' => [],
@@ -123,7 +106,7 @@ class NewsletterNewsletterAdmin extends AbstractAdmin
             ]);
     }
 
-    protected function configureFormFields(FormMapper $formMapper)
+    protected function configureFormFields(FormMapper $form)
     {
         /** @var Newsletter $object */
         $object = $this->getSubject();
@@ -135,10 +118,10 @@ class NewsletterNewsletterAdmin extends AbstractAdmin
         $roleAdmin = $this->canManageContent();
 
         //region Général
-        $formMapper
+        $form
             ->tab('Général', ['box_class' => '']);
 
-        $formMapper
+        $form
             ->with('', ['box_class' => 'header_none'])
             ->add('title', TextType::class, [
                 'label' => 'Titre',
@@ -148,16 +131,15 @@ class NewsletterNewsletterAdmin extends AbstractAdmin
             ]);
 
         if ($this->isCurrentRoute('edit') || $this->getRequest()->isXmlHttpRequest()) {
-            $formMapper
+            $form
                 ->add('sender', TextType::class, [
                     'label' => "Nom de l'expéditeur",
                 ])
                 ->add('email', EmailType::class, [
                     'label' => 'Email de retour',
-                ])
-            ;
+                ]);
         }
-        $formMapper
+        $form
             ->end()
             ->end();
         //endregion
@@ -165,10 +147,10 @@ class NewsletterNewsletterAdmin extends AbstractAdmin
 
         if ($this->isCurrentRoute('edit') || $this->getRequest()->isXmlHttpRequest()) {
             //region Envoie
-            $formMapper
+            $form
                 ->tab("Options d'envoi", ['box_class' => '']);
 
-            $formMapper
+            $form
                 ->with('', ['box_class' => 'header_none'])
                 ->add('groups', EntityType::class, [
                     'label' => "Destinataires",
@@ -184,19 +166,17 @@ class NewsletterNewsletterAdmin extends AbstractAdmin
                 ->add('sendInAllLocales', CheckboxType::class, [
                     'label' => "Envoyer dans toutes les langues",
                     'required' => false,
-                ])
-
-            ;
-            $formMapper
+                ]);
+            $form
                 ->end()
                 ->end();
             //endregion
             //region Contenus
-            $formMapper
+            $form
                 ->tab('Contenus', ['box_class' => 'header_none', 'class' => 'col-xs-12'])
                 ->with('', ['box_class' => 'header_none'])
                 ->add('contents', NewsletterContentsType::class, [
-                    'label'        => false,
+                    'label' => false,
                     'by_reference' => false,
                     'role_admin' => $roleAdmin
                 ])
@@ -207,17 +187,18 @@ class NewsletterNewsletterAdmin extends AbstractAdmin
         }
     }
 
-    protected function configureShowFields(ShowMapper $showMapper)
+    protected function configureShowFields(ShowMapper $show)
     {
-        $showMapper
+        $show
             ->add('id')
             ->add('model')
             ->add('title');
     }
 
-    protected function canManageContent()
+    protected function canManageContent(): bool
     {
-        $user = $this->getConfigurationPool()->getContainer()->get('security.token_storage')->getToken()->getUser();
+        /** @var User $user */
+        $user = $this->tokenStorage->getToken()->getUser();
 
         return $user->hasRole('ROLE_ADMIN_CMS');
     }

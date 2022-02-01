@@ -2,7 +2,7 @@
 
 namespace WebEtDesign\NewsletterBundle\Services;
 
-use Doctrine\ORM\EntityManagerInterface;
+use Exception;
 
 /**
  * Class PageProvider
@@ -10,20 +10,9 @@ use Doctrine\ORM\EntityManagerInterface;
  */
 class ModelProvider
 {
-    private $config;
+    public function __construct(private array $config) {}
 
-    public function __construct(array $config)
-    {
-        $this->config = $config;
-    }
-
-    /**
-     * @param null $filter
-     * @return array
-     *
-     * List of available templates for choice type
-     */
-    public function getModelList($filter = null)
+    public function getModelList(): array
     {
         $list = [];
         foreach ($this->config as $key => $template) {
@@ -37,14 +26,14 @@ class ModelProvider
     /**
      * @param $modelName
      * @return mixed
-     * @throws \Exception
+     * @throws Exception
      *
      * Retrieve a twig path for a template
      */
-    public function getTemplate($modelName)
+    public function getTemplate($modelName): mixed
     {
         if (!isset($this->config[$modelName])) {
-            throw new \Exception('Template name :'.$modelName.' does not exists. Please add it in newsletter.yaml');
+            throw new Exception('Template name :'.$modelName.' does not exists. Please add it in newsletter.yaml');
         }
 
         return $this->config[$modelName]['template'];
@@ -53,14 +42,14 @@ class ModelProvider
     /**
      * @param $modelName
      * @return mixed
-     * @throws \Exception
+     * @throws Exception
      *
      * Retrieve a twig path for a template
      */
-    public function getTxt($modelName)
+    public function getTxt($modelName): mixed
     {
         if (!isset($this->config[$modelName])) {
-            throw new \Exception('Txt name :'.$modelName.' does not exists. Please add it in newsletter.yaml');
+            throw new Exception('Txt name :'.$modelName.' does not exists. Please add it in newsletter.yaml');
         }
 
         return $this->config[$modelName]['txt'];
@@ -69,14 +58,14 @@ class ModelProvider
     /**
      * @param $name
      * @return mixed
-     * @throws \Exception
+     * @throws Exception
      *
      * Get whole configuration of a template
      */
-    public function getConfigurationFor($name)
+    public function getConfigurationFor($name): mixed
     {
         if (!isset($this->config[$name])) {
-            throw new \Exception('Configuration for :'.$name.' does not exists. Please add it in newsletter.yaml');
+            throw new Exception('Configuration for :'.$name.' does not exists. Please add it in newsletter.yaml');
         }
 
         return $this->config[$name];

@@ -8,6 +8,7 @@
 
 namespace WebEtDesign\NewsletterBundle\DependencyInjection;
 
+use Exception;
 use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\Extension;
@@ -20,6 +21,9 @@ use WebEtDesign\NewsletterBundle\Entity\Newsletter;
 
 class WDNewsletterBundleExtension extends Extension
 {
+    /**
+     * @throws Exception
+     */
     public function load(array $configs, ContainerBuilder $container)
     {
         $configuration = new Configuration();
@@ -37,7 +41,6 @@ class WDNewsletterBundleExtension extends Extension
         $container->setParameter('wd_newsletter.mailer', $config['mailer']);
         $container->setParameter('wd_newsletter.models', $config['models']);
         $container->setParameter('wd_newsletter.routes', $config['routes']);
-        $container->setParameter('wd_newsletter.roles', $config['roles']);
         $container->setParameter('wd_newsletter.noreply', $config['noreply']);
         $container->setParameter('wd_newsletter.locales', $config['locales']);
         $container->setParameter('wd_newsletter.admin.config.class.content', NewsletterContentAdmin::class);
@@ -51,7 +54,7 @@ class WDNewsletterBundleExtension extends Extension
 
     }
 
-    public function getAlias()
+    public function getAlias(): string
     {
         return 'wd-newsletter';
     }

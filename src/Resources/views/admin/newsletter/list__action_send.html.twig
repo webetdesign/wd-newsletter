@@ -1,16 +1,21 @@
 {% if not object.isSent  %}
     {% set total = count_users(object) %}
-    <a
-        href="{{ admin.generateObjectUrl('send', object, actions.link_parameters|default([])) }}"
-        class="btn btn-sm btn-default"
-        title="{{ 'action_edit'|trans({}, 'SonataAdminBundle') }}"
-        data-id="{{ object.id }}"
-        data-total="{{ total }}"
-        id="send-{{ object.id }}"
-    >
-        <i class="fa fa-send" aria-hidden="true"></i>
-        Envoyer ({{total}})
-    </a>
+    {% if total > 0 %}
+        <a
+                href="{{ admin.generateObjectUrl('send', object, actions.link_parameters|default([])) }}"
+                class="btn btn-sm btn-default"
+                title="{{ 'action_edit'|trans({}, 'SonataAdminBundle') }}"
+                data-id="{{ object.id }}"
+                data-total="{{ total }}"
+                id="send-{{ object.id }}"
+        >
+            <i class="fa fa-send" aria-hidden="true"></i>
+            Envoyer ({{total}})
+        </a>
+    {% else %}
+        <button class="btn btn-sm btn-default disabled" disabled><i class="fa fa-send" aria-hidden="true"></i> Aucun destinataire</button>
+    {% endif %}
+
     <script type="text/javascript">
         var confirmIt = function showloader(e) {
             if (confirm('Êtes vous sûr de vouloir envoyer cette newsletter à ' + e.target.dataset.total + ' email(s) ? ')) {

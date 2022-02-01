@@ -6,17 +6,9 @@ use Symfony\Component\Form\DataTransformerInterface;
 
 class ContentCollectionTransformer implements DataTransformerInterface
 {
+    private ?string $class;
 
-    /**
-     * @var EntityManagerInterface
-     */
-    private $em;
-    private $class;
-
-    public function __construct(EntityManagerInterface $em)
-    {
-        $this->em = $em;
-    }
+    public function __construct(private EntityManagerInterface $em) {}
 
     public function transform($value): string
     {
@@ -39,20 +31,16 @@ class ContentCollectionTransformer implements DataTransformerInterface
         return $value;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getClass()
+    public function getClass(): ?string
     {
         return $this->class;
     }
 
-    /**
-     * @param mixed $class
-     */
-    public function setClass($class): void
+    public function setClass($class): self
     {
         $this->class = $class;
+
+        return $this;
     }
 
 }

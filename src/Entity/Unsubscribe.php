@@ -4,8 +4,8 @@ namespace WebEtDesign\NewsletterBundle\Entity;
 
 use DateTime;
 use Doctrine\ORM\Mapping as ORM;
-use Gedmo\Mapping\Annotation as Gedmo;
 use Gedmo\Mapping\Annotation\Timestampable;
+use JetBrains\PhpStorm\Pure;
 
 /**
  * @ORM\Entity()
@@ -19,24 +19,23 @@ class Unsubscribe
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
      */
-    private $id;
+    private ?int $id;
 
     /**
      * @ORM\Column(type="text")
      */
-    private $email;
+    private ?string $email;
 
     /**
      * @var null|DateTime
      * @ORM\Column(type="datetime", nullable=true)
      * @Timestampable(on="create", field="createdAt")
      */
-    protected $createdAt;
+    protected ?DateTime $createdAt;
 
-
-    public function __toString()
+    #[Pure] public function __toString()
     {
-        return $this->getEmail();
+        return $this->getEmail() ?? '';
     }
 
 
@@ -58,25 +57,14 @@ class Unsubscribe
         return $this;
     }
 
-    /**
-     * Sets createdAt.
-     *
-     * @param DateTime|null $createdAt
-     * @return $this
-     */
-    public function setCreatedAt(?DateTime $createdAt)
+    public function setCreatedAt(?DateTime $createdAt): self
     {
         $this->createdAt = $createdAt;
 
         return $this;
     }
 
-    /**
-     * Returns createdAt.
-     *
-     * @return DateTime|null
-     */
-    public function getCreatedAt()
+    public function getCreatedAt(): ?DateTime
     {
         return $this->createdAt;
     }

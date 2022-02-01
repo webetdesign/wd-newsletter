@@ -8,18 +8,15 @@
 
 namespace WebEtDesign\NewsletterBundle\DependencyInjection;
 
-
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
-use Symfony\Component\HttpFoundation\Request;
-use WebEtDesign\CmsBundle\Entity\CmsGlobalVarsDelimiterEnum;
 
 class Configuration implements ConfigurationInterface
 {
-    public function getConfigTreeBuilder()
+    public function getConfigTreeBuilder(): TreeBuilder
     {
-        $treeBuilder = new TreeBuilder();
-        $rootNode = $treeBuilder->root('wd-newsletter');
+        $treeBuilder = new TreeBuilder('wd-newsletter');
+        $rootNode = $treeBuilder->getRootNode();
 
         $rootNode
             ->children()
@@ -45,14 +42,6 @@ class Configuration implements ConfigurationInterface
                 ->arrayNode('routes')->addDefaultsIfNotSet()
                     ->children()
                         ->scalarNode('home')->defaultValue('index')->end()
-                    ->end()
-                ->end()
-                ->arrayNode('roles')
-                    ->arrayPrototype()
-                        ->children()
-                            ->scalarNode('name')->isRequired()->cannotBeEmpty()->end()
-                            ->scalarNode('value')->isRequired()->cannotBeEmpty()->end()
-                        ->end()
                     ->end()
                 ->end()
                 ->scalarNode('noreply')->defaultNull()->end()

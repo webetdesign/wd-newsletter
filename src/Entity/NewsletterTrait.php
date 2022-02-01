@@ -4,13 +4,12 @@
 namespace WebEtDesign\NewsletterBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
-
 trait NewsletterTrait
 {
     /**
      * @ORM\Column(type="text", nullable=true)
      */
-    private $newsletterToken;
+    private ?string $newsletterToken;
 
     public function getNewsletterToken(): ?string
     {

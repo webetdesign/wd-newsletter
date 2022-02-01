@@ -3,11 +3,13 @@
 namespace WebEtDesign\NewsletterBundle\Twig;
 
 use Doctrine\ORM\EntityManagerInterface;
-use Sonata\MediaBundle\Provider\ImageProvider;
+use Exception;
+use Liip\ImagineBundle\Exception\Config\Filter\NotFoundException;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
+use WebEtDesign\MediaBundle\Services\WDMediaService;
 use WebEtDesign\NewsletterBundle\Entity\Content;
 use WebEtDesign\NewsletterBundle\Entity\Newsletter;
 use WebEtDesign\NewsletterBundle\Entity\NewsletterContentTypeEnum;
@@ -16,44 +18,17 @@ use WebEtDesign\NewsletterBundle\Services\ModelProvider;
 
 class NewsletterTwigExtension extends AbstractExtension
 {
-    /**
-     * @var ContainerInterface
-     */
-    private $container;
-    /**
-     * @var RequestStack
-     */
-    private $requestStack;
+    private ModelProvider $modelProvider;
 
-    /** @var EmailService $emailService */
-    private $emailService;
-
-    /** @var ModelProvider $modelProvider */
-    private $modelProvider;
-    /**
-     * @var EntityManagerInterface
-     */
-    private $em;
-
-    /**
-     * NewsletterTwigExtension constructor.
-     * @param EmailService $emailService
-     * @param ContainerInterface $container
-     * @param RequestStack $requestStack
-     */
     public function __construct(
-        EmailService $emailService,
-        ContainerInterface $container,
-        RequestStack $requestStack,
-        EntityManagerInterface $em
+        private EmailService $emailService,
+        private ContainerInterface $container,
+        private RequestStack $requestStack,
+        private EntityManagerInterface $em,
+        private WDMediaService $mediaService
     )
     {
-        $this->container = $container;
-        $this->requestStack = $requestStack;
-        $this->emailService = $emailService;
-        // pb injection
         $this->modelProvider = new ModelProvider($this->container->getParameter('wd_newsletter.models'));
-        $this->em = $em;
     }
 
     public function getFunctions(): array
@@ -74,9 +49,9 @@ class NewsletterTwigExtension extends AbstractExtension
         ];
     }
 
-    public function renderContent($object, $content_code, $locale = 'fr'){
+    public function renderContent($object, $content_code, $locale = 'fr'): array|string|null
+    {
         if ($object instanceof Newsletter){
-            /** @var Content|null $content */
             $content = $object->getContent($content_code);
             if (!$content){
                 return null;
@@ -115,7 +90,8 @@ class NewsletterTwigExtension extends AbstractExtension
         return null;
     }
 
-    public function renderMedia($object, $content_code, $format){
+    public function renderMedia($object, $content_code): ?string
+    {
         if ($object instanceof Newsletter){
             /** @var Content|null $content */
             $content = $object->getContent($content_code);
@@ -123,15 +99,14 @@ class NewsletterTwigExtension extends AbstractExtension
                 return null;
             }
 
-            /** @var ImageProvider $provider */
-            $provider = $this->container->get($content->getMedia()->getProviderName());
-            return $this->requestStack->getCurrentRequest()->getSchemeAndHttpHost() . $provider->generatePublicUrl($content->getMedia(), $provider->getFormatName($content->getMedia(), $format));
+            return $this->requestStack->getCurrentRequest()->getSchemeAndHttpHost() . $this->mediaService->getMediaPath($content->getMedia());
         }
 
         return null;
     }
 
-    public function countUsers($object){
+    public function countUsers($object): int
+    {
         $total = 0;
 
         if ($object instanceof Newsletter){
@@ -149,11 +124,15 @@ class NewsletterTwigExtension extends AbstractExtension
         return isset($models[$model]) ? $models[$model]['name'] : $model;
     }
 
+    /**
+     * @throws Exception
+     */
     public function getTemplate($model){
         return $this->modelProvider->getTemplate($model);
     }
 
-    public function getLocales(){
+    public function getLocales(): array
+    {
         return $this->container->getParameter('wd_newsletter.locales');
     }
 

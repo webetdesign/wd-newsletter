@@ -3,6 +3,8 @@
 namespace WebEtDesign\NewsletterBundle\Entity;
 
 use App\Entity\Group;
+use DateTime;
+use JetBrains\PhpStorm\Pure;
 use WebEtDesign\NewsletterBundle\Repository\NewsletterRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -19,65 +21,64 @@ class Newsletter
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
      */
-    private $id;
+    private ?int $id;
 
     /**
      * @ORM\Column(type="text")
      */
-    private $title;
+    private ?string $title;
 
     /**
      * @ORM\Column(type="text")
      */
-    private $model;
+    private ?string $model = '';
 
     /**
      * @ORM\Column(type="text")
      */
-    private $sender;
+    private ?string $sender = '';
 
     /**
      * @ORM\Column(type="text")
      */
-    private $email;
+    private ?string $email = '';
 
     /**
      * @ORM\OneToMany(targetEntity=Content::class, mappedBy="newsletter", orphanRemoval=true, cascade={"persist", "remove"})
      */
-    private $contents;
+    private Collection $contents;
 
     /**
-     * @var string|null $emailsMore
      * @ORM\Column(type="text", nullable=true)
      */
-    private $emailsMore;
+    private ?string $emailsMore;
 
     /**
-     * @ORM\ManyToMany(targetEntity=App\Entity\Group::class)
+     * @ORM\ManyToMany(targetEntity=Group::class)
      */
-    private $groups;
-
-    /**
-     * @ORM\Column(type="boolean", nullable=true)
-     */
-    private $isSent = false;
+    private Collection $groups;
 
     /**
      * @ORM\Column(type="boolean", nullable=true)
      */
-    private $sendInAllLocales = false;
+    private bool $isSent = false;
+
+    /**
+     * @ORM\Column(type="boolean", nullable=true)
+     */
+    private bool $sendInAllLocales = false;
 
     /**
      * @ORM\Column(type="datetime", nullable=true)
      */
-    protected $sendedAt;
+    protected mixed $sentAt;
 
-    public function __toString()
+    #[Pure] public function __toString()
     {
-        return $this->getTitle();
+        return $this->getTitle() ?? '';
     }
 
-    public function __construct()
+    #[Pure] public function __construct()
     {
         $this->contents = new ArrayCollection();
         $this->groups = new ArrayCollection();
@@ -136,9 +137,6 @@ class Newsletter
         return $this;
     }
 
-    /**
-     * @return Collection|Content[]
-     */
     public function getContents(): Collection
     {
         return $this->contents;
@@ -167,7 +165,8 @@ class Newsletter
         return $this;
     }
 
-    public function getContent($code){
+    public function getContent($code): ?Content
+    {
         foreach ($this->contents as $content) {
             if ($content->getCode() === $code){
                 return $content;
@@ -177,19 +176,11 @@ class Newsletter
         return null;
     }
 
-
-    /**
-     * @return string|null
-     */
     public function getEmailsMore(): ?string
     {
         return $this->emailsMore;
     }
 
-    /**
-     * @param string|null $emailsMore
-     * @return Newsletter
-     */
     public function setEmailsMore(?string $emailsMore): self
     {
         $this->emailsMore = $emailsMore;
@@ -197,8 +188,8 @@ class Newsletter
         return $this;
     }
 
-    public function getEmailsMoreArray(){
-
+    public function getEmailsMoreArray(): array
+    {
         $more = ['fr' => []];
         $cpt = 0;
 
@@ -214,14 +205,10 @@ class Newsletter
         return $cpt != 0 ? $more : [];
     }
 
-    /**
-     * @return ArrayCollection
-     */
-    public function getGroups()
+    public function getGroups(): Collection
     {
         return $this->groups;
     }
-
 
     public function addGroup(Group $group): self
     {
@@ -241,55 +228,36 @@ class Newsletter
         return $this;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getIsSent()
+    public function getIsSent(): bool
     {
         return $this->isSent;
     }
 
-    /**
-     * @param mixed $isSent
-     * @return Newsletter
-     */
-    public function setIsSent($isSent): self
+    public function setIsSent(bool $isSent): self
     {
         $this->isSent = $isSent;
         return $this;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getSendedAt()
+    public function getSentAt(): ?DateTime
     {
-        return $this->sendedAt;
+        return $this->sentAt;
     }
 
-    /**
-     * @param mixed $sendedAt
-     */
-    public function setSendedAt($sendedAt): void
+    public function setSentAt($sentAt): void
     {
-        $this->sendedAt = $sendedAt;
+        $this->sentAt = $sentAt;
     }
 
-    public function sendedAtFormated(){
-        return $this->sendedAt ? $this->sendedAt->format('d/m/Y H:i:s') : null;
+    public function sentAtFormatted(){
+        return $this->sentAt?->format('d/m/Y H:i:s');
     }
 
-    /**
-     * @return bool
-     */
     public function isSendInAllLocales(): bool
     {
         return $this->sendInAllLocales !== null ? $this->sendInAllLocales : false;
     }
 
-    /**
-     * @param bool $sendInAllLocales
-     */
     public function setSendInAllLocales(bool $sendInAllLocales): void
     {
         $this->sendInAllLocales = $sendInAllLocales;

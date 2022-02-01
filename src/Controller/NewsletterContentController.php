@@ -11,15 +11,7 @@ use WebEtDesign\NewsletterBundle\Repository\ContentCollectionRepositoryInterface
 
 class NewsletterContentController extends AbstractController
 {
-    /**
-     * @var EntityManagerInterface
-     */
-    private $em;
-
-    public function __construct(EntityManagerInterface $em)
-    {
-        $this->em = $em;
-    }
+    public function __construct(private EntityManagerInterface $em){}
 
     /**
      * @Route(path="/admin/newsletter/content/collection", name="newsletter_content_collection")
@@ -41,5 +33,4 @@ class NewsletterContentController extends AbstractController
             'results' => $results
         ]);
     }
-
 }

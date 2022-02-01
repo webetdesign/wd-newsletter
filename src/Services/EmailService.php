@@ -5,10 +5,11 @@ namespace WebEtDesign\NewsletterBundle\Services;
 
 use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\QueryBuilder;
 use Exception;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
+use Swift_Mailer;
+use Swift_Message;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Templating\EngineInterface;
@@ -17,73 +18,23 @@ use WebEtDesign\NewsletterBundle\Entity\Unsubscribe;
 
 class EmailService
 {
-    /**
-     * @var \Swift_Mailer
-     */
-    private $mailer;
-    /**
-     * @var EngineInterface
-     */
-    private $templating;
-    /**
-     * @var ModelProvider
-     */
-    private $modelProvider;
-    /**
-     * @var string
-     */
-    private $from;
 
-    /** @var EntityManagerInterface $em */
-    private $em;
-    /**
-     * @var RouterInterface
-     */
-    private $router;
-    /**
-     * @var array
-     */
-    private $locales;
-    /**
-     * @var string
-     */
-    private $rootDir;
-
-    /**
-     * EmailService constructor.
-     * @param \Swift_Mailer $mailer
-     * @param EngineInterface $templating
-     * @param ModelProvider $modelProvider
-     * @param EntityManagerInterface $em
-     * @param null|string $from
-     * @param RouterInterface $router
-     * @param array $locales
-     * @param string $rootDir
-     */
     public function __construct(
-        \Swift_Mailer $mailer,
-        EngineInterface $templating,
-        ModelProvider $modelProvider,
-        EntityManagerInterface $em,
-        ?string $from,
-        RouterInterface $router,
-        array $locales,
-        string $rootDir
+        private Swift_Mailer $mailer,
+        private EngineInterface $templating,
+        private ModelProvider $modelProvider,
+        private EntityManagerInterface $em,
+        private ?string $from,
+        private RouterInterface $router,
+        private array $locales,
+        private string $rootDir
 
-    ) {
-        $this->mailer       = $mailer;
-        $this->templating = $templating;
-        $this->modelProvider = $modelProvider;
-        $this->from = $from;
-        $this->em = $em;
-        $this->router = $router;
-        $this->locales = $locales;
-        $this->rootDir = $rootDir;
-    }
+    ) {}
 
     /**
      * @param Newsletter $newsletter
      * @param $email_list
+     * @param FlashBagInterface|null $flashBag
      * @return int
      * @throws Exception
      */
@@ -99,8 +50,8 @@ class EmailService
                     $log->info('Mail to ' . $email . ' created');
                     $link = $token ? $this->router->generate('newsletter_unsub', ['token' => $token], $this->router::ABSOLUTE_URL) : $this->router->generate('newsletter_unsub_auto', [], $this->router::ABSOLUTE_URL) ;
 
-                    $message = (new \Swift_Message($newsletter->getTitle()))
-                        ->setFrom([$this->from ? $this->from : $newsletter->getEmail() => $newsletter->getSender()])
+                    $message = (new Swift_Message($newsletter->getTitle()))
+                        ->setFrom([$this->from ?: $newsletter->getEmail() => $newsletter->getSender()])
                         ->setTo($email)
                         ->setReplyTo($newsletter->getEmail())
                         ->setBody(
@@ -121,9 +72,7 @@ class EmailService
                     $res = $this->mailer->send($message);
                 }catch (Exception $e){
                     $log->error('Mail to ' . $email . ' error');
-                    if ($flashBag){
-                        $flashBag->add('error', "Le mail à l'adresse " . $email . " n'a pas été envoyé suite à une erreur. (" . $e->getMessage() . ')');
-                    }
+                    $flashBag?->add('error', "Le mail à l'adresse " . $email . " n'a pas été envoyé suite à une erreur. (" . $e->getMessage() . ')');
                     $res = -1;
                 }
            }
@@ -132,8 +81,9 @@ class EmailService
         return $res;
     }
 
-    public function getEmails(Newsletter $newsletter){
-        $unsubcribe = array_map(function(Unsubscribe $a){
+    public function getEmails(Newsletter $newsletter): array
+    {
+        $unsubscribe = array_map(function(Unsubscribe $a){
             return $a->getEmail();
         }, $this->em->getRepository(Unsubscribe::class)->findAll());
 
@@ -141,7 +91,6 @@ class EmailService
 
 
         if ($newsletter->getGroups()->count() > 0){
-            /** @var QueryBuilder $qb */
             $qb = $this->em->getRepository(User::class)->createQueryBuilder('u');
 
             $or = '(';
@@ -157,11 +106,11 @@ class EmailService
                 $qb->andWhere($or);
             }
 
-            if (!empty($unsubcribe)){
+            if (!empty($unsubscribe)){
                 $qb->andWhere(
                     $qb->expr()->notIn('u.email', ':unsub')
                 )
-                    ->setParameter('unsub', $unsubcribe);
+                    ->setParameter('unsub', $unsubscribe);
             }
 
             $users = $qb->getQuery()->getResult();
@@ -182,7 +131,7 @@ class EmailService
         if (!empty($more)){
 
             foreach ($more['fr'] as $key => $item) {
-                if (in_array($item, $unsubcribe)){
+                if (in_array($item, $unsubscribe)){
                     unset($more['fr'][$key]);
                 }
             }
@@ -190,15 +139,16 @@ class EmailService
 
         $emails = array_merge_recursive($emails, $more);
         foreach ($emails as $locale => $email) {
-            $emails[$locale] = array_unique($emails[$locale]);
+            $emails[$locale] = array_unique($email);
         }
 
         return $emails;
     }
 
-    public function countEmails($email_list){
+    public function countEmails($email_list): int
+    {
         $total = 0;
-        foreach ($email_list as $locale => $emails) {
+        foreach ($email_list as $emails) {
             $total += empty($emails) ? 0 : count($emails);
         }
         return $total;

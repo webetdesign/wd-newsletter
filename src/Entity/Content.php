@@ -2,7 +2,6 @@
 
 namespace WebEtDesign\NewsletterBundle\Entity;
 
-use App\Entity\Common\CallTranslations;
 use WebEtDesign\MediaBundle\Entity\Media;
 use Knp\DoctrineBehaviors\Contract\Entity\TranslatableInterface;
 use Knp\DoctrineBehaviors\Model\Translatable\TranslatableTrait;
@@ -23,77 +22,68 @@ class Content implements TranslatableInterface
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
      */
-    private $id;
+    private ?int $id;
 
     /**
      * @ORM\ManyToOne(targetEntity=Newsletter::class, inversedBy="contents")
      * @ORM\JoinColumn(nullable=false)
      */
-    private $newsletter;
+    private ?Newsletter $newsletter;
 
     /**
      * @ORM\Column(type="text")
      */
-    private $type;
+    private ?string $type = '';
 
     /**
      * @ORM\Column(type="text", nullable=true)
      */
-    private $label;
-
+    private ?string $label = '';
 
     /**
      * @ORM\Column(type="text")
      */
-    private $code;
+    private ?string $code = '';
 
     /**
-     * @var string|null $help
      * @ORM\Column(type="text", nullable=true)
      */
-    private $help;
+    private ?string $help;
 
     /**
      * @ORM\ManyToOne(targetEntity=Media::class)
      */
-    private $media;
+    private ?Media $media;
 
     /**
      * @ORM\Column(type="text", nullable=true)
      */
-    private $canTranslate;
+    private ?string $canTranslate;
 
-
-    public function getMedia()
+    public function getMedia(): ?Media
     {
         return $this->media;
     }
 
-    public function setMedia($media): self
+    public function setMedia(?Media $media): self
     {
         $this->media = $media;
 
         return $this;
     }
 
-
-    /**
-     * @return string|null
-     */
     public function getHelp(): ?string
     {
         return $this->help;
     }
 
-    /**
-     * @param string|null $help
-     */
     public function setHelp(?string $help): self
     {
         $this->help = $help;
 
         return $this;
     }
+
     public function __call($method, $arguments)
     {
         if ($method == '_action') {
@@ -132,7 +122,6 @@ class Content implements TranslatableInterface
         return $this;
     }
 
-
     public function getLabel(): ?string
     {
         return $this->label;
@@ -157,19 +146,12 @@ class Content implements TranslatableInterface
         return $this;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getCanTranslate()
+    public function getCanTranslate(): ?string
     {
         return $this->canTranslate;
     }
 
-    /**
-     * @param mixed $canTranslate
-     * @return Content
-     */
-    public function setCanTranslate($canTranslate): self
+    public function setCanTranslate(?string $canTranslate): self
     {
         $this->canTranslate = $canTranslate;
 

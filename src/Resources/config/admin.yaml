@@ -5,7 +5,7 @@ services:
       - ~
       - WebEtDesign\NewsletterBundle\Entity\Content
       - ~
-      - '@doctrine.orm.default_entity_manager'
+      - '@security.token_storage'
       - '%wd_newsletter.entity.media%'
       - '@newsletter.newsletter_provider'
       - '%wd_newsletter.locales%'
@@ -31,8 +31,7 @@ services:
       - ~
       - '%wd_newsletter.entity.newsletter%'
       - WebEtDesign\NewsletterBundle\Controller\Admin\NewsletterAdminController
-      - '@doctrine.orm.default_entity_manager'
-      - '@newsletter.role_provider'
+      - '@security.token_storage'
     tags:
       - { name: sonata.admin, manager_type: orm, group: newsletter, label: Newsletter }
     public: true

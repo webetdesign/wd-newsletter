@@ -8,18 +8,10 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use WebEtDesign\NewsletterBundle\Form\Transformer\ContentCollectionTransformer;
 use Symfony\Component\Form\AbstractType;
 
-/**
- * Class NewsletterContentDocumentType
- *
- */
 class NewsletterContentCollectionType extends AbstractType
 {
-    private $transformer;
-
-    public function __construct(ContentCollectionTransformer $transformer)
-    {
-        $this->transformer = $transformer;
-    }
+    public function __construct(private ContentCollectionTransformer $transformer)
+    {}
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {

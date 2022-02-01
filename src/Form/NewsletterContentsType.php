@@ -3,7 +3,6 @@
 
 namespace WebEtDesign\NewsletterBundle\Form;
 
-
 use Sonata\Form\EventListener\ResizeFormListener;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -11,7 +10,6 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use WebEtDesign\CmsBundle\Form\SonataCollectionType;
-
 
 class NewsletterContentsType extends SonataCollectionType
 {
@@ -45,7 +43,7 @@ class NewsletterContentsType extends SonataCollectionType
         ]);
     }
 
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'newsletter_contents';
     }

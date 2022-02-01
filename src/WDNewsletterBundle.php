@@ -2,6 +2,7 @@
 
 namespace WebEtDesign\NewsletterBundle;
 
+use JetBrains\PhpStorm\Pure;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 use WebEtDesign\NewsletterBundle\DependencyInjection\WDNewsletterBundleExtension;
 
@@ -11,7 +12,7 @@ use WebEtDesign\NewsletterBundle\DependencyInjection\WDNewsletterBundleExtension
  */
 class WDNewsletterBundle extends Bundle
 {
-    public function getContainerExtension()
+    #[Pure] public function getContainerExtension(): WDNewsletterBundleExtension
     {
         return new WDNewsletterBundleExtension();
     }

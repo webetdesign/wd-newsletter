@@ -7,18 +7,9 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-/**
- * Class TemplateType
- *
- */
 class NewsletterModelType extends AbstractType
 {
-    private $provider;
-
-    public function __construct(ModelProvider $provider)
-    {
-        $this->provider = $provider;
-    }
+    public function __construct(private ModelProvider $provider) {}
 
     public function configureOptions(OptionsResolver $resolver)
     {
@@ -30,14 +21,11 @@ class NewsletterModelType extends AbstractType
         );
     }
 
-    public function getParent()
+    public function getParent(): string
     {
         return ChoiceType::class;
     }
 
-    /**
-     * @return ModelProvider
-     */
     public function getProvider(): ModelProvider
     {
         return $this->provider;

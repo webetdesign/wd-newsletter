@@ -1,13 +1,6 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: Clement
- * Date: 18/01/2019
- * Time: 10:47
- */
 
 namespace WebEtDesign\NewsletterBundle\Entity;
-
 
 class NewsletterContentTypeEnum
 {
@@ -20,7 +13,7 @@ class NewsletterContentTypeEnum
     const ACTUALITIES             = "ACTUALITIES";
 
     /** @var array user friendly named type */
-    protected static $typeName = [
+    protected static array $typeName = [
         self::TEXT                    => 'Text',
         self::TEXTAREA                => 'Textarea',
         self::WYSYWYG                 => 'WYSYWYG',
@@ -30,10 +23,6 @@ class NewsletterContentTypeEnum
         self::ACTUALITIES             => 'Actualités',
     ];
 
-    /**
-     * @param string $typeShortName
-     * @return string
-     */
     public static function getName(string $typeShortName): string
     {
         if (!isset(static::$typeName[$typeShortName])) {
@@ -43,9 +32,6 @@ class NewsletterContentTypeEnum
         return static::$typeName[$typeShortName];
     }
 
-    /**
-     * @return array<string>
-     */
     public static function getAvailableTypes(): array
     {
         return [

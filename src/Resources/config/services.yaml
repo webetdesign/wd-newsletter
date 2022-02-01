@@ -4,11 +4,6 @@ services:
     public: true
     arguments: ['%wd_newsletter.models%']
 
-  newsletter.role_provider:
-    class: WebEtDesign\NewsletterBundle\Services\RoleProvider
-    public: true
-    arguments: ['%wd_newsletter.roles%']
-
   WebEtDesign\NewsletterBundle\:
     resource: '../../*'
     exclude: '../../{DependencyInjection,Entity,Admin}'

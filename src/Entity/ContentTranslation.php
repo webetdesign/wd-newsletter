@@ -4,7 +4,6 @@ namespace WebEtDesign\NewsletterBundle\Entity;
 
 use Knp\DoctrineBehaviors\Contract\Entity\TranslationInterface;
 use Knp\DoctrineBehaviors\Model\Translatable\TranslationTrait;
-use Symfony\Component\PropertyAccess\PropertyAccess;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -20,12 +19,12 @@ class ContentTranslation implements TranslationInterface
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
      */
-    private $id;
+    private ?int $id;
 
     /**
      * @ORM\Column(type="text", nullable=true)
      */
-    private $value;
+    private ?string $value;
 
     public function getId(): ?int
     {
@@ -43,9 +42,5 @@ class ContentTranslation implements TranslationInterface
 
         return $this;
     }
-
-
-
-
 
 }
