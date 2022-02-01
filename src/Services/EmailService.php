@@ -122,7 +122,7 @@ class EmailService
                 }catch (Exception $e){
                     $log->error('Mail to ' . $email . ' error');
                     if ($flashBag){
-                        $flashBag->add('error', "Le mail à l'adresse " . $email . "n'a pas été envoyé suite à une erreur. (" . $e->getMessage() . ')');
+                        $flashBag->add('error', "Le mail à l'adresse " . $email . " n'a pas été envoyé suite à une erreur. (" . $e->getMessage() . ')');
                     }
                     $res = -1;
                 }

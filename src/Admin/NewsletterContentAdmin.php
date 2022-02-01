@@ -3,8 +3,6 @@
 namespace WebEtDesign\NewsletterBundle\Admin;
 
 use A2lix\TranslationFormBundle\Form\Type\TranslationsType;
-use App\Entity\Document;
-use App\Entity\Media;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Mapping as ORM;
@@ -126,7 +124,7 @@ final class NewsletterContentAdmin extends AbstractAdmin
                         'media',
                         ModelListType::class,
                         [
-                            'class'         => Media::class,
+                            'class'         => $this->media_class,
                             'required'      => false,
                             'model_manager' => $admin->getModelManager(),
                         ],

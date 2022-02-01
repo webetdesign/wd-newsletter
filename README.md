@@ -81,23 +81,21 @@ fos_ck_editor:
   default_config: default
   configs:
     newsletter:
-        toolbar:
-          <<: *default_toolbar
-        allowedContent: true
-        filebrowserUploadMethod: form
-        filebrowserBrowseRoute: admin_app_media_ckeditor_browser
-        filebrowserImageBrowseRoute: admin_app_media_ckeditor_browser
-        # Display images by default when clicking the image dialog browse button
-        filebrowserImageBrowseRouteParameters:
-          provider: sonata.media.provider.image
-          context: cms_page
-        # Upload file as image when sending a file from the image dialog
-        filebrowserImageUploadRoute: admin_app_media_ckeditor_upload
-        filebrowserBrowseRouteType: 0
-        filebrowserImageUploadRouteParameters:
-          provider: sonata.media.provider.image
-          context: cms_page # Optional, to upload in a custom context
-          format: big # Optional, media format or original size returned to editor
+      toolbar:
+        - [ Bold, Italic, Underline, -, Cut, Copy, Paste, PasteText, PasteFromWord, -, Undo, Redo, -, BackgroundColor, TextColor, -, NumberedList, BulletedList, -, Outdent, Indent, -, JustifyLeft, JustifyCenter, JustifyRight, JustifyBlock, -, Blockquote, -, Image, Link, Unlink, Table ]
+        - [ Format, Maximize, Source ]
+      allowedContent: true
+      filebrowserUploadMethod: form
+      filebrowserBrowseRoute: admin_webetdesign_media_media_ckeditor_browser
+      filebrowserImageBrowseRoute: admin_webetdesign_media_media_ckeditor_browser
+      # Display images by default when clicking the image dialog browse button
+      filebrowserImageBrowseRouteParameters:
+        category: default_cms
+      # Upload file as image when sending a file from the image dialog
+      filebrowserImageUploadRoute: admin_webetdesign_media_media_ckeditor_upload
+      extraPlugins: "collapsibleItem,accordionList"
+      filebrowserImageUploadRouteParameters:
+        category: default_cms
 ```
 
 7° add sonata_media config

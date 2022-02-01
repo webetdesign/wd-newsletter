@@ -2,7 +2,6 @@
 
 namespace WebEtDesign\NewsletterBundle\Entity;
 
-use App\Entity\Media;
 use Knp\DoctrineBehaviors\Contract\Entity\TranslationInterface;
 use Knp\DoctrineBehaviors\Model\Translatable\TranslationTrait;
 use Symfony\Component\PropertyAccess\PropertyAccess;

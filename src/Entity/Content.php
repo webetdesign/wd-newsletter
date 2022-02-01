@@ -3,7 +3,7 @@
 namespace WebEtDesign\NewsletterBundle\Entity;
 
 use App\Entity\Common\CallTranslations;
-use App\Entity\Media;
+use WebEtDesign\MediaBundle\Entity\Media;
 use Knp\DoctrineBehaviors\Contract\Entity\TranslatableInterface;
 use Knp\DoctrineBehaviors\Model\Translatable\TranslatableTrait;
 use Symfony\Component\PropertyAccess\PropertyAccess;
@@ -64,12 +64,12 @@ class Content implements TranslatableInterface
     private $canTranslate;
 
 
-    public function getMedia(): ?Media
+    public function getMedia()
     {
         return $this->media;
     }
 
-    public function setMedia(?Media $media): self
+    public function setMedia($media): self
     {
         $this->media = $media;
 
