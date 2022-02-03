@@ -13,8 +13,10 @@ use Swift_Message;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Templating\EngineInterface;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use WebEtDesign\NewsletterBundle\Entity\Newsletter;
 use WebEtDesign\NewsletterBundle\Entity\Unsubscribe;
+use WebEtDesign\NewsletterBundle\Event\MailSentEvent;
 
 class EmailService
 {
@@ -24,6 +26,7 @@ class EmailService
         private EngineInterface $templating,
         private ModelProvider $modelProvider,
         private EntityManagerInterface $em,
+        private EventDispatcherInterface $eventDispatcher,
         private ?string $from,
         private RouterInterface $router,
         private array $locales,
@@ -70,6 +73,7 @@ class EmailService
                         );
 
                     $res = $this->mailer->send($message);
+                    $event = $this->eventDispatcher->dispatch(new MailSentEvent($message), MailSentEvent::NAME);
                 }catch (Exception $e){
                     $log->error('Mail to ' . $email . ' error');
                     $flashBag?->add('error', "Le mail à l'adresse " . $email . " n'a pas été envoyé suite à une erreur. (" . $e->getMessage() . ')');

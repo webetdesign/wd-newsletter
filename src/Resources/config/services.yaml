@@ -60,6 +60,7 @@ services:
       - '@templating'
       - '@newsletter.newsletter_provider'
       - '@doctrine.orm.default_entity_manager'
+      - '@event_dispatcher'
       - '%wd_newsletter.noreply%'
       - '@router'
       - '%wd_newsletter.locales%'
