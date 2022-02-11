@@ -6,7 +6,10 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use WebEtDesign\NewsletterBundle\Entity\NewsletterLog;
+use WebEtDesign\NewsletterBundle\Http\TransparentPixelResponse;
 use WebEtDesign\NewsletterBundle\Repository\ContentCollectionRepositoryInterface;
 
 class NewsletterContentController extends AbstractController
@@ -33,4 +36,20 @@ class NewsletterContentController extends AbstractController
             'results' => $results
         ]);
     }
+
+    /**
+     * @Route(path="/email/track/{token}/image.png", name="newsletter_track_opening")
+     */
+    public function trackOpening (?string $token): Response
+    {
+        $newsletterLog = $this->em->getRepository(NewsletterLog::class)->findOneBy(['token' => $token]);
+
+        if ($newsletterLog && !$newsletterLog->getViewed()){
+            $newsletterLog->setViewed(true);
+            $this->em->flush();
+        }
+
+        return new TransparentPixelResponse();
+    }
+
 }

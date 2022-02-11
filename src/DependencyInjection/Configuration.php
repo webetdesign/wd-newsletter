@@ -20,7 +20,8 @@ class Configuration implements ConfigurationInterface
 
         $rootNode
             ->children()
-            ->scalarNode('mailer')->isRequired()->end()
+                ->scalarNode('mailer')->isRequired()->end()
+                ->scalarNode('enable_log')->defaultFalse()->end()
                 ->arrayNode('locales')
                     ->beforeNormalization()
                         ->ifString()

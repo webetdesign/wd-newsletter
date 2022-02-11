@@ -11,6 +11,7 @@ use Monolog\Logger;
 use Swift_Mailer;
 use Swift_Message;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Templating\EngineInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
@@ -30,7 +31,8 @@ class EmailService
         private ?string $from,
         private RouterInterface $router,
         private array $locales,
-        private string $rootDir
+        private string $rootDir,
+        private bool $enableLog
 
     ) {}
 
@@ -47,11 +49,15 @@ class EmailService
         $log->pushHandler(new StreamHandler($this->rootDir . '/var/log/mailer.log', Logger::DEBUG));
 
         $res = -1;
+
         foreach ($email_list as $locale => $emails) {
             foreach ($emails as $token => $email) {
                 try{
                     $log->info('Mail to ' . $email . ' created');
                     $link = $token ? $this->router->generate('newsletter_unsub', ['token' => $token], $this->router::ABSOLUTE_URL) : $this->router->generate('newsletter_unsub_auto', [], $this->router::ABSOLUTE_URL) ;
+
+                    $trackingToken = md5(uniqid('', true));
+                    $tracker = $this->enableLog ? "<img src='" . $this->router->generate('newsletter_track_opening', ['token' => $trackingToken], UrlGeneratorInterface::ABSOLUTE_URL) . "'>" : '';
 
                     $message = (new Swift_Message($newsletter->getTitle()))
                         ->setFrom([$this->from ?: $newsletter->getEmail() => $newsletter->getSender()])
@@ -62,7 +68,7 @@ class EmailService
                                 'object' => $newsletter,
                                 'locale' => $newsletter->isSendInAllLocales() ? $this->locales : [$locale],
                                 'unsub' => $link
-                            ]), 'text/html'
+                            ]) . " " . $tracker, 'text/html'
                         )
                         ->addPart(
                             $this->templating->render($this->modelProvider->getTxt($newsletter->getModel()), [
@@ -73,7 +79,7 @@ class EmailService
                         );
 
                     $res = $this->mailer->send($message);
-                    $event = $this->eventDispatcher->dispatch(new MailSentEvent($message), MailSentEvent::NAME);
+                    $this->eventDispatcher->dispatch(new MailSentEvent($message, $trackingToken, $newsletter->getId()), MailSentEvent::NAME);
                 }catch (Exception $e){
                     $log->error('Mail to ' . $email . ' error');
                     $flashBag?->add('error', "Le mail à l'adresse " . $email . " n'a pas été envoyé suite à une erreur. (" . $e->getMessage() . ')');

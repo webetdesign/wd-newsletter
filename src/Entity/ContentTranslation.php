@@ -24,7 +24,7 @@ class ContentTranslation implements TranslationInterface
     /**
      * @ORM\Column(type="text", nullable=true)
      */
-    private ?string $value;
+    private ?string $value = '';
 
     public function getId(): ?int
     {

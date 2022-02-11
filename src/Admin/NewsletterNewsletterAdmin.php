@@ -24,7 +24,7 @@ class NewsletterNewsletterAdmin extends AbstractAdmin
 {
     protected $datagridValues = [
         '_page'       => 1,
-        '_sort_order' => 'ASC',
+        '_sort_order' => 'DESC',
         '_sort_by'    => 'createdAt',
     ];
 
@@ -98,7 +98,9 @@ class NewsletterNewsletterAdmin extends AbstractAdmin
                     'copy' => [
                         'template' => 'WDNewsletterBundle:admin/newsletter:list__action_copy.html.twig'
                     ],
-                    'delete' => [],
+                    'delete' => [
+                        'template' => 'WDNewsletterBundle:admin/newsletter:list__action_delete.html.twig'
+                    ],
                     'send' => [
                         'template' => 'WDNewsletterBundle:admin/newsletter:list__action_send.html.twig'
                     ],
@@ -202,5 +204,6 @@ class NewsletterNewsletterAdmin extends AbstractAdmin
 
         return $user->hasRole('ROLE_ADMIN_CMS');
     }
+
 
 }

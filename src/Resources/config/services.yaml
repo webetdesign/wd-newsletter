@@ -65,6 +65,7 @@ services:
       - '@router'
       - '%wd_newsletter.locales%'
       - '%kernel.project_dir%'
+      - '%wd_newsletter.enable_log%'
 
   newsletter.content_creator_service:
     class: WebEtDesign\NewsletterBundle\Services\NewsletterContentCreatorService
@@ -77,3 +78,13 @@ services:
     class: WebEtDesign\NewsletterBundle\Form\Transformer\ContentCollectionTransformer
     public: true
     autowire: true
+
+  newsletter.sent_subscriber:
+    class: WebEtDesign\NewsletterBundle\Subscriber\NewsletterSentSubscriber
+    autowire: true
+    public: truc
+    tags:
+      - { name: kernel.event_subscriber }
+    arguments:
+      - '@doctrine.orm.default_entity_manager'
+      - '%wd_newsletter.enable_log%'

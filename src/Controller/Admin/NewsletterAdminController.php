@@ -56,8 +56,8 @@ class NewsletterAdminController extends CRUDController
         if ($res) {
             $this->addFlash('success',
                 'La newsletter va être envoyée');
-            $newsletter->setIsSent(true);
-            $newsletter->setSentAt(new \DateTime('now'));
+//            $newsletter->setIsSent(true);
+//            $newsletter->setSentAt(new \DateTime('now'));
         } else {
             $this->addFlash('error', "La newsletter n'a pas été envoyée");
             $newsletter->setIsSent(false);
