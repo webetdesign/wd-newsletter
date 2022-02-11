@@ -25,27 +25,27 @@ class NewsletterLogRepository extends ServiceEntityRepository
     public function getAnalytics($site_id, $newsletterId)
     {
         try{
-            $total = $this->createQueryBuilder('nl')
+            $total = intval($this->createQueryBuilder('nl')
                 ->select('count(nl.id)')
                 ->andWhere("nl.newsletterId = :id")
                 ->setParameter("id", $newsletterId)
                 ->getQuery()
-                ->getSingleScalarResult();
+                ->getSingleScalarResult());
 
-            $opened = $this->createQueryBuilder('nl')
+            $opened = intval($this->createQueryBuilder('nl')
                 ->select('count(nl.id)')
                 ->andWhere("nl.newsletterId = :id")
                 ->andWhere('(nl.viewed = 1 and nl.clicked = 0)')
                 ->setParameter("id", $newsletterId)
-                ->getQuery()
+                ->getQuery())
                 ->getSingleScalarResult();
 
-            $clicked = $this->createQueryBuilder('nl')
+            $clicked = intval($this->createQueryBuilder('nl')
                 ->select('count(nl.id)')
                 ->andWhere("nl.newsletterId = :id")
                 ->andWhere('(nl.viewed = 1 and nl.clicked = 1)')
                 ->setParameter("id", $newsletterId)
-                ->getQuery()
+                ->getQuery())
                 ->getSingleScalarResult();
 
             if ($total === 0) throw new Exception();
