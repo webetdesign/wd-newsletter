@@ -19,4 +19,14 @@ class NewsletterRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Newsletter::class);
     }
+
+    public function findAvailableAnalytics (){
+        return $this->createQueryBuilder('n')
+            ->andWhere('n.isSent = 1')
+            ->setMaxResults(10)
+            ->orderBy('n.sentAt', 'DESC')
+            ->getQuery()
+            ->getResult();
+    }
+
 }

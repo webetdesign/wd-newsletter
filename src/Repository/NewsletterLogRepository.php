@@ -2,6 +2,9 @@
 
 namespace WebEtDesign\NewsletterBundle\Repository;
 
+use Doctrine\ORM\NonUniqueResultException;
+use Doctrine\ORM\NoResultException;
+use Exception;
 use WebEtDesign\NewsletterBundle\Entity\NewsletterLog;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -19,32 +22,59 @@ class NewsletterLogRepository extends ServiceEntityRepository
         parent::__construct($registry, NewsletterLog::class);
     }
 
-    // /**
-    //  * @return NewsletterLog[] Returns an array of NewsletterLog objects
-    //  */
-    /*
-    public function findByExampleField($value)
+    public function getAnalytics($site_id, $newsletterId)
     {
-        return $this->createQueryBuilder('n')
-            ->andWhere('n.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('n.id', 'ASC')
-            ->setMaxResults(10)
-            ->getQuery()
-            ->getResult()
-        ;
-    }
-    */
+        try{
+            $total = $this->createQueryBuilder('nl')
+                ->select('count(nl.id)')
+                ->andWhere("nl.newsletterId = :id")
+                ->setParameter("id", $newsletterId)
+                ->getQuery()
+                ->getSingleScalarResult();
 
-    /*
-    public function findOneBySomeField($value): ?NewsletterLog
-    {
-        return $this->createQueryBuilder('n')
-            ->andWhere('n.exampleField = :val')
-            ->setParameter('val', $value)
-            ->getQuery()
-            ->getOneOrNullResult()
-        ;
+            $opened = $this->createQueryBuilder('nl')
+                ->select('count(nl.id)')
+                ->andWhere("nl.newsletterId = :id")
+                ->andWhere('(nl.viewed = 1 and nl.clicked = 0)')
+                ->setParameter("id", $newsletterId)
+                ->getQuery()
+                ->getSingleScalarResult();
+
+            $clicked = $this->createQueryBuilder('nl')
+                ->select('count(nl.id)')
+                ->andWhere("nl.newsletterId = :id")
+                ->andWhere('(nl.viewed = 1 and nl.clicked = 1)')
+                ->setParameter("id", $newsletterId)
+                ->getQuery()
+                ->getSingleScalarResult();
+
+            if ($total === 0) throw new Exception();
+
+            return [
+                'labels' => [
+                    ['Non lus', 'fa-2x fa fa-paper-plane'],
+                    ['Ouverts', 'fa-2x fa fa-eye'],
+                    ['Ouverts et cliqués', 'fa-2x fa fa-mouse-pointer']
+                ],
+                "values" => [
+                    $total - $opened - $clicked,
+                    $opened,
+                    $clicked
+                ],
+                'total' => $total,
+                'percents' => [
+                    (($total - $opened - $clicked) / $total) * 100,
+                    (($opened) / $total) * 100,
+                    (($clicked) / $total) * 100
+                ]
+            ];
+        }catch (Exception $exception){
+            return [
+                'labels' => [],
+                "values" => [],
+                'total' => 0,
+                'percent' => []
+            ];
+        }
     }
-    */
 }
