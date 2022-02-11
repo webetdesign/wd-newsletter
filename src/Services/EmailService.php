@@ -105,12 +105,7 @@ class EmailService
 
     public function getEmails(Newsletter $newsletter): array
     {
-        $unsubscribe = array_map(function (Unsubscribe $a) {
-            return $a->getEmail();
-        }, $this->em->getRepository(Unsubscribe::class)->findAll());
-
         $emails = [];
-
 
         if ($newsletter->getGroups()->count() > 0) {
             $qb = $this->em->getRepository(User::class)->createQueryBuilder('u');
@@ -128,12 +123,7 @@ class EmailService
                 $qb->andWhere($or);
             }
 
-            if (!empty($unsubscribe)) {
-                $qb->andWhere(
-                    $qb->expr()->notIn('u.email', ':unsub')
-                )
-                    ->setParameter('unsub', $unsubscribe);
-            }
+            $qb->andWhere("u.newsletter = 1");
 
             $users = $qb->getQuery()->getResult();
 
@@ -150,14 +140,6 @@ class EmailService
         }
 
         $more = $newsletter->getEmailsMoreArray();
-        if (!empty($more)) {
-
-            foreach ($more['fr'] as $key => $item) {
-                if (in_array($item, $unsubscribe)) {
-                    unset($more['fr'][$key]);
-                }
-            }
-        }
 
         $emails = array_merge_recursive($emails, $more);
         foreach ($emails as $locale => $email) {

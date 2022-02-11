@@ -34,35 +34,16 @@ class UnsubController extends AbstractController
      */
     public function token(string $token): RedirectResponse
     {
-        $matches = [];
-        $done = false;
-        preg_match('/([0-9]{1,})(_)([a-zA-Z1-9@\.\-\_]{1,})/', $token, $matches);
+        /** @var User $user */
+        $user = $this->em->getRepository(User::class)->findOneBy([
+            'newsletterToken' => $token
+        ]);
 
-        if (count($matches) === 4 && $matches[0] === $token){
-            $news = $this->em->getRepository(Newsletter::class)->findOneById($matches[1]);
-            $email = $matches[3];
-            if ($email && $news){
-                $this->makeUnsub($email);
-                $done = true;
-            }
+        if ($user) {
+            $this->makeUnsub($user);
         }else{
-            /** @var User $user */
-            $user = $this->em->getRepository(User::class)->findOneBy([
-                'newsletterToken' => $token
-            ]);
-
-            if ($user) {
-                $this->makeUnsub($user->getEmail());
-                $user->setNewsletterToken(null);
-                $done = true;
-            }
-        }
-
-        if (!$done){
             $this->addFlash('error', "Vous n'êtes pas inscrit dans notre liste de diffusion");
         }
-
-        $this->em->flush();
 
         return $this->redirectToRoute($this->home);
     }
@@ -77,15 +58,15 @@ class UnsubController extends AbstractController
     }
 
     /**
-     * @param string $email
+     * @param User $user
      */
-    private function makeUnsub(string $email){
-        if (!$this->em->getRepository(Unsubscribe::class)->findOneBy(['email' => $email])){
-            $unsub = new Unsubscribe();
-            $unsub->setEmail($email);
-            $this->em->persist($unsub);
-        }
-
+    private function makeUnsub(User $user)
+    {
+        $user
+            ->setNewsletterAcceptedAt(null)
+            ->setNewsletterToken(null)
+            ->setNewsletter(false);
+        $this->em->flush();
         $this->addFlash('success', "Vous avez été supprimé de notre liste de diffusion.");
     }
 

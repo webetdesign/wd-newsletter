@@ -197,7 +197,7 @@ class Newsletter
 
         foreach (explode(',', $emails) as $email) {
            if ($email){
-               $more['fr'][$this->id . '_' .$email] = $email;
+               $more['fr'][md5(uniqid())] = $email;
                $cpt++;
            }
         }

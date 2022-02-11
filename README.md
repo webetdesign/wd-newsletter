@@ -169,8 +169,3 @@ sonata_admin:
         label: Newsletters
         icon: '<i class="fa fa-send"></i>'
 ```
-
-
-## Note :
-
-When you subscribe to the newsletter, don't forget to remove it from the unsub list 
