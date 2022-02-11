@@ -73,6 +73,12 @@ newsletter.routes:
   resource: "@WDNewsletterBundle/Resources/config/routing.yaml"
 
 ````
+````yaml
+#config/packages/security.yaml
+access_control:
+  # bien mettre tout en haut
+  - { path: ^/newsletter/track/.*, role: [ IS_AUTHENTICATED_ANONYMOUSLY ] }
+````
 
 6° add ckeditor config
 ```yaml
@@ -126,6 +132,12 @@ swiftmailer:
                 path: '%kernel.project_dir%/var/spool'
 
 ```
+9° Token encryption log
+`````dotenv
+#.env.local
+# Possiblité de générer le token depuis le site https://jwt.io/ en mettant un payload vide (copier la partie bleue du token
+NEWSLETTER_IV='mon-token'
+`````
 
 ## Models : 
 

@@ -35,7 +35,8 @@
         "symfony/twig-bridge": "^4.4",
         "symfony/twig-bundle": "^4.4",
         "symfony/validator": "^4.4",
-        "twig/extensions": "^1.5"
+        "twig/extensions": "^1.5",
+        "ext-openssl": "*"
     },
     "require-dev": {
         "symfony/filesystem": "^4.4",

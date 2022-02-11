@@ -67,19 +67,8 @@ class EmailService
 
                     $trackingToken = md5(uniqid('', true));
 
-                    if ($this->enableLog) {
-                        $tracker = "<img border=0 width=1 alt='' height=1  src='" . $this->router->generate('newsletter_track_opening', ['token' => $trackingToken], UrlGeneratorInterface::ABSOLUTE_URL) . "'>";
-
-                        $linebreak = ByteString::fromRandom(32)->toString();
-                        $html = str_replace("\n", $linebreak, $html);
-
-                        if (preg_match("/^(.*<body[^>]*>)(.*)$/", $html, $matches)) {
-                            $html = $matches[1] . $matches[2] . $tracker;
-                        } else {
-                            $html = $html . $tracker;
-                        }
-                        $html = str_replace($linebreak, "\n", $html);
-                    }
+                    $html = $this->injectTrackerOpening($html, $trackingToken);
+                    $html = $this->injectLinkTracker($html, $trackingToken);
 
                     $message = (new Swift_Message($newsletter->getTitle()))
                         ->setFrom([$this->from ?: $newsletter->getEmail() => $newsletter->getSender()])
@@ -95,7 +84,8 @@ class EmailService
                                 'unsub' => $link
                             ]), 'text/plain'
                         );
-                    if ($this->enableLog){
+
+                    if ($this->enableLog) {
                         $message->getHeaders()->addTextHeader('X-Mailer-Hash', $trackingToken);
                         $message->getHeaders()->has('X-No-Track') ? $message->getHeaders()->remove('X-No-Track') : null;
                     }
@@ -185,4 +175,48 @@ class EmailService
         }
         return $total;
     }
+
+    private function injectTrackerOpening(string $html, string $trackingToken): string
+    {
+        if ($this->enableLog) {
+            $tracker = "<img border=0 width=1 alt='' height=1  src='" . $this->router->generate('newsletter_track_opening', ['token' => $trackingToken], UrlGeneratorInterface::ABSOLUTE_URL) . "'>";
+
+            $linebreak = ByteString::fromRandom(32)->toString();
+            $html = str_replace("\n", $linebreak, $html);
+
+            if (preg_match("/^(.*<body[^>]*>)(.*)$/", $html, $matches)) {
+                $html = $matches[1] . $matches[2] . $tracker;
+            } else {
+                $html = $html . $tracker;
+            }
+            $html = str_replace($linebreak, "\n", $html);
+        }
+
+        return $html;
+    }
+
+    private function injectLinkTracker($html, $hash)
+    {
+        if ($this->enableLog && isset($_ENV['NEWSLETTER_IV']) && strlen($_ENV['NEWSLETTER_IV']) > 0) {
+            $html = preg_replace_callback(
+                "/(<a[^>]*href=[\"](.+)[\"])/",
+                function ($matches) use ($hash) {
+                    $url = "";
+                    if (!empty($matches[2]) && strlen($matches[2]) > 0) {
+                        $url = str_replace('&amp;', '&', $matches[2]);
+
+                        $link = $this->router->generate('newsletter_track_link', [
+                            'url' => openssl_encrypt($url, 'AES-256-CBC', $_ENV['APP_SECRET'], 0, substr(hash('sha256', $_ENV['NEWSLETTER_IV']), 0, 16)),
+                            'token' => $hash
+                        ], UrlGeneratorInterface::ABSOLUTE_URL);
+                        $url = str_replace($matches[2], $link, $matches[1]) ;
+                    }
+                    return $url;
+                },
+                $html
+            );
+        }
+        return $html;
+    }
+
 }

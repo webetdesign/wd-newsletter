@@ -5,6 +5,7 @@ namespace WebEtDesign\NewsletterBundle\Controller;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -38,7 +39,7 @@ class NewsletterContentController extends AbstractController
     }
 
     /**
-     * @Route(path="/email/track/{token}/image.png", name="newsletter_track_opening")
+     * @Route(path="/newsletter/track/opening/{token}/image.png", name="newsletter_track_opening")
      */
     public function trackOpening (?string $token): Response
     {
@@ -51,5 +52,22 @@ class NewsletterContentController extends AbstractController
 
         return new TransparentPixelResponse();
     }
+
+    /**
+     * @Route(path="/newsletter/track/link/{token}", name="newsletter_track_link")
+     */
+    public function trackLink (?string $token, Request $request): RedirectResponse
+    {
+        $newsletterLog = $this->em->getRepository(NewsletterLog::class)->findOneBy(['token' => $token]);
+
+        if ($newsletterLog){
+            $newsletterLog->setClicked(true);
+            $this->em->flush();
+        }
+
+        return new RedirectResponse(openssl_decrypt($request->query->get('url'), 'AES-256-CBC', $_ENV['APP_SECRET'], $options=0, substr(hash('sha256', $_ENV['NEWSLETTER_IV']), 0, 16)));
+    }
+
+
 
 }
