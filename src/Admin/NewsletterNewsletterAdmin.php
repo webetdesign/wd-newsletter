@@ -25,7 +25,7 @@ class NewsletterNewsletterAdmin extends AbstractAdmin
     protected $datagridValues = [
         '_page'       => 1,
         '_sort_order' => 'DESC',
-        '_sort_by'    => 'createdAt',
+        '_sort_by'    => 'id',
     ];
 
     public function __construct(
