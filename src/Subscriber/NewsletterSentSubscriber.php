@@ -24,8 +24,9 @@ class NewsletterSentSubscriber implements EventSubscriberInterface
         $user = $this->em->getRepository(User::class)->findOneBy(['email' => array_key_first($event->getMessage()->getTo())]);
 
         $this->em->persist(
-            (new NewsletterLog())
+            ($l = new NewsletterLog())
                 ->setUser($user)
+                ->setReceiver(array_key_first($event->getMessage()->getTo()))
                 ->setToken($event->getToken())
                 ->setTitle($event->getMessage()->getSubject())
                 ->setBody($event->getMessage()->getBody())

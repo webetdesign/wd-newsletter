@@ -22,9 +22,9 @@ class NewsletterLogRepository extends ServiceEntityRepository
         parent::__construct($registry, NewsletterLog::class);
     }
 
-    public function getAnalytics($site_id, $newsletterId)
+    public function getAnalyticsStats($site_id, $newsletterId)
     {
-        try{
+        try {
             $total = intval($this->createQueryBuilder('nl')
                 ->select('count(nl.id)')
                 ->andWhere("nl.newsletterId = :id")
@@ -68,7 +68,7 @@ class NewsletterLogRepository extends ServiceEntityRepository
                     (($clicked) / $total) * 100
                 ]
             ];
-        }catch (Exception $exception){
+        } catch (Exception $exception) {
             return [
                 'labels' => [],
                 "values" => [],
@@ -76,5 +76,18 @@ class NewsletterLogRepository extends ServiceEntityRepository
                 'percent' => []
             ];
         }
+    }
+
+    public function getAnalyticsLogs($site_id, $newsletterId, $page)
+    {
+        return $this->createQueryBuilder('nl')
+            ->select('nl.clicked, nl.viewed, u.email, nl.createdAt')
+            ->innerJoin('nl.user', 'u')
+            ->andWhere("nl.newsletterId = :id")
+            ->setParameter("id", $newsletterId)
+            ->setMaxResults(20)
+            ->setFirstResult(20 * $page)
+            ->getQuery()
+            ->getResult();
     }
 }

@@ -59,6 +59,11 @@ class NewsletterLog
      */
     private ?int $newsletterId = null;
 
+    /**
+     * @ORM\Column(type="text", nullable=true)
+     */
+    private ?string $receiver = '';
+    
     #[Pure] public function __toString(): string
     {
         return $this->getTitle() ?? '';
@@ -179,4 +184,22 @@ class NewsletterLog
         return $this;
     }
 
+    /**
+     * @return string|null
+     */
+    public function getReceiver(): ?string
+    {
+        return $this->receiver;
+    }
+
+    /**
+     * @param string|null $receiver
+     * @return NewsletterLog
+     */
+    public function setReceiver(?string $receiver): NewsletterLog
+    {
+        $this->receiver = $receiver;
+        return $this;
+    }
+    
 }
