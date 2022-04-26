@@ -14,6 +14,7 @@ class NewsletterContentCreatorService
 
     public function createNewsletterContents(array $config, Newsletter $newsletter): Newsletter
     {
+        $i = 0;
         foreach ($config['contents'] as $content) {
             $newsletterContent = $newsletter->getContent($content['code']);
             if (!$newsletterContent){
@@ -23,6 +24,7 @@ class NewsletterContentCreatorService
                 $newsletterContent->setType($content['type']);
                 $newsletterContent->setCode($content['code']);
                 $newsletterContent->setCanTranslate($content['translate']);
+                $newsletterContent->setPosition($i);
 
                 if ($newsletterContent->getType() !== NewsletterContentTypeEnum::MEDIA ){
                     if ($content['translate']){
@@ -36,11 +38,11 @@ class NewsletterContentCreatorService
                         $newsletterContent_trans->setLocale($locale);
                         $newsletterContent_trans->setTranslatable($newsletterContent);
                         $this->em->persist($newsletterContent_trans);
-
                     }
                 }
             }
             $newsletter->addContent($newsletterContent);
+            $i++;
         }
 
         return $newsletter;

@@ -45,6 +45,7 @@ class Newsletter
 
     /**
      * @ORM\OneToMany(targetEntity=Content::class, mappedBy="newsletter", orphanRemoval=true, cascade={"persist", "remove"})
+     * @ORM\OrderBy({"position" = "ASC"})
      */
     private Collection $contents;
 

@@ -59,6 +59,10 @@ class Content implements TranslatableInterface
      * @ORM\Column(type="text", nullable=true)
      */
     private ?string $canTranslate;
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    private ?int $position;
 
     public function getMedia(): ?Media
     {
@@ -158,5 +162,22 @@ class Content implements TranslatableInterface
         return $this;
     }
 
+    /**
+     * @return int|null
+     */
+    public function getPosition(): ?int
+    {
+        return $this->position;
+    }
 
+    /**
+     * @param int|null $position
+     * @return Content
+     */
+    public function setPosition(?int $position): Content
+    {
+        $this->position = $position;
+        return $this;
+    }
+    
 }
