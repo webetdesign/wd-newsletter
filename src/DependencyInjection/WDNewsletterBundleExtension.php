@@ -43,6 +43,7 @@ class WDNewsletterBundleExtension extends Extension
         $container->setParameter('wd_newsletter.models', $config['models']);
         $container->setParameter('wd_newsletter.routes', $config['routes']);
         $container->setParameter('wd_newsletter.noreply', $config['noreply']);
+        $container->setParameter('wd_newsletter.replyTo', $config['replyTo']);
         $container->setParameter('wd_newsletter.locales', $config['locales']);
         $container->setParameter('wd_newsletter.admin.config.class.content', NewsletterContentAdmin::class);
         $container->setParameter('wd_newsletter.admin.config.class.newsletter', NewsletterNewsletterAdmin::class);

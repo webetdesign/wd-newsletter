@@ -37,7 +37,12 @@ wd-newsletter:
     media: App\Entity\Media
     document: App\Entity\Document # Pas obligatoire (Le repository doit implémenter ContentCollectionRepositoryInterface)
     actuality: App\Entity\News # Pas obligatoire (Le repository doit implémenter ContentCollectionRepositoryInterface)
-  noreply: 'noreply@your-site.fr'
+  noreply:
+    email: 'noreply@your-site.fr'
+    name: 'Your site'
+  replyTo:
+    email: 'contact@your-site.fr' #optional
+    name: 'Your site' #optional
   locales: [fr, en]
   models:
     defaut:

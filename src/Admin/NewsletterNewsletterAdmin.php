@@ -85,12 +85,12 @@ class NewsletterNewsletterAdmin extends AbstractAdmin
             ->add('sentAtFormatted', null, [
                 'label' => 'Date d\'envoi',
             ])
-            ->add('sender', null, [
-                'label' => "Nom de l'expéditeur",
-            ])
-            ->add('email', null, [
-                'label' => 'Email de retour',
-            ])
+//            ->add('sender', null, [
+//                'label' => "Nom de l'expéditeur",
+//            ])
+//            ->add('email', null, [
+//                'label' => 'Email de retour',
+//            ])
             ->add('_action', null, [
                 'actions' => [
                     'show' => [],
@@ -132,15 +132,15 @@ class NewsletterNewsletterAdmin extends AbstractAdmin
                 'label' => 'Modèle',
             ]);
 
-        if ($this->isCurrentRoute('edit') || $this->getRequest()->isXmlHttpRequest()) {
-            $form
-                ->add('sender', TextType::class, [
-                    'label' => "Nom de l'expéditeur",
-                ])
-                ->add('email', EmailType::class, [
-                    'label' => 'Email de retour',
-                ]);
-        }
+//        if ($this->isCurrentRoute('edit') || $this->getRequest()->isXmlHttpRequest()) {
+//            $form
+//                ->add('sender', TextType::class, [
+//                    'label' => "Nom de l'expéditeur",
+//                ])
+//                ->add('email', EmailType::class, [
+//                    'label' => 'Email de retour',
+//                ]);
+//        }
         $form
             ->end()
             ->end();

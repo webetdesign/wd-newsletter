@@ -29,7 +29,8 @@ class EmailService
         private ModelProvider            $modelProvider,
         private EntityManagerInterface   $em,
         private EventDispatcherInterface $eventDispatcher,
-        private ?string                  $from,
+        private ?array                   $from,
+        private ?array                   $reply,
         private RouterInterface          $router,
         private array                    $locales,
         private string                   $rootDir,
@@ -71,9 +72,8 @@ class EmailService
                     $html = $this->injectLinkTracker($html, $trackingToken);
 
                     $message = (new Swift_Message($newsletter->getTitle()))
-                        ->setFrom([$this->from ?: $newsletter->getEmail() => $newsletter->getSender()])
+                        ->setFrom([$this->from['email'] => $this->from['name']])
                         ->setTo($email)
-                        ->setReplyTo($newsletter->getEmail())
                         ->setBody(
                             $html, 'text/html'
                         )
@@ -84,6 +84,10 @@ class EmailService
                                 'unsub' => $link
                             ]), 'text/plain'
                         );
+
+                    if ($this->reply && isset($this->reply['email']) && isset($this->reply['name'])){
+                        $message->setReplyTo([$this->reply['email'] => $this->reply['name']]);
+                    }
 
                     if ($this->enableLog) {
                         $message->getHeaders()->addTextHeader('X-Mailer-Hash', $trackingToken);

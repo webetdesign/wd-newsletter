@@ -62,6 +62,7 @@ services:
       - '@doctrine.orm.default_entity_manager'
       - '@event_dispatcher'
       - '%wd_newsletter.noreply%'
+      - '%wd_newsletter.replyTo%'
       - '@router'
       - '%wd_newsletter.locales%'
       - '%kernel.project_dir%'
