@@ -9,6 +9,7 @@ use JetBrains\PhpStorm\ArrayShape;
 use JetBrains\PhpStorm\NoReturn;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use WebEtDesign\NewsletterBundle\Event\MailSentEvent;
+use WebEtDesign\UserBundle\Entity\WDUser;
 
 class NewsletterSentSubscriber implements EventSubscriberInterface
 {
@@ -21,7 +22,7 @@ class NewsletterSentSubscriber implements EventSubscriberInterface
     {
         if (!$this->log) return;
 
-        $user = $this->em->getRepository(User::class)->findOneBy(['email' => array_key_first($event->getMessage()->getTo())]);
+        $user = $this->em->getRepository(WDUser::class)->findOneBy(['email' => array_key_first($event->getMessage()->getTo())]);
 
         $this->em->persist(
             ($l = new NewsletterLog())
@@ -29,7 +30,7 @@ class NewsletterSentSubscriber implements EventSubscriberInterface
                 ->setReceiver(array_key_first($event->getMessage()->getTo()))
                 ->setToken($event->getToken())
                 ->setTitle($event->getMessage()->getSubject())
-                ->setBody($event->getMessage()->getBody())
+                ->setBody($event->getMessage()->getHtmlBody())
                 ->setViewed(false)
                 ->setNewsletterId($event->getNewsletterId())
                 ->setClicked(false)

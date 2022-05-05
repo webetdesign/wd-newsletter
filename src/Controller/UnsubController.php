@@ -6,10 +6,8 @@ use App\Entity\User as User;
 use Doctrine\ORM\EntityManagerInterface as EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\HttpFoundation\Request as Request;
 use Symfony\Component\Routing\Annotation\Route;
-use WebEtDesign\NewsletterBundle\Entity\Newsletter;
-use WebEtDesign\NewsletterBundle\Entity\Unsubscribe;
+use WebEtDesign\UserBundle\Entity\WDUser;
 
 class UnsubController extends AbstractController
 {
@@ -34,8 +32,8 @@ class UnsubController extends AbstractController
      */
     public function token(string $token): RedirectResponse
     {
-        /** @var User $user */
-        $user = $this->em->getRepository(User::class)->findOneBy([
+        /** @var WDUser $user */
+        $user = $this->em->getRepository(WDUser::class)->findOneBy([
             'newsletterToken' => $token
         ]);
 
@@ -58,14 +56,15 @@ class UnsubController extends AbstractController
     }
 
     /**
-     * @param User $user
+     * @param WDUser $user
      */
-    private function makeUnsub(User $user)
+    private function makeUnsub(WDUser $user)
     {
         $user
             ->setNewsletterAcceptedAt(null)
+            ->setNewsletter(false)
             ->setNewsletterToken(null)
-            ->setNewsletter(false);
+        ;
         $this->em->flush();
         $this->addFlash('success', "Vous avez été supprimé de notre liste de diffusion.");
     }

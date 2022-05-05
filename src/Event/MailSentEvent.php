@@ -2,7 +2,7 @@
 
 namespace WebEtDesign\NewsletterBundle\Event;
 
-use Swift_Message;
+use Symfony\Component\Mime\Email;
 use Symfony\Contracts\EventDispatcher\Event;
 
 class MailSentEvent extends Event
@@ -10,21 +10,21 @@ class MailSentEvent extends Event
 
     public const NAME = 'NEWSLETTER_MAIL_SENT';
 
-    public function __construct(private Swift_Message $message, private string $token, private ?int $newsletterId)
+    public function __construct(private Email $message, private string $token, private ?int $newsletterId)
     {}
 
     /**
-     * @return Swift_Message
+     * @return Email
      */
-    public function getMessage(): Swift_Message
+    public function getMessage(): Email
     {
         return $this->message;
     }
 
     /**
-     * @param Swift_Message $message
+     * @param Email $message
      */
-    public function setMessage(Swift_Message $message): void
+    public function setMessage(Email $message): void
     {
         $this->message = $message;
     }

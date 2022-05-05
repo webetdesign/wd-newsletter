@@ -8,8 +8,10 @@ use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
-use Swift_Mailer;
-use Swift_Message;
+use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mime\Address;
+use Symfony\Component\Mime\Email;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
@@ -17,14 +19,14 @@ use Symfony\Component\String\ByteString;
 use Symfony\Component\Templating\EngineInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use WebEtDesign\NewsletterBundle\Entity\Newsletter;
-use WebEtDesign\NewsletterBundle\Entity\Unsubscribe;
 use WebEtDesign\NewsletterBundle\Event\MailSentEvent;
+use WebEtDesign\UserBundle\Entity\WDUser;
 
 class EmailService
 {
 
     public function __construct(
-        private Swift_Mailer             $mailer,
+        private MailerInterface          $mailer,
         private EngineInterface          $templating,
         private ModelProvider            $modelProvider,
         private EntityManagerInterface   $em,
@@ -36,16 +38,14 @@ class EmailService
         private string                   $rootDir,
         private bool                     $enableLog
 
-    )
-    {
-    }
+    ){}
 
     /**
      * @param Newsletter $newsletter
      * @param $email_list
      * @param FlashBagInterface|null $flashBag
      * @return int
-     * @throws Exception
+     * @throws Exception|TransportExceptionInterface
      */
     public function sendNewsletter(Newsletter $newsletter, $email_list, FlashBagInterface $flashBag = null): int
     {
@@ -71,13 +71,14 @@ class EmailService
                     $html = $this->injectTrackerOpening($html, $trackingToken);
                     $html = $this->injectLinkTracker($html, $trackingToken);
 
-                    $message = (new Swift_Message($newsletter->getTitle()))
-                        ->setFrom([$this->from['email'] => $this->from['name']])
-                        ->setTo($email)
-                        ->setBody(
+                    $message = (new Email())
+                        ->subject($newsletter->getTitle())
+                        ->from(new Address($this->from['email'], $this->from['name']))
+                        ->to($email)
+                        ->html(
                             $html, 'text/html'
                         )
-                        ->addPart(
+                        ->text(
                             $this->templating->render($this->modelProvider->getTxt($newsletter->getModel()), [
                                 'object' => $newsletter,
                                 'locale' => $newsletter->isSendInAllLocales() ? $this->locales : [$locale],
@@ -86,7 +87,7 @@ class EmailService
                         );
 
                     if ($this->reply && isset($this->reply['email']) && isset($this->reply['name'])){
-                        $message->setReplyTo([$this->reply['email'] => $this->reply['name']]);
+                        $message->replyTo(new Address($this->reply['email'], $this->reply['name']));
                     }
 
                     if ($this->enableLog) {
@@ -94,17 +95,17 @@ class EmailService
                         $message->getHeaders()->has('X-No-Track') ? $message->getHeaders()->remove('X-No-Track') : null;
                     }
 
-                    $res = $this->mailer->send($message);
+                    $this->mailer->send($message);
                     $this->eventDispatcher->dispatch(new MailSentEvent($message, $trackingToken, $newsletter->getId()), MailSentEvent::NAME);
+                    return 1;
                 } catch (Exception $e) {
                     $log->error('Mail to ' . $email . ' error');
                     $flashBag?->add('error', "Le mail à l'adresse " . $email . " n'a pas été envoyé suite à une erreur. (" . $e->getMessage() . ')');
-                    $res = -1;
+                    return -1;
                 }
             }
         }
 
-        return $res;
     }
 
     public function getEmails(Newsletter $newsletter): array
@@ -112,7 +113,7 @@ class EmailService
         $emails = [];
 
         if ($newsletter->getGroups()->count() > 0) {
-            $qb = $this->em->getRepository(User::class)->createQueryBuilder('u');
+            $qb = $this->em->getRepository(WDUser::class)->createQueryBuilder('u');
 
             $or = '(';
             $cpt = 0;
@@ -131,7 +132,7 @@ class EmailService
 
             $users = $qb->getQuery()->getResult();
 
-            /** @var User $u */
+            /** @var WDUser $u */
             foreach ($users as $u) {
                 if (!$u->getNewsletterToken()) {
                     $u->setNewsletterToken(md5(uniqid()));

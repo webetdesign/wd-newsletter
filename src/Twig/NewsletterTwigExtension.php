@@ -4,7 +4,6 @@ namespace WebEtDesign\NewsletterBundle\Twig;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
-use Liip\ImagineBundle\Exception\Config\Filter\NotFoundException;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Twig\Extension\AbstractExtension;

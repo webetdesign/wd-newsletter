@@ -5,6 +5,7 @@ namespace WebEtDesign\NewsletterBundle\Admin;
 use A2lix\TranslationFormBundle\Form\Type\TranslationsType;
 use App\Entity\User;
 use Exception;
+use FOS\CKEditorBundle\Form\Type\CKEditorType;
 use Sonata\AdminBundle\Form\Type\ModelListType;
 use Symfony\Component\Form\Extension\Core\Type\ColorType;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
@@ -14,7 +15,6 @@ use Sonata\AdminBundle\Admin\AbstractAdmin;
 use Sonata\AdminBundle\Datagrid\DatagridMapper;
 use Sonata\AdminBundle\Datagrid\ListMapper;
 use Sonata\AdminBundle\Form\FormMapper;
-use Sonata\FormatterBundle\Form\Type\SimpleFormatterType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use WebEtDesign\NewsletterBundle\Form\NewsletterContentCollectionType;
@@ -37,17 +37,15 @@ final class NewsletterContentAdmin extends AbstractAdmin
         parent::__construct($code, $class, $baseControllerName);
     }
 
-    protected function configureDatagridFilters(DatagridMapper $filter)
+    protected function configureDatagridFilters(DatagridMapper $filter): void
     {
         $filter
             ->add('id')
             ->add('type');
     }
 
-    protected function configureListFields(ListMapper $list)
+    protected function configureListFields(ListMapper $list): void
     {
-        unset($this->listModes['mosaic']);
-
         $list
             ->add('id')
             ->add(
@@ -66,7 +64,7 @@ final class NewsletterContentAdmin extends AbstractAdmin
     /**
      * @throws Exception
      */
-    protected function configureFormFields(FormMapper $form)
+    protected function configureFormFields(FormMapper $form): void
     {
         $form->getFormBuilder()->setMethod('patch');
 
@@ -116,7 +114,7 @@ final class NewsletterContentAdmin extends AbstractAdmin
                     }
                     $fields['value'] = [
                         'label' => false,
-                        'field_type' => SimpleFormatterType::class,
+                        'field_type' => CKEditorType::class,
                         'format' => 'richhtml',
                         'ckeditor_context' => 'newsletter',
                         'required' => false,
@@ -172,7 +170,6 @@ final class NewsletterContentAdmin extends AbstractAdmin
 
     protected function canManageContent(): bool
     {
-        /** @var User $user */
         $user = $this->tokenStorage->getToken()->getUser();
 
         return $user->hasRole('ROLE_ADMIN_CMS');

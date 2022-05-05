@@ -2,13 +2,13 @@
 
 namespace WebEtDesign\NewsletterBundle\Entity;
 
-use App\Entity\Group;
 use DateTime;
 use JetBrains\PhpStorm\Pure;
 use WebEtDesign\NewsletterBundle\Repository\NewsletterRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use WebEtDesign\UserBundle\Entity\WDGroup;
 
 /**
  * @ORM\Entity(repositoryClass="WebEtDesign\NewsletterBundle\Repository\NewsletterRepository", repositoryClass=NewsletterRepository::class)
@@ -55,7 +55,7 @@ class Newsletter
     private ?string $emailsMore;
 
     /**
-     * @ORM\ManyToMany(targetEntity=Group::class)
+     * @ORM\ManyToMany(targetEntity=WDGroup::class)
      */
     private Collection $groups;
 
@@ -211,7 +211,7 @@ class Newsletter
         return $this->groups;
     }
 
-    public function addGroup(Group $group): self
+    public function addGroup(WDGroup $group): self
     {
         if (!$this->groups->contains($group)) {
             $this->groups[] = $group;
@@ -220,7 +220,7 @@ class Newsletter
         return $this;
     }
 
-    public function removeGroup(Group $group): self
+    public function removeGroup(WDGroup $group): self
     {
         if ($this->groups->contains($group)) {
             $this->groups->removeElement($group);

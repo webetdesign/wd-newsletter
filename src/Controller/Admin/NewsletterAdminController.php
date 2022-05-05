@@ -6,6 +6,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
 use Sonata\AdminBundle\Controller\CRUDController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 use WebEtDesign\NewsletterBundle\Entity\Content;
 use WebEtDesign\NewsletterBundle\Entity\ContentTranslation;
@@ -24,12 +25,13 @@ class NewsletterAdminController extends CRUDController
     public function __construct(
         private EmailService           $emailService,
         private EntityManagerInterface $em,
-        private FlashBagInterface      $flashBag
+        private FlashBagInterface      $flashBag,
+        private RequestStack $requestStack
     ){}
 
     public function sendAction($id = null): RedirectResponse
     {
-        $request = $this->getRequest();
+        $request = $this->requestStack->getCurrentRequest();
 
         $id = $request->get($this->admin->getIdParameter());
         $newsletter = $this->admin->getObject($id);
@@ -70,7 +72,7 @@ class NewsletterAdminController extends CRUDController
 
     public function copyAction($id = null): RedirectResponse
     {
-        $request = $this->getRequest();
+        $request = $this->requestStack->getCurrentRequest();
 
         $id = $request->get($this->admin->getIdParameter());
         /** @var Newsletter $old */
