@@ -8,8 +8,7 @@ use WebEtDesign\NewsletterBundle\Repository\NewsletterRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use WebEtDesign\UserBundle\Entity\WDGroup;
-
+use App\Entity\User\Group; 
 /**
  * @ORM\Entity(repositoryClass="WebEtDesign\NewsletterBundle\Repository\NewsletterRepository", repositoryClass=NewsletterRepository::class)
  * @ORM\Table(name="newsletter__newsletter")
@@ -55,7 +54,7 @@ class Newsletter
     private ?string $emailsMore;
 
     /**
-     * @ORM\ManyToMany(targetEntity=WDGroup::class)
+     * @ORM\ManyToMany(targetEntity=Group::class)
      */
     private Collection $groups;
 
@@ -211,7 +210,7 @@ class Newsletter
         return $this->groups;
     }
 
-    public function addGroup(WDGroup $group): self
+    public function addGroup(Group $group): self
     {
         if (!$this->groups->contains($group)) {
             $this->groups[] = $group;
@@ -220,7 +219,7 @@ class Newsletter
         return $this;
     }
 
-    public function removeGroup(WDGroup $group): self
+    public function removeGroup(Group $group): self
     {
         if ($this->groups->contains($group)) {
             $this->groups->removeElement($group);

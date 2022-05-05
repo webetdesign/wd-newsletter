@@ -20,18 +20,12 @@ services:
     arguments:
       - ~
       - '%wd_newsletter.entity.newsletter%'
-      - WebEtDesign\NewsletterBundle\Controller\Admin\NewsletterAdminController
+      - ~
       - '@security.token_storage'
+      - '@WebEtDesign\NewsletterBundle\Factory\NewsletterFactory'
     tags:
-      - { name: sonata.admin, manager_type: orm, group: newsletter, label: Newsletter }
+      - { name: sonata.admin, manager_type: orm, group: newsletter, label: Newsletter, controller: WebEtDesign\NewsletterBundle\Controller\Admin\NewsletterAdminController }
     public: true
     calls:
       - [setTemplate, ['show', 'WDNewsletterBundle:admin/newsletter:show.html.twig']]
-      - [setFormContractor, ['@cms.sonata.form_contractor.bridge']]
-
-  WebEtDesign\NewsletterBundle\Controller\Admin\NewsletterAdminController:
-    autowire: true
-    arguments:
-      - '@newsletter.email_service'
-      - '@doctrine.orm.default_entity_manager'
-    tags: ['controller.service_arguments']
+#      - [setFormContractor, ['@cms.sonata.form_contractor.bridge']]

@@ -8,6 +8,7 @@ use Sonata\AdminBundle\Controller\CRUDController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
+use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use WebEtDesign\NewsletterBundle\Entity\Content;
 use WebEtDesign\NewsletterBundle\Entity\ContentTranslation;
 use WebEtDesign\NewsletterBundle\Entity\Newsletter;
@@ -21,6 +22,7 @@ class NewsletterAdminController extends CRUDController
      * @param EmailService $emailService
      * @param EntityManagerInterface $em
      * @param FlashBagInterface $flashBag
+     * @param RequestStack $requestStack
      */
     public function __construct(
         private EmailService           $emailService,
@@ -50,7 +52,7 @@ class NewsletterAdminController extends CRUDController
 
         try {
             $res = $this->emailService->sendNewsletter($newsletter, $emails, $this->flashBag);
-        } catch (\Exception $e) {
+        } catch (\Exception|TransportExceptionInterface $e) {
             $res = 0;
             $this->addFlash('error', $e->getMessage());
         }

@@ -2,6 +2,7 @@
 
 namespace WebEtDesign\NewsletterBundle\Admin;
 
+use App\Entity\User\Group;
 use Sonata\AdminBundle\Admin\AbstractAdmin;
 use Sonata\AdminBundle\Datagrid\DatagridMapper;
 use Sonata\AdminBundle\Datagrid\ListMapper;
@@ -13,10 +14,9 @@ use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
-use WebEtDesign\NewsletterBundle\Entity\Newsletter;
+use WebEtDesign\CmsBundle\Form\Content\AdminCmsBlockCollectionType;
+use WebEtDesign\NewsletterBundle\Factory\NewsletterFactory;
 use WebEtDesign\NewsletterBundle\Form\NewsletterModelType;
-use WebEtDesign\NewsletterBundle\Form\NewsletterContentsType;
-use WebEtDesign\UserBundle\Entity\WDGroup;
 
 class NewsletterNewsletterAdmin extends AbstractAdmin
 {
@@ -30,11 +30,13 @@ class NewsletterNewsletterAdmin extends AbstractAdmin
         string                        $code,
         string                        $class,
         string                        $baseControllerName,
-        private TokenStorageInterface $tokenStorage
+        private TokenStorageInterface $tokenStorage,
+        private NewsletterFactory     $factory
     )
     {
         parent::__construct($code, $class, $baseControllerName);
     }
+
 
     protected function configureDatagridFilters(DatagridMapper $filter): void
     {
@@ -108,7 +110,7 @@ class NewsletterNewsletterAdmin extends AbstractAdmin
     protected function configureFormFields(FormMapper $form): void
     {
         $this->setFormTheme(array_merge($this->getFormTheme(), [
-            'WDNewsletterBundle:form:newsletter_contents_type.html.twig'
+            '@WDNewsletter/form/newsletter_contents_type.html.twig'
         ]));
 
         $roleAdmin = $this->canManageContent();
@@ -150,7 +152,7 @@ class NewsletterNewsletterAdmin extends AbstractAdmin
                 ->with('', ['box_class' => 'header_none'])
                 ->add('groups', EntityType::class, [
                     'label' => "Destinataires",
-                    'class' => WDGroup::class,
+                    'class' => Group::class,
                     'required' => false,
                     'expanded' => true,
                     'multiple' => true
@@ -171,10 +173,8 @@ class NewsletterNewsletterAdmin extends AbstractAdmin
             $form
                 ->tab('Contenus', ['box_class' => 'header_none', 'class' => 'col-xs-12'])
                 ->with('', ['box_class' => 'header_none'])
-                ->add('contents', NewsletterContentsType::class, [
-                    'label' => false,
-                    'by_reference' => false,
-                    'role_admin' => $roleAdmin
+                ->add('contents', AdminCmsBlockCollectionType::class, [
+                    'factory' => $this->factory
                 ])
                 ->end();
 

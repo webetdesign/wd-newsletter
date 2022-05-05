@@ -6,8 +6,7 @@ use WebEtDesign\NewsletterBundle\Repository\NewsletterLogRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Timestampable\Traits\TimestampableEntity;
 use JetBrains\PhpStorm\Pure;
-use WebEtDesign\UserBundle\Entity\WDUser;
-
+use App\Entity\User\User;
 /**
  * @ORM\Entity(repositoryClass=NewsletterLogRepository::class)
  * @ORM\Table(name="newsletter__log")
@@ -24,10 +23,10 @@ class NewsletterLog
     private ?int $id;
 
     /**
-     * @ORM\ManyToOne(targetEntity=WDUser::class)
+     * @ORM\ManyToOne(targetEntity=User::class)
      * @ORM\JoinColumn(nullable=true)
      */
-    private ?WDUser $user = null;
+    private ?User $user = null;
 
     /**
      * @ORM\Column(type="text", nullable=true)
@@ -75,12 +74,12 @@ class NewsletterLog
         return $this->id;
     }
 
-    public function getUser(): ?WDUser
+    public function getUser(): ?User
     {
         return $this->user;
     }
 
-    public function setUser(?WDUser $user): self
+    public function setUser(?User $user): self
     {
         $this->user = $user;
 

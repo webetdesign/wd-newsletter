@@ -9,7 +9,8 @@ use Exception;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
-use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mailer\Messenger\SendEmailMessage;
+use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
@@ -18,6 +19,7 @@ use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\String\ByteString;
 use Symfony\Component\Templating\EngineInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Twig\Environment;
 use WebEtDesign\NewsletterBundle\Entity\Newsletter;
 use WebEtDesign\NewsletterBundle\Event\MailSentEvent;
 use WebEtDesign\UserBundle\Entity\WDUser;
@@ -26,8 +28,8 @@ class EmailService
 {
 
     public function __construct(
-        private MailerInterface          $mailer,
-        private EngineInterface          $templating,
+        private MessageBusInterface      $bus,
+        private Environment          $templating,
         private ModelProvider            $modelProvider,
         private EntityManagerInterface   $em,
         private EventDispatcherInterface $eventDispatcher,
@@ -51,8 +53,6 @@ class EmailService
     {
         $log = new Logger('mailer');
         $log->pushHandler(new StreamHandler($this->rootDir . '/var/log/mailer.log', Logger::DEBUG));
-
-        $res = -1;
 
         foreach ($email_list as $locale => $emails) {
             foreach ($emails as $token => $email) {
@@ -95,17 +95,18 @@ class EmailService
                         $message->getHeaders()->has('X-No-Track') ? $message->getHeaders()->remove('X-No-Track') : null;
                     }
 
-                    $this->mailer->send($message);
+                    $this->bus->dispatch(new SendEmailMessage($message));
                     $this->eventDispatcher->dispatch(new MailSentEvent($message, $trackingToken, $newsletter->getId()), MailSentEvent::NAME);
-                    return 1;
+                    $res = 1;
                 } catch (Exception $e) {
                     $log->error('Mail to ' . $email . ' error');
                     $flashBag?->add('error', "Le mail à l'adresse " . $email . " n'a pas été envoyé suite à une erreur. (" . $e->getMessage() . ')');
-                    return -1;
+                    $res = -1;
                 }
             }
         }
 
+        return $res;
     }
 
     public function getEmails(Newsletter $newsletter): array

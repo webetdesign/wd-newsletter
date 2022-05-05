@@ -30,7 +30,6 @@
 3° Create File wd-newsletter.yaml : 
 ```yaml
 wd-newsletter:
-  mailer: 'swiftmailer.mailer.spool_mailer'
   routes:
     home: fr_home
   class:
@@ -57,6 +56,16 @@ wd-newsletter:
         - {code: 'picture_margin', label: "Marge de l'image", help: "Marge de l'image à gauche et à droite" ,type: TEXT}        
         - {code: 'title', label: 'Titre',type: WYSYWYG}
 ```
+````yaml
+#config/packages/messenger.yaml
+framework:
+    messenger:
+        transports:
+            async: "%env(MESSENGER_TRANSPORT_DSN)%"
+        routing:
+            'Symfony\Component\Mailer\Messenger\SendEmailMessage': async
+
+````
 4° Add token to User
 
 ```php
