@@ -1,9 +1,4 @@
 services:
-  newsletter.newsletter_provider:
-    class: WebEtDesign\NewsletterBundle\Services\ModelProvider
-    public: true
-    arguments: ['%wd_newsletter.models%']
-
   WebEtDesign\NewsletterBundle\:
     resource: '../../*'
     exclude: '../../{DependencyInjection,Entity,Admin}'
@@ -34,13 +29,22 @@ services:
 
   WebEtDesign\NewsletterBundle\Form\NewsletterModelType:
     arguments:
-      - '@newsletter.newsletter_provider'
+      - '@WebEtDesign\NewsletterBundle\Factory\NewsletterFactory'
+    tags:
+      - { name: form.type }
+
+
+  WebEtDesign\NewsletterBundle\Form\AdminNewsletterType:
+    arguments:
+      - '@WebEtDesign\NewsletterBundle\Factory\NewsletterFactory'
+      - '@WebEtDesign\CmsBundle\Factory\BlockFactory'
+      - '%wd_newsletter.locales%'
     tags:
       - { name: form.type }
 
   WebEtDesign\NewsletterBundle\Form\NewsletterContentCollectionType:
     arguments:
-      - '@newsletter.content_collection_transformer'
+#      - '@newsletter.content_collection_transformer'
     tags:
       - { name: form.type }
 
@@ -61,7 +65,7 @@ services:
     arguments:
       - '@messenger.bus.default'
       - '@twig'
-      - '@newsletter.newsletter_provider'
+      - '@WebEtDesign\NewsletterBundle\Factory\NewsletterFactory'
       - '@doctrine.orm.default_entity_manager'
       - '@event_dispatcher'
       - '%wd_newsletter.noreply%'
@@ -70,13 +74,6 @@ services:
       - '%wd_newsletter.locales%'
       - '%kernel.project_dir%'
       - '%wd_newsletter.enable_log%'
-
-  newsletter.content_creator_service:
-    class: WebEtDesign\NewsletterBundle\Services\NewsletterContentCreatorService
-    public: true
-    arguments:
-      - '%wd_newsletter.locales%'
-      - '@doctrine.orm.default_entity_manager'
 
   newsletter.content_collection_transformer:
     class: WebEtDesign\NewsletterBundle\Form\Transformer\ContentCollectionTransformer

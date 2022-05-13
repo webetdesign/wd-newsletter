@@ -20,6 +20,7 @@ use Symfony\Component\String\ByteString;
 use Symfony\Component\Templating\EngineInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Twig\Environment;
+use WebEtDesign\CmsBundle\Factory\TemplateFactoryInterface;
 use WebEtDesign\NewsletterBundle\Entity\Newsletter;
 use WebEtDesign\NewsletterBundle\Event\MailSentEvent;
 use WebEtDesign\UserBundle\Entity\WDUser;
@@ -30,7 +31,7 @@ class EmailService
     public function __construct(
         private MessageBusInterface      $bus,
         private Environment          $templating,
-        private ModelProvider            $modelProvider,
+        private TemplateFactoryInterface            $factory,
         private EntityManagerInterface   $em,
         private EventDispatcherInterface $eventDispatcher,
         private ?array                   $from,

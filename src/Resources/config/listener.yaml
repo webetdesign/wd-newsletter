@@ -2,7 +2,8 @@ services:
   newsletter.admin.newsletter_listener:
     class: WebEtDesign\NewsletterBundle\EventListener\NewsletterAdminListener
     arguments:
-      - '@newsletter.newsletter_provider'
-      - '@newsletter.content_creator_service'
+      - '@WebEtDesign\NewsletterBundle\Factory\NewsletterFactory'
+      - '@doctrine.orm.default_entity_manager'
+      - '%wd_newsletter.locales%'
     tags:
       - { name: doctrine.event_listener, event: prePersist }

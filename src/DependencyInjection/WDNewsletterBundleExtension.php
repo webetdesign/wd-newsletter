@@ -10,14 +10,19 @@ namespace WebEtDesign\NewsletterBundle\DependencyInjection;
 
 use Exception;
 use Symfony\Component\Config\Definition\Processor;
+use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
+use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
+use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\Extension;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\Config\FileLocator;
 use WebEtDesign\NewsletterBundle\Admin\NewsletterContentAdmin;
 use WebEtDesign\NewsletterBundle\Admin\NewsletterNewsletterAdmin;
+use WebEtDesign\NewsletterBundle\Attribute\AsNewsletterModel;
 use WebEtDesign\NewsletterBundle\Entity\Content;
 use WebEtDesign\NewsletterBundle\Entity\Newsletter;
+use WebEtDesign\NewsletterBundle\Factory\NewsletterFactory;
 
 class WDNewsletterBundleExtension extends Extension
 {
@@ -39,7 +44,6 @@ class WDNewsletterBundleExtension extends Extension
 
 
         $container->setParameter('wd_newsletter.enable_log', $config['enable_log']);
-        $container->setParameter('wd_newsletter.models', $config['models']);
         $container->setParameter('wd_newsletter.routes', $config['routes']);
         $container->setParameter('wd_newsletter.noreply', $config['noreply']);
         $container->setParameter('wd_newsletter.replyTo', $config['replyTo']);
@@ -52,6 +56,22 @@ class WDNewsletterBundleExtension extends Extension
         $container->setParameter('wd_newsletter.entity.media', $config['class']['media']);
         $container->setParameter('wd_newsletter.entity.document', $config['class']['document']);
         $container->setParameter('wd_newsletter.entity.actuality', $config['class']['actuality']);
+
+        if (method_exists($container, 'registerAttributeForAutoconfiguration')) {
+            $container->registerAttributeForAutoconfiguration(AsNewsletterModel::class,
+                static function (ChildDefinition $definition, AsNewsletterModel $attribute) {
+                    $definition->addTag('wd_newsletter.model', array_filter([
+                        'key'       => $attribute->code,
+                    ]));
+                }
+            );
+        }
+
+        $container->getDefinition(NewsletterFactory::class)->setArguments([
+            new ServiceLocatorArgument(new TaggedIteratorArgument('wd_newsletter.model', 'key',
+                null, true)),
+            []
+        ]);
 
     }
 

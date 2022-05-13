@@ -13,12 +13,9 @@ use WebEtDesign\NewsletterBundle\Entity\Content;
 use WebEtDesign\NewsletterBundle\Entity\Newsletter;
 use WebEtDesign\NewsletterBundle\Entity\NewsletterContentTypeEnum;
 use WebEtDesign\NewsletterBundle\Services\EmailService;
-use WebEtDesign\NewsletterBundle\Services\ModelProvider;
 
 class NewsletterTwigExtension extends AbstractExtension
 {
-    private ModelProvider $modelProvider;
-
     public function __construct(
         private EmailService $emailService,
         private ContainerInterface $container,
@@ -27,7 +24,6 @@ class NewsletterTwigExtension extends AbstractExtension
         private WDMediaService $mediaService
     )
     {
-        $this->modelProvider = new ModelProvider($this->container->getParameter('wd_newsletter.models'));
     }
 
     public function getFunctions(): array

@@ -8,29 +8,18 @@ use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use WebEtDesign\CmsBundle\Factory\TemplateFactoryInterface;
 use WebEtDesign\NewsletterBundle\Repository\NewsletterRepository;
-use WebEtDesign\NewsletterBundle\Services\ModelProvider;
-use WebEtDesign\NewsletterBundle\Services\NewsletterContentCreatorService;
 
 class NewsletterSyncContentCommand extends Command
 {
     protected static $defaultName = 'newsletter:sync-contents';
 
-
-    /**
-     * NewsletterSyncContentCommand constructor.
-     * @param string|null $name
-     * @param EntityManagerInterface $em
-     * @param NewsletterRepository $repository
-     * @param ModelProvider $templateProvider
-     * @param NewsletterContentCreatorService $contentCreatorService
-     */
     public function __construct(
         ?string                                 $name,
         private EntityManagerInterface          $em,
         private NewsletterRepository            $repository,
-        private ModelProvider                   $templateProvider,
-        private NewsletterContentCreatorService $contentCreatorService
+        private TemplateFactoryInterface $templateFactory
     )
     {
         parent::__construct($name);

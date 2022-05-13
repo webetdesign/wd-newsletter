@@ -15,7 +15,9 @@ use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use WebEtDesign\CmsBundle\Form\Content\AdminCmsBlockCollectionType;
+use WebEtDesign\NewsletterBundle\EventListener\NewsletterContentFormListener;
 use WebEtDesign\NewsletterBundle\Factory\NewsletterFactory;
+use WebEtDesign\NewsletterBundle\Form\AdminNewsletterType;
 use WebEtDesign\NewsletterBundle\Form\NewsletterModelType;
 
 class NewsletterNewsletterAdmin extends AbstractAdmin
@@ -110,7 +112,7 @@ class NewsletterNewsletterAdmin extends AbstractAdmin
     protected function configureFormFields(FormMapper $form): void
     {
         $this->setFormTheme(array_merge($this->getFormTheme(), [
-            '@WDNewsletter/form/newsletter_contents_type.html.twig'
+            "@WebEtDesignCms/admin/form/cms_block.html.twig",
         ]));
 
         $roleAdmin = $this->canManageContent();
@@ -174,7 +176,12 @@ class NewsletterNewsletterAdmin extends AbstractAdmin
                 ->tab('Contenus', ['box_class' => 'header_none', 'class' => 'col-xs-12'])
                 ->with('', ['box_class' => 'header_none'])
                 ->add('contents', AdminCmsBlockCollectionType::class, [
-                    'factory' => $this->factory
+                    'label' => false,
+                    'templateFactory' => $this->factory,
+                    'listener' => new NewsletterContentFormListener(
+                        templateFactory: $this->factory,
+                        type: AdminNewsletterType::class
+                    )
                 ])
                 ->end();
 

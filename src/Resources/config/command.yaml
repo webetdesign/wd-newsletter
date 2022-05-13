@@ -4,7 +4,6 @@ services:
       - ~
       - '@doctrine.orm.default_entity_manager'
       - '@newsletter.newsletter_repository'
-      - '@newsletter.newsletter_provider'
-      - '@newsletter.content_creator_service'
+      - '@WebEtDesign\NewsletterBundle\Factory\NewsletterFactory'
     tags:
       - { name: 'console.command', command: 'newsletter:sync-contents' }

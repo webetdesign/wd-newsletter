@@ -2,16 +2,21 @@
 
 namespace WebEtDesign\NewsletterBundle\EventListener;
 
+use Doctrine\ORM\EntityManagerInterface;
 use Exception;
-use WebEtDesign\NewsletterBundle\Services\ModelProvider;
+use WebEtDesign\CmsBundle\Factory\TemplateFactoryInterface;
+use WebEtDesign\NewsletterBundle\Attribute\AbstractModel;
+use WebEtDesign\NewsletterBundle\Entity\Content;
+use WebEtDesign\NewsletterBundle\Entity\ContentTranslation;
 use WebEtDesign\NewsletterBundle\Entity\Newsletter;
-use WebEtDesign\NewsletterBundle\Services\NewsletterContentCreatorService;
+use WebEtDesign\NewsletterBundle\Entity\NewsletterContentTypeEnum;
 
 class NewsletterAdminListener
 {
     public function __construct(
-        private ModelProvider $provider,
-        private NewsletterContentCreatorService $contentCreatorService
+        private TemplateFactoryInterface $templateFactory,
+        private EntityManagerInterface $em,
+        private array $locales = ['fr']
     ) {}
 
     /**
@@ -25,14 +30,48 @@ class NewsletterAdminListener
             return;
         }
 
-        $config = $this->provider->getConfigurationFor($newsletter->getModel());
+        /** @var AbstractModel $config */
+        $config = $this->templateFactory->get($newsletter->getModel());
 
         if (!$newsletter->getSender() || !$newsletter->getEmail()){
-            $newsletter->setSender($config['sender'])
-                ->setEmail($config['email']);
+            $newsletter->setSender($config->getSender())
+                ->setEmail($config->getEmail());
         }
 
-        $this->contentCreatorService->createNewsletterContents($config, $newsletter);
+        $i = 0;
+        foreach ($config->getBlocks() as $block) {
+            if (!($content = $newsletter->getContent($block->getCode()))) {
+                $content = new Content();
+                $content->setHelp($block->getHelp());
+                $content->setLabel($block->getLabel() ?? $block->getCode());
+                $content->setType($block->getType());
+                $content->setCode($block->getCode());
+                $content->setCanTranslate($block->getType() !== NewsletterContentTypeEnum::MEDIA);
+                $content->setPosition($i);
+
+                if ($content->getType() !== NewsletterContentTypeEnum::MEDIA ){
+                    if ($content->getCanTranslate()){
+                        $locales = $this->locales;
+                    }else{
+                        $locales = ['fr'];
+                    }
+
+                    foreach ($locales as $locale) {
+                        $newsletterContent_trans = new ContentTranslation();
+                        $newsletterContent_trans->setLocale($locale);
+                        $newsletterContent_trans->setTranslatable($content);
+                        $this->em->persist($newsletterContent_trans);
+                    }
+                }
+                $CmsContent = new Content();
+                $CmsContent->setCode($block->getCode());
+                $CmsContent->setLabel($block->getLabel());
+                $CmsContent->setType($block->getType());
+            }
+            $i++;
+            $newsletter->addContent($content);
+        }
+
     }
 
 }

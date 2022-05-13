@@ -9,6 +9,7 @@ use FOS\CKEditorBundle\Form\Type\CKEditorType;
 use Sonata\AdminBundle\Form\Type\ModelListType;
 use Symfony\Component\Form\Extension\Core\Type\ColorType;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use WebEtDesign\CmsBundle\Factory\TemplateFactoryInterface;
 use WebEtDesign\NewsletterBundle\Entity\Content;
 use WebEtDesign\NewsletterBundle\Entity\NewsletterContentTypeEnum;
 use Sonata\AdminBundle\Admin\AbstractAdmin;
@@ -18,7 +19,6 @@ use Sonata\AdminBundle\Form\FormMapper;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use WebEtDesign\NewsletterBundle\Form\NewsletterContentCollectionType;
-use WebEtDesign\NewsletterBundle\Services\ModelProvider;
 
 final class NewsletterContentAdmin extends AbstractAdmin
 {
@@ -28,7 +28,7 @@ final class NewsletterContentAdmin extends AbstractAdmin
         string                        $baseControllerName,
         private TokenStorageInterface $tokenStorage,
         private string                $media_class,
-        private ModelProvider         $modelProvider,
+        private TemplateFactoryInterface         $factory,
         private array                 $locales,
         private ?string               $document_class,
         private ?string               $actuality_class

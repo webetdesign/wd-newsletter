@@ -4,6 +4,7 @@ namespace WebEtDesign\NewsletterBundle\Factory;
 
 use WebEtDesign\CmsBundle\CmsTemplate\TemplateInterface;
 use WebEtDesign\CmsBundle\Factory\AbstractTemplateFactory;
+use WebEtDesign\NewsletterBundle\Attribute\AbstractModel;
 
 class NewsletterFactory extends AbstractTemplateFactory
 {
@@ -17,26 +18,25 @@ class NewsletterFactory extends AbstractTemplateFactory
     protected function getConfig($code): array
     {
         if (!isset($this->configs[$code])) {
-            throw new \InvalidArgumentException(sprintf('Unknown page config "%s". The registered page configs are: %s',
+            throw new \InvalidArgumentException(sprintf('Unknown model config "%s". The registered model configs are: %s',
                 $code, implode(', ', array_keys($this->configs))));
         };
 
         return $this->configs[$code];
     }
 
+    public function getConfigsList (): array
+    {
+        return $this->configs;
+    }
+
     protected function getServices(string $code): TemplateInterface
     {
         if (!$this->serviceLocator->has($code)) {
-            throw new \InvalidArgumentException(sprintf('Unknown page "%s". The registered page are: %s',
+            throw new \InvalidArgumentException(sprintf('Unknown model "%s". The registered model are: %s',
                 $code, implode(', ', array_keys($this->serviceLocator->getProvidedServices()))));
         };
 
-        $service = $this->serviceLocator->get($code);
-
-        if (empty($service->getCode())) {
-            $service->setCode($code);
-        }
-
-        return $service;
+        return $this->serviceLocator->get($code);
     }
 }
