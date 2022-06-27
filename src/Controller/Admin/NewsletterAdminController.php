@@ -31,6 +31,7 @@ class NewsletterAdminController extends CRUDController
         private RequestStack $requestStack
     ){}
 
+
     public function sendAction($id = null): RedirectResponse
     {
         $request = $this->requestStack->getCurrentRequest();
@@ -45,7 +46,7 @@ class NewsletterAdminController extends CRUDController
 
         if ($newsletter->getIsSent()) {
             $this->addFlash('error', "La newsletter a déjà été envoyée");
-            return $this->redirect($this->admin->generateObjectUrl('list', null, []));
+            return $this->redirect($this->admin->generateObjectUrl('list', $newsletter, []));
         }
 
         $emails = $this->emailService->getEmails($newsletter);
@@ -69,7 +70,7 @@ class NewsletterAdminController extends CRUDController
 
         $this->em->flush();
 
-        return $this->redirect($this->admin->generateObjectUrl('list', null, []));
+        return $this->redirect($this->admin->generateObjectUrl('list', $newsletter, []));
     }
 
     public function copyAction($id = null): RedirectResponse

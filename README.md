@@ -30,10 +30,12 @@
 3° Create File wd-newsletter.yaml : 
 ```yaml
 wd-newsletter:
+  enable_log: true # Pour les statistiques
   routes:
     home: fr_home
   class:
     media: App\Entity\Media
+    user: App\Entity\User\User
     document: App\Entity\Document # Pas obligatoire (Le repository doit implémenter ContentCollectionRepositoryInterface)
     actuality: App\Entity\News # Pas obligatoire (Le repository doit implémenter ContentCollectionRepositoryInterface)
   noreply:
@@ -43,18 +45,6 @@ wd-newsletter:
     email: 'contact@your-site.fr' #optional
     name: 'Your site' #optional
   locales: [fr, en]
-  models:
-    defaut:
-      name: 'name'
-      sender: 'sender'
-      email: 'email'
-      template: 'newsletters/default.html.twig'
-      txt: 'newsletters/default.txt.twig'
-      contents:
-        - {code: 'main_color', label: 'Couleur principale', type: COLOR}
-        - {code: 'main_picture', label: 'Image de la newsletter', type: MEDIA}
-        - {code: 'picture_margin', label: "Marge de l'image", help: "Marge de l'image à gauche et à droite" ,type: TEXT}        
-        - {code: 'title', label: 'Titre',type: WYSYWYG}
 ```
 ````yaml
 #config/packages/messenger.yaml
@@ -64,9 +54,12 @@ framework:
             async: "%env(MESSENGER_TRANSPORT_DSN)%"
         routing:
             'Symfony\Component\Mailer\Messenger\SendEmailMessage': async
-
 ````
-4° Add token to User
+````dotenv
+#.env.local
+MESSENGER_TRANSPORT_DSN=doctrine://default
+````
+4° Add token to User (Used to unsubscribe)
 
 ```php
 <?php 
@@ -118,41 +111,17 @@ fos_ck_editor:
         category: default_cms
 ```
 
-7° add sonata_media config
-```yaml
-# config/packages/sonata_media.yaml
-sonata_media:
-  contexts:
-    newsletter:
-      providers:
-        - sonata.media.provider.image
-      formats:
-        small: { width: 100 , quality: 70}
-        big:   { width: 900 , quality: 70}
-```
-
-8° swiftmailer configuration
-```yaml
-#config/packages/swiftmailer.yaml
-swiftmailer:
-    default_mailer: direct_mailer
-    mailers:
-        direct_mailer:
-            url: '%env(MAILER_URL)%'
-        spool_mailer:
-            url: '%env(MAILER_URL)%'
-            spool:
-                type: 'file'
-                path: '%kernel.project_dir%/var/spool'
-
-```
-9° Token encryption log
+7° Token encryption log
 `````dotenv
 #.env.local
-# Possiblité de générer le token depuis le site https://jwt.io/ en mettant un payload vide (copier la partie bleue du token
+# Possiblité de générer le token depuis le site https://jwt.io/ en mettant un payload vide
 NEWSLETTER_IV='mon-token'
 `````
 
+8° Send mails 
+````shell
+bin/console messenger:consume async
+````
 ## Models : 
 
 #### Paramèters
@@ -164,9 +133,39 @@ NEWSLETTER_IV='mon-token'
 - txt : txt of template of the model.
 - contents :
     - code : use to find and render the content
+    - type : like cms type
     - label : name display in the admin
-    - type : on of them --> [COLOR, MEDIA, WYSYWYG, TEXT, ACTUALITIES, DOCUMENTS]
 
+````php
+#[AsNewsletterModel(code: self::CODE)]
+class DefaultModel extends AbstractModel
+{
+    public const CODE = 'default';
+
+    protected ?string $name = 'name';
+    protected ?string $sender = 'noreply@your-site.com';
+    protected ?string $email = 'contact@your-site.com';
+    protected ?string $template = 'newsletters/default.html.twig';
+    protected ?string $txt = 'newsletters/default.txt.twig';
+
+    public function getBlocks(): iterable
+    {
+        yield BlockDefinition::new('title', WysiwygBlock::code, 'Titre');
+        yield BlockDefinition::new('picture_margin', TextBlock::code, "Marge de l'image");
+        yield BlockDefinition::new('main_picture', MediaBlock::code, "Image de la newsletter")->setFormOptions([
+            'category' => 'default_cms'
+        ]);
+        yield BlockDefinition::new('main_color', ColorBlock::code, 'Couleur principale');
+        yield BlockDefinition::new('documents', DynamicBlock::code, 'Documents')->setAvailableBlocks([
+            BlockDefinition::new('document', EntityBlock::code, 'Document')->setFormOptions([
+                'class' => User::class
+            ])
+        ])
+        ;
+
+    }
+}
+````
 #### Traductions
 
 - All of contents except MEDIA type will be translated in all of the locales provided in the locales config field.

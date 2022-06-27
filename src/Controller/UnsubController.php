@@ -2,12 +2,10 @@
 
 namespace WebEtDesign\NewsletterBundle\Controller;
 
-use App\Entity\User as User;
 use Doctrine\ORM\EntityManagerInterface as EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Routing\Annotation\Route;
-use WebEtDesign\UserBundle\Entity\WDUser;
 
 class UnsubController extends AbstractController
 {
@@ -32,8 +30,7 @@ class UnsubController extends AbstractController
      */
     public function token(string $token): RedirectResponse
     {
-        /** @var WDUser $user */
-        $user = $this->em->getRepository(WDUser::class)->findOneBy([
+        $user = $this->em->getRepository(User::class)->findOneBy([
             'newsletterToken' => $token
         ]);
 

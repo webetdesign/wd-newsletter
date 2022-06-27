@@ -1,4 +1,11 @@
 services:
+
+  sonata.admin.request.fetcher:
+    class: Sonata\AdminBundle\Request\AdminFetcher
+    public: true
+    arguments:
+      - '@sonata.admin.pool'
+
   WebEtDesign\NewsletterBundle\:
     resource: '../../*'
     exclude: '../../{DependencyInjection,Entity,Admin}'
@@ -33,12 +40,16 @@ services:
     tags:
       - { name: form.type }
 
-
   WebEtDesign\NewsletterBundle\Form\AdminNewsletterType:
     arguments:
-      - '@WebEtDesign\NewsletterBundle\Factory\NewsletterFactory'
       - '@WebEtDesign\CmsBundle\Factory\BlockFactory'
       - '%wd_newsletter.locales%'
+    tags:
+      - { name: form.type }
+
+  WebEtDesign\NewsletterBundle\Form\NewsletterContentType:
+    arguments:
+      - '@WebEtDesign\CmsBundle\Factory\BlockFactory'
     tags:
       - { name: form.type }
 
@@ -74,6 +85,7 @@ services:
       - '%wd_newsletter.locales%'
       - '%kernel.project_dir%'
       - '%wd_newsletter.enable_log%'
+      - '%wd_newsletter.entity.user%'
 
   newsletter.content_collection_transformer:
     class: WebEtDesign\NewsletterBundle\Form\Transformer\ContentCollectionTransformer

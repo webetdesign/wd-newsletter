@@ -29,16 +29,12 @@ class NewsletterNewsletterAdmin extends AbstractAdmin
     ];
 
     public function __construct(
-        string                        $code,
-        string                        $class,
-        string                        $baseControllerName,
         private TokenStorageInterface $tokenStorage,
         private NewsletterFactory     $factory
     )
     {
-        parent::__construct($code, $class, $baseControllerName);
+        parent::__construct();
     }
-
 
     protected function configureDatagridFilters(DatagridMapper $filter): void
     {
@@ -64,7 +60,7 @@ class NewsletterNewsletterAdmin extends AbstractAdmin
             ])
             ->add('model', null, [
                 'label' => 'Modèle',
-                'template' => 'WDNewsletterBundle:admin/newsletter:model_type.html.twig'
+                'template' => '@WDNewsletter/admin/newsletter/model_type.html.twig'
             ])
             ->add('groups', null, [
                 'label' => 'Destinataires',
@@ -92,18 +88,18 @@ class NewsletterNewsletterAdmin extends AbstractAdmin
 //            ->add('email', null, [
 //                'label' => 'Email de retour',
 //            ])
-            ->add('_action', null, [
+            ->add(ListMapper::NAME_ACTIONS, null, [
                 'actions' => [
                     'show' => [],
                     'edit' => [],
                     'copy' => [
-                        'template' => 'WDNewsletterBundle:admin/newsletter:list__action_copy.html.twig'
+                        'template' => '@WDNewsletter/admin/newsletter/list__action_copy.html.twig'
                     ],
                     'delete' => [
-                        'template' => 'WDNewsletterBundle:admin/newsletter:list__action_delete.html.twig'
+                        'template' => '@WDNewsletter/admin/newsletter/list__action_delete.html.twig'
                     ],
                     'send' => [
-                        'template' => 'WDNewsletterBundle:admin/newsletter:list__action_send.html.twig'
+                        'template' => '@WDNewsletter/admin/newsletter/list__action_send.html.twig'
                     ],
                 ]
             ]);
@@ -113,6 +109,8 @@ class NewsletterNewsletterAdmin extends AbstractAdmin
     {
         $this->setFormTheme(array_merge($this->getFormTheme(), [
             "@WebEtDesignCms/admin/form/cms_block.html.twig",
+            '@WebEtDesignCms/form/cms_global_vars_type.html.twig',
+            '@WebEtDesignCms/admin/form/dynamic_block.html.twig',
         ]));
 
         $roleAdmin = $this->canManageContent();

@@ -48,12 +48,12 @@ class WDNewsletterBundleExtension extends Extension
         $container->setParameter('wd_newsletter.noreply', $config['noreply']);
         $container->setParameter('wd_newsletter.replyTo', $config['replyTo']);
         $container->setParameter('wd_newsletter.locales', $config['locales']);
-        $container->setParameter('wd_newsletter.admin.config.class.content', NewsletterContentAdmin::class);
         $container->setParameter('wd_newsletter.admin.config.class.newsletter', NewsletterNewsletterAdmin::class);
 
         $container->setParameter('wd_newsletter.entity.content', Content::class);
         $container->setParameter('wd_newsletter.entity.newsletter', Newsletter::class);
         $container->setParameter('wd_newsletter.entity.media', $config['class']['media']);
+        $container->setParameter('wd_newsletter.entity.user', $config['class']['user']);
         $container->setParameter('wd_newsletter.entity.document', $config['class']['document']);
         $container->setParameter('wd_newsletter.entity.actuality', $config['class']['actuality']);
 

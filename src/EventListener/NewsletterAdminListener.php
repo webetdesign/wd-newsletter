@@ -4,6 +4,7 @@ namespace WebEtDesign\NewsletterBundle\EventListener;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
+use WebEtDesign\CmsBundle\CmsBlock\DynamicBlock;
 use WebEtDesign\CmsBundle\Factory\TemplateFactoryInterface;
 use WebEtDesign\NewsletterBundle\Attribute\AbstractModel;
 use WebEtDesign\NewsletterBundle\Entity\Content;
@@ -46,10 +47,12 @@ class NewsletterAdminListener
                 $content->setLabel($block->getLabel() ?? $block->getCode());
                 $content->setType($block->getType());
                 $content->setCode($block->getCode());
-                $content->setCanTranslate($block->getType() !== NewsletterContentTypeEnum::MEDIA);
                 $content->setPosition($i);
 
-                if ($content->getType() !== NewsletterContentTypeEnum::MEDIA ){
+                $canTranslate = !in_array($content->getType(), [NewsletterContentTypeEnum::MEDIA]);
+                $content->setCanTranslate($canTranslate);
+
+                if ($canTranslate){
                     if ($content->getCanTranslate()){
                         $locales = $this->locales;
                     }else{

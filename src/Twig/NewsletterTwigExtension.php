@@ -2,16 +2,18 @@
 
 namespace WebEtDesign\NewsletterBundle\Twig;
 
-use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
+use WebEtDesign\CmsBundle\CmsBlock\DynamicBlock;
+use WebEtDesign\CmsBundle\Form\Transformer\CmsBlockTransformer;
 use WebEtDesign\MediaBundle\Services\WDMediaService;
 use WebEtDesign\NewsletterBundle\Entity\Content;
 use WebEtDesign\NewsletterBundle\Entity\Newsletter;
 use WebEtDesign\NewsletterBundle\Entity\NewsletterContentTypeEnum;
+use WebEtDesign\NewsletterBundle\Factory\NewsletterFactory;
 use WebEtDesign\NewsletterBundle\Services\EmailService;
 
 class NewsletterTwigExtension extends AbstractExtension
@@ -20,8 +22,9 @@ class NewsletterTwigExtension extends AbstractExtension
         private EmailService $emailService,
         private ContainerInterface $container,
         private RequestStack $requestStack,
-        private EntityManagerInterface $em,
-        private WDMediaService $mediaService
+        private WDMediaService $mediaService,
+        private NewsletterFactory $newsletterFactory,
+        private CmsBlockTransformer $cmsBlockTransformer
     )
     {
     }
@@ -63,21 +66,10 @@ class NewsletterTwigExtension extends AbstractExtension
                     $base = $this->requestStack->getCurrentRequest()->getSchemeAndHttpHost();
 
                     return preg_replace('~(?:src|action|href)=[\'"]\K/(?!/)[^\'"]*~',"$base$0", $content->translate($locale)->getValue());
-                case NewsletterContentTypeEnum::DOCUMENTS:
-                case NewsletterContentTypeEnum::ACTUALITIES:
-                $er = $this->em->getRepository(
-                    $content->getType() === NewsletterContentTypeEnum::ACTUALITIES ?
-                        $this->container->getParameter('wd_newsletter.entity.actuality') :
-                        $this->container->getParameter('wd_newsletter.entity.document')
-                );
-                $data = [];
-                foreach (explode(',', $content->translate($locale)->getValue()) as $id) {
-                    $object = $er->find($id);
-                    if ($object){
-                        $data[] = $object;
-                    }
-                }
-                return $data;
+                case DynamicBlock::code:
+                    return array_map(function (array $row){
+                        return $row['value'];
+                    }, $this->cmsBlockTransformer->transform($content->translate($locale)->getValue()));
             }
 
         }
@@ -115,15 +107,14 @@ class NewsletterTwigExtension extends AbstractExtension
     }
 
     public function getModelTitle($model){
-        $models = $this->container->getParameter('wd_newsletter.models');
-        return isset($models[$model]) ? $models[$model]['name'] : $model;
+        return $this->newsletterFactory->get($model)->getLabel();
     }
 
     /**
      * @throws Exception
      */
     public function getTemplate($model){
-        return $this->modelProvider->getTemplate($model);
+        return $this->newsletterFactory->get($model)->getTemplate();
     }
 
     public function getLocales(): array

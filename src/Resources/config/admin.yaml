@@ -1,31 +1,12 @@
 services:
-  newsletter.admin.content:
-    class: WebEtDesign\NewsletterBundle\Admin\NewsletterContentAdmin
-    arguments:
-      - ~
-      - WebEtDesign\NewsletterBundle\Entity\Content
-      - ~
-      - '@security.token_storage'
-      - '%wd_newsletter.entity.media%'
-      - '@WebEtDesign\NewsletterBundle\Factory\NewsletterFactory'
-      - '%wd_newsletter.locales%'
-      - '%wd_newsletter.entity.document%'
-      - '%wd_newsletter.entity.actuality%'
-    tags:
-      - { name: sonata.admin, manager_type: orm, group: NEWSLETTER, label: Content, show_in_dashboard: false }
-    public: true
-
   newsletter.admin.newsletter:
     class: WebEtDesign\NewsletterBundle\Admin\NewsletterNewsletterAdmin
     arguments:
-      - ~
-      - '%wd_newsletter.entity.newsletter%'
-      - ~
       - '@security.token_storage'
       - '@WebEtDesign\NewsletterBundle\Factory\NewsletterFactory'
     tags:
-      - { name: sonata.admin, manager_type: orm, group: newsletter, label: Newsletter, controller: WebEtDesign\NewsletterBundle\Controller\Admin\NewsletterAdminController }
+      - { name: sonata.admin, manager_type: orm, group: newsletter, model_class: '%wd_newsletter.entity.newsletter%',  label: Newsletter, controller: WebEtDesign\NewsletterBundle\Controller\Admin\NewsletterAdminController }
     public: true
     calls:
-      - [setTemplate, ['show', 'WDNewsletterBundle:admin/newsletter:show.html.twig']]
+      - [ setTemplate, [ 'show', '@@WDNewsletter/admin/newsletter/show.html.twig' ] ]
 #      - [setFormContractor, ['@cms.sonata.form_contractor.bridge']]
