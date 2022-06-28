@@ -54,11 +54,6 @@ class Newsletter
     private ?string $emailsMore;
 
     /**
-     * @ORM\ManyToMany(targetEntity=Group::class)
-     */
-    private Collection $groups;
-
-    /**
      * @ORM\Column(type="boolean", nullable=true)
      */
     private bool $isSent = false;
@@ -81,7 +76,6 @@ class Newsletter
     #[Pure] public function __construct()
     {
         $this->contents = new ArrayCollection();
-        $this->groups = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -203,29 +197,6 @@ class Newsletter
         }
 
         return $cpt != 0 ? $more : [];
-    }
-
-    public function getGroups(): Collection
-    {
-        return $this->groups;
-    }
-
-    public function addGroup(Group $group): self
-    {
-        if (!$this->groups->contains($group)) {
-            $this->groups[] = $group;
-        }
-
-        return $this;
-    }
-
-    public function removeGroup(Group $group): self
-    {
-        if ($this->groups->contains($group)) {
-            $this->groups->removeElement($group);
-        }
-
-        return $this;
     }
 
     public function getIsSent(): bool

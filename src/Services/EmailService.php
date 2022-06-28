@@ -40,7 +40,9 @@ class EmailService
         private string                   $rootDir,
         private bool                     $enableLog,
         private string                   $userClass
-    ){}
+    )
+    {
+    }
 
     /**
      * @param Newsletter $newsletter
@@ -114,36 +116,21 @@ class EmailService
     {
         $emails = [];
 
-        if ($newsletter->getGroups()->count() > 0) {
-            $qb = $this->em->getRepository($this->userClass)->createQueryBuilder('u');
+        $qb = $this->em->getRepository($this->userClass)->createQueryBuilder('u');
 
-            $or = '(';
-            $cpt = 0;
-            foreach ($newsletter->getGroups() as $group) {
-                $or .= ':group_' . $cpt . ' MEMBER OF u.groups OR ';
-                $qb->setParameter('group_' . $cpt, $group);
-                $cpt++;
+        $qb->andWhere("u.newsletter = 1");
+
+        $users = $qb->getQuery()->getResult();
+
+        foreach ($users as $u) {
+            if (!$u->getNewsletterToken()) {
+                $u->setNewsletterToken(md5(uniqid()));
             }
-            $or = substr($or, 0, strlen($or) - 3) . ')';
-
-            if (strlen($or) > 5) {
-                $qb->andWhere($or);
-            }
-
-            $qb->andWhere("u.newsletter = 1");
-
-            $users = $qb->getQuery()->getResult();
-
-            foreach ($users as $u) {
-                if (!$u->getNewsletterToken()) {
-                    $u->setNewsletterToken(md5(uniqid()));
-                }
-                $locale = method_exists($u, 'getLocale') ? $u->getLocale() : 'fr';
-                $locale = $locale !== '' && $locale !== null ? $locale : 'fr';
-                $emails[$locale][$u->getNewsletterToken()] = $u->getEmail();
-            }
-            $this->em->flush();
+            $locale = method_exists($u, 'getLocale') ? $u->getLocale() : 'fr';
+            $locale = $locale !== '' && $locale !== null ? $locale : 'fr';
+            $emails[$locale][$u->getNewsletterToken()] = $u->getEmail();
         }
+        $this->em->flush();
 
         $more = $newsletter->getEmailsMoreArray();
 

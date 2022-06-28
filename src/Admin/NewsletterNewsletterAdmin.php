@@ -2,14 +2,12 @@
 
 namespace WebEtDesign\NewsletterBundle\Admin;
 
-use App\Entity\User\Group;
 use Sonata\AdminBundle\Admin\AbstractAdmin;
 use Sonata\AdminBundle\Datagrid\DatagridMapper;
 use Sonata\AdminBundle\Datagrid\ListMapper;
 use Sonata\AdminBundle\Form\FormMapper;
 use Sonata\AdminBundle\Route\RouteCollectionInterface;
 use Sonata\AdminBundle\Show\ShowMapper;
-use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -70,9 +68,7 @@ class NewsletterNewsletterAdmin extends AbstractAdmin
                 'label' => 'Modèle',
                 'template' => '@WDNewsletter/admin/newsletter/model_type.html.twig'
             ])
-            ->add('groups', null, [
-                'label' => 'Destinataires',
-            ]);
+        ;
 
         if ($this->canManageContent()) {
             $list->add('isSent', null, [
@@ -121,8 +117,6 @@ class NewsletterNewsletterAdmin extends AbstractAdmin
             '@WebEtDesignCms/admin/form/dynamic_block.html.twig',
         ]));
 
-        $roleAdmin = $this->canManageContent();
-
         //region Général
         $form
             ->tab('Général', ['box_class' => '']);
@@ -134,18 +128,7 @@ class NewsletterNewsletterAdmin extends AbstractAdmin
             ])
             ->add('model', NewsletterModelType::class, [
                 'label' => 'Modèle',
-            ]);
-
-//        if ($this->isCurrentRoute('edit') || $this->getRequest()->isXmlHttpRequest()) {
-//            $form
-//                ->add('sender', TextType::class, [
-//                    'label' => "Nom de l'expéditeur",
-//                ])
-//                ->add('email', EmailType::class, [
-//                    'label' => 'Email de retour',
-//                ]);
-//        }
-        $form
+            ])
             ->end()
             ->end();
         //endregion
@@ -155,16 +138,8 @@ class NewsletterNewsletterAdmin extends AbstractAdmin
             //region Envoie
             $form
                 ->tab("Options d'envoi", ['box_class' => '']);
-
             $form
                 ->with('', ['box_class' => 'header_none'])
-                ->add('groups', EntityType::class, [
-                    'label' => "Destinataires",
-                    'class' => Group::class,
-                    'required' => false,
-                    'expanded' => true,
-                    'multiple' => true
-                ])
                 ->add('emailsMore', TextareaType::class, [
                     'label' => "Liste d'e-mails complémentaires",
                     'required' => false,
