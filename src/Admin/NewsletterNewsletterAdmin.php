@@ -51,6 +51,14 @@ class NewsletterNewsletterAdmin extends AbstractAdmin
         parent::configureRoutes($collection);
     }
 
+    protected function configureBatchActions(array $actions): array
+    {
+        $actions = parent::configureBatchActions($actions);
+        unset($actions['delete']);
+        return $actions;
+    }
+
+
     protected function configureListFields(ListMapper $list): void
     {
 

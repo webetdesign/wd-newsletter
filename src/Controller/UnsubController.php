@@ -16,7 +16,7 @@ class UnsubController extends AbstractController
      * @param EntityManagerInterface $em
      * @param array $routes
      */
-    public function __construct(private EntityManagerInterface $em, array $routes)
+    public function __construct(private EntityManagerInterface $em, array $routes, private string $userClass)
     {
         $this->home = array_key_exists('home', $routes) ? $routes['home'] : 'index';
     }
@@ -30,7 +30,7 @@ class UnsubController extends AbstractController
      */
     public function token(string $token): RedirectResponse
     {
-        $user = $this->em->getRepository(User::class)->findOneBy([
+        $user = $this->em->getRepository($this->userClass)->findOneBy([
             'newsletterToken' => $token
         ]);
 
@@ -52,10 +52,7 @@ class UnsubController extends AbstractController
         return $this->redirectToRoute($this->home);
     }
 
-    /**
-     * @param WDUser $user
-     */
-    private function makeUnsub(WDUser $user)
+    private function makeUnsub($user)
     {
         $user
             ->setNewsletterAcceptedAt(null)

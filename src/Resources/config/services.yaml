@@ -21,6 +21,7 @@ services:
     arguments:
       - '@doctrine.orm.default_entity_manager'
       - '%wd_newsletter.routes%'
+      - '%wd_newsletter.entity.user%'
     tags: ['controller.service_arguments']
 
   WebEtDesign\NewsletterBundle\Controller\NewsletterContentController:
@@ -28,6 +29,8 @@ services:
     arguments:
       - '@doctrine.orm.default_entity_manager'
     tags: [ 'controller.service_arguments' ]
+    calls:
+      - [setContainer, ['@service_container']]
 
   WebEtDesign\NewsletterBundle\Repository\:
     resource: '../../Repository'
@@ -101,3 +104,4 @@ services:
     arguments:
       - '@doctrine.orm.default_entity_manager'
       - '%wd_newsletter.enable_log%'
+      - '%wd_newsletter.entity.user%'
