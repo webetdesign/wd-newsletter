@@ -10,6 +10,7 @@ use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
 use Swift_Mailer;
 use Swift_Message;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
@@ -17,13 +18,13 @@ use Symfony\Component\String\ByteString;
 use Symfony\Component\Templating\EngineInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use WebEtDesign\NewsletterBundle\Entity\Newsletter;
-use WebEtDesign\NewsletterBundle\Entity\Unsubscribe;
 use WebEtDesign\NewsletterBundle\Event\MailSentEvent;
 
 class EmailService
 {
 
     public function __construct(
+        private ParameterBagInterface    $parameterBag,
         private Swift_Mailer             $mailer,
         private EngineInterface          $templating,
         private ModelProvider            $modelProvider,
@@ -71,28 +72,7 @@ class EmailService
                     $html = $this->injectTrackerOpening($html, $trackingToken);
                     $html = $this->injectLinkTracker($html, $trackingToken);
 
-                    $message = (new Swift_Message($newsletter->getTitle()))
-                        ->setFrom([$this->from['email'] => $this->from['name']])
-                        ->setTo($email)
-                        ->setBody(
-                            $html, 'text/html'
-                        )
-                        ->addPart(
-                            $this->templating->render($this->modelProvider->getTxt($newsletter->getModel()), [
-                                'object' => $newsletter,
-                                'locale' => $newsletter->isSendInAllLocales() ? $this->locales : [$locale],
-                                'unsub' => $link
-                            ]), 'text/plain'
-                        );
-
-                    if ($this->reply && isset($this->reply['email']) && isset($this->reply['name'])){
-                        $message->setReplyTo([$this->reply['email'] => $this->reply['name']]);
-                    }
-
-                    if ($this->enableLog) {
-                        $message->getHeaders()->addTextHeader('X-Mailer-Hash', $trackingToken);
-                        $message->getHeaders()->has('X-No-Track') ? $message->getHeaders()->remove('X-No-Track') : null;
-                    }
+                    $message = $this->getSwift_Message($newsletter, $email, $html, $locale, $link, $trackingToken);
 
                     $res = $this->mailer->send($message);
                     $this->eventDispatcher->dispatch(new MailSentEvent($message, $trackingToken, $newsletter->getId()), MailSentEvent::NAME);
@@ -203,6 +183,43 @@ class EmailService
             );
         }
         return $html;
+    }
+
+    /**
+     * @param Newsletter $newsletter
+     * @param mixed $email
+     * @param mixed $html
+     * @param int|string $locale
+     * @param string $link
+     * @param string $trackingToken
+     * @return Swift_Message
+     * @throws Exception
+     */
+    public function getSwift_Message(Newsletter $newsletter, mixed $email, mixed $html, int|string $locale, string $link, string $trackingToken): Swift_Message
+    {
+        $message = (new Swift_Message($newsletter->getTitle()))
+            ->setFrom([$this->from['email'] => $this->from['name']])
+            ->setTo($email)
+            ->setBody(
+                $html, 'text/html'
+            )
+            ->addPart(
+                $this->templating->render($this->modelProvider->getTxt($newsletter->getModel()), [
+                    'object' => $newsletter,
+                    'locale' => $newsletter->isSendInAllLocales() ? $this->locales : [$locale],
+                    'unsub' => $link
+                ]), 'text/plain'
+            );
+
+        if ($this->reply && isset($this->reply['email']) && isset($this->reply['name'])) {
+            $message->setReplyTo([$this->reply['email'] => $this->reply['name']]);
+        }
+
+        if ($this->enableLog) {
+            $message->getHeaders()->addTextHeader('X-Mailer-Hash', $trackingToken);
+            $message->getHeaders()->has('X-No-Track') ? $message->getHeaders()->remove('X-No-Track') : null;
+        }
+        return $message;
     }
 
 }

@@ -56,6 +56,7 @@ services:
     class: WebEtDesign\NewsletterBundle\Services\EmailService
     public: true
     arguments:
+      - '@parameter_bag'
       - '@=service(parameter("wd_newsletter.mailer"))'
       - '@templating'
       - '@newsletter.newsletter_provider'
