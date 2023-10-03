@@ -74,6 +74,7 @@ class Newsletter
      */
     protected mixed $sentAt;
 
+
     #[Pure] public function __toString()
     {
         return $this->getTitle() ?? '';
@@ -262,6 +263,16 @@ class Newsletter
     public function setSendInAllLocales(bool $sendInAllLocales): void
     {
         $this->sendInAllLocales = $sendInAllLocales;
+    }
+
+    public function getMessengerMessage(): ?MessengerMessage
+    {
+        return $this->messengerMessage;
+    }
+
+    public function setMessengerMessage(?MessengerMessage $messengerMessage): void
+    {
+        $this->messengerMessage = $messengerMessage;
     }
 
 }
