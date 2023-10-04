@@ -285,14 +285,4 @@ class Newsletter
         $this->sendInAllLocales = $sendInAllLocales;
     }
 
-    public function getMessengerMessage(): ?MessengerMessage
-    {
-        return $this->messengerMessage;
-    }
-
-    public function setMessengerMessage(?MessengerMessage $messengerMessage): void
-    {
-        $this->messengerMessage = $messengerMessage;
-    }
-
 }
