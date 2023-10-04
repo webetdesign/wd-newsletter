@@ -34,4 +34,6 @@ services:
     arguments:
       - '@newsletter.email_service'
       - '@doctrine.orm.default_entity_manager'
+      - '@parameter_bag'
+      - '@messenger.default_bus'
     tags: ['controller.service_arguments']

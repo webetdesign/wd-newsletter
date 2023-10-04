@@ -56,7 +56,7 @@ services:
     class: WebEtDesign\NewsletterBundle\Services\EmailService
     public: true
     arguments:
-      - '@parameter_bag'
+      - '@request_stack'
       - '@=service(parameter("wd_newsletter.mailer"))'
       - '@templating'
       - '@newsletter.newsletter_provider'
@@ -68,7 +68,6 @@ services:
       - '%wd_newsletter.locales%'
       - '%kernel.project_dir%'
       - '%wd_newsletter.enable_log%'
-      - '@messenger.routable_message_bus'
 
   newsletter.content_creator_service:
     class: WebEtDesign\NewsletterBundle\Services\NewsletterContentCreatorService
@@ -91,3 +90,9 @@ services:
     arguments:
       - '@doctrine.orm.default_entity_manager'
       - '%wd_newsletter.enable_log%'
+
+  WebEtDesign\NewsletterBundle\Messenger\EmailMessageHandler:
+    autoconfigure: true
+    arguments:
+      - '@newsletter.email_service'
+      - '@doctrine.orm.default_entity_manager'

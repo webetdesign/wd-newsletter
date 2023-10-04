@@ -5,11 +5,13 @@ namespace WebEtDesign\NewsletterBundle\Controller\Admin;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
 use Sonata\AdminBundle\Controller\CRUDController;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
+use Symfony\Component\Messenger\MessageBusInterface;
 use WebEtDesign\NewsletterBundle\Entity\Content;
 use WebEtDesign\NewsletterBundle\Entity\ContentTranslation;
 use WebEtDesign\NewsletterBundle\Entity\Newsletter;
+use WebEtDesign\NewsletterBundle\Messenger\EmailMessage;
 use WebEtDesign\NewsletterBundle\Services\EmailService;
 
 class NewsletterAdminController extends CRUDController
@@ -19,12 +21,14 @@ class NewsletterAdminController extends CRUDController
      * NewsletterAdminController constructor.
      * @param EmailService $emailService
      * @param EntityManagerInterface $em
-     * @param FlashBagInterface $flashBag
+     * @param ParameterBagInterface $parameterBag
+     * @param MessageBusInterface $messageBus
      */
     public function __construct(
-        private EmailService           $emailService,
-        private EntityManagerInterface $em,
-        private FlashBagInterface      $flashBag
+        protected EmailService           $emailService,
+        protected EntityManagerInterface $em,
+        protected ParameterBagInterface  $parameterBag,
+        protected MessageBusInterface    $messageBus
     ){}
 
     public function sendAction($id = null): RedirectResponse
@@ -46,24 +50,17 @@ class NewsletterAdminController extends CRUDController
 
         $emails = $this->emailService->getEmails($newsletter);
 
-        try {
-            $res = $this->emailService->sendNewsletter($newsletter, $emails, $this->flashBag);
-        } catch (\Exception $e) {
-            $res = 0;
-            $this->addFlash('error', $e->getMessage());
-        }
+        if ($this->parameterBag->get('wd_newsletter.send_by_messenger')) {
+            $message = new EmailMessage($newsletter->getId(), $emails);
+            $this->messageBus->dispatch($message);
+            $newsletter->setIsScheduled(true);
+            $this->addFlash('success', "La newsletter a été programmée");
+            $this->em->persist($newsletter);
+            $this->em->flush();
 
-        if ($res) {
-            $this->addFlash('success',
-                'La newsletter va être envoyée');
-            $newsletter->setIsSent(true);
-            $newsletter->setSentAt(new \DateTime('now'));
         } else {
-            $this->addFlash('error', "La newsletter n'a pas été envoyée");
-            $newsletter->setIsSent(false);
+            $this->emailService->processNewsletter($newsletter, $emails);
         }
-
-        $this->em->flush();
 
         return $this->redirect($this->admin->generateObjectUrl('list', null, []));
     }

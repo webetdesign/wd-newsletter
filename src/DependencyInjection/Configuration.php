@@ -22,7 +22,7 @@ class Configuration implements ConfigurationInterface
             ->children()
                 ->scalarNode('mailer')->isRequired()->end()
                 ->scalarNode('enable_log')->defaultFalse()->end()
-                ->scalarNode('send_by_messenger')->defaultFalse()->end()
+                ->booleanNode('send_by_messenger')->defaultFalse()->end()
                 ->arrayNode('locales')
                     ->beforeNormalization()
                         ->ifString()

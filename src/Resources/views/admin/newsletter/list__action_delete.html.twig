@@ -1,4 +1,4 @@
-{% if not object.isSent %}
+{% if not object.isSent and not object.isScheduled %}
     <a
             href="{{ admin.generateObjectUrl('delete', object, actions.link_parameters|default([])) }}"
             class="btn btn-sm btn-danger"

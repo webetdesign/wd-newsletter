@@ -11,6 +11,7 @@ use Monolog\Logger;
 use Swift_Mailer;
 use Swift_Message;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\MessageBusInterface;
@@ -28,7 +29,7 @@ class EmailService
 {
 
     public function __construct(
-        private ParameterBagInterface    $parameterBag,
+        private RequestStack             $requestStack,
         private Swift_Mailer             $mailer,
         private EngineInterface          $templating,
         private ModelProvider            $modelProvider,
@@ -40,7 +41,6 @@ class EmailService
         private array                    $locales,
         private string                   $rootDir,
         private bool                     $enableLog,
-        private MessageBusInterface      $messageBus
 
     )
     {
@@ -53,43 +53,65 @@ class EmailService
      * @return int
      * @throws Exception
      */
-//    public function sendNewsletter(Newsletter $newsletter, $email_list, FlashBagInterface $flashBag = null): int
-//    {
-//        $log = new Logger('mailer');
-//        $log->pushHandler(new StreamHandler($this->rootDir . '/var/log/mailer.log', Logger::DEBUG));
-//
-//        $res = -1;
-//
-//        foreach ($email_list as $locale => $emails) {
-//            foreach ($emails as $token => $email) {
-//                try {
-//                    $log->info('Mail to ' . $email . ' created');
-//                    $link = $token ? $this->router->generate('newsletter_unsub', ['token' => $token], $this->router::ABSOLUTE_URL) : $this->router->generate('newsletter_unsub_auto', [], $this->router::ABSOLUTE_URL);
-//
-//                    $html = $this->templating->render($this->modelProvider->getTemplate($newsletter->getModel()), [
-//                        'object' => $newsletter,
-//                        'locale' => $newsletter->isSendInAllLocales() ? $this->locales : [$locale],
-//                        'unsub' => $link
-//                    ]);
-//
-//                    $trackingToken = md5(uniqid('', true));
-//
-//                    $html = $this->injectTrackerOpening($html, $trackingToken);
-//                    $html = $this->injectLinkTracker($html, $trackingToken);
-//
-//                    $res = $this->createEmail($newsletter, $email, $html, $locale, $link, $trackingToken);
-//
-//
-//                } catch (Exception $e) {
-//                    $log->error('Mail to ' . $email . ' error');
-//                    $flashBag?->add('error', "Le mail à l'adresse " . $email . " n'a pas été envoyé suite à une erreur. (" . $e->getMessage() . ')');
-//                    $res = -1;
-//                }
-//            }
-//        }
-//
-//        return $res;
-//    }
+    public function sendNewsletter(Newsletter $newsletter, $email_list, FlashBagInterface $flashBag = null): int
+    {
+        $log = new Logger('mailer');
+        $log->pushHandler(new StreamHandler($this->rootDir . '/var/log/mailer.log', Logger::DEBUG));
+
+        $res = -1;
+
+        foreach ($email_list as $locale => $emails) {
+            foreach ($emails as $token => $email) {
+                try {
+                    $log->info('Mail to ' . $email . ' created');
+                    $link = $token ? $this->router->generate('newsletter_unsub', ['token' => $token], $this->router::ABSOLUTE_URL) : $this->router->generate('newsletter_unsub_auto', [], $this->router::ABSOLUTE_URL);
+
+                    $html = $this->templating->render($this->modelProvider->getTemplate($newsletter->getModel()), [
+                        'object' => $newsletter,
+                        'locale' => $newsletter->isSendInAllLocales() ? $this->locales : [$locale],
+                        'unsub' => $link
+                    ]);
+
+                    $trackingToken = md5(uniqid('', true));
+
+                    $html = $this->injectTrackerOpening($html, $trackingToken);
+                    $html = $this->injectLinkTracker($html, $trackingToken);
+
+                    $message = (new Swift_Message($newsletter->getTitle()))
+                        ->setFrom([$this->from['email'] => $this->from['name']])
+                        ->setTo($email)
+                        ->setBody(
+                            $html, 'text/html'
+                        )
+                        ->addPart(
+                            $this->templating->render($this->modelProvider->getTxt($newsletter->getModel()), [
+                                'object' => $newsletter,
+                                'locale' => $newsletter->isSendInAllLocales() ? $this->locales : [$locale],
+                                'unsub' => $link
+                            ]), 'text/plain'
+                        );
+
+                    if ($this->reply && isset($this->reply['email']) && isset($this->reply['name'])){
+                        $message->setReplyTo([$this->reply['email'] => $this->reply['name']]);
+                    }
+
+                    if ($this->enableLog) {
+                        $message->getHeaders()->addTextHeader('X-Mailer-Hash', $trackingToken);
+                        $message->getHeaders()->has('X-No-Track') ? $message->getHeaders()->remove('X-No-Track') : null;
+                    }
+
+                    $res = $this->mailer->send($message);
+                    $this->eventDispatcher->dispatch(new MailSentEvent($message, $trackingToken, $newsletter->getId()), MailSentEvent::NAME);
+                } catch (Exception $e) {
+                    $log->error('Mail to ' . $email . ' error');
+                    $flashBag?->add('error', "Le mail à l'adresse " . $email . " n'a pas été envoyé suite à une erreur. (" . $e->getMessage() . ')');
+                    $res = -1;
+                }
+            }
+        }
+
+        return $res;
+    }
 
     public function getEmails(Newsletter $newsletter): array
     {
@@ -189,161 +211,31 @@ class EmailService
         return $html;
     }
 
-    /**
-     * @param Newsletter $newsletter
-     * @param mixed $email
-     * @param mixed $html
-     * @param int|string $locale
-     * @param string $link
-     * @param string $trackingToken
-     * @return int $res
-     * @throws Exception
-     */
-//    public function createEmail(Newsletter $newsletter, mixed $email, mixed $html, int|string $locale, string $link, string $trackingToken): int
-//    {
-//        if ($this->parameterBag->get('wd_newsletter.send_by_messenger')) {
-//            $message = [
-//                'subject' => $newsletter->getTitle(),
-//                'from' => [$this->from['email'] => $this->from['name']],
-//                'to' => $email,
-//                'body' => $html,
-//                'body_txt' => $this->templating->render($this->modelProvider->getTxt($newsletter->getModel()), [
-//                    'object' => $newsletter,
-//                    'locale' => $newsletter->isSendInAllLocales() ? $this->locales : [$locale],
-//                    'unsub' => $link
-//                ]),
-//                'replyTo' => $this->reply,
-//                'trackingToken' => $trackingToken,
-//                'trackingLink' => $link,
-//                'newsletterId' => $newsletter->getId()
-//            ];
-//
-//            $res = $this->eventDispatcher->dispatch(new MailSentEvent($message, $trackingToken, $newsletter->getId()), MailSentEvent::NAME);
-//        } else {
-//            $message = (new Swift_Message($newsletter->getTitle()))
-//                ->setFrom([$this->from['email'] => $this->from['name']])
-//                ->setTo($email)
-//                ->setBody(
-//                    $html, 'text/html'
-//                )
-//                ->addPart(
-//                    $this->templating->render($this->modelProvider->getTxt($newsletter->getModel()), [
-//                        'object' => $newsletter,
-//                        'locale' => $newsletter->isSendInAllLocales() ? $this->locales : [$locale],
-//                        'unsub' => $link
-//                    ]), 'text/plain'
-//                );
-//
-//            if ($this->reply && isset($this->reply['email']) && isset($this->reply['name'])) {
-//                $message->setReplyTo([$this->reply['email'] => $this->reply['name']]);
-//            }
-//
-//            if ($this->enableLog) {
-//                $message->getHeaders()->addTextHeader('X-Mailer-Hash', $trackingToken);
-//                $message->getHeaders()->has('X-No-Track') ? $message->getHeaders()->remove('X-No-Track') : null;
-//            }
-//
-//            $res = $this->mailer->send($message);
-//            $this->eventDispatcher->dispatch(new MailSentEvent($message, $trackingToken, $newsletter->getId()), MailSentEvent::NAME);
-//
-//        }
-//        return $res;
-//    }
 
-    public function sendNewsletter(Newsletter $newsletter, $email_list, FlashBagInterface $flashBag = null): int
-    {
-        $log = new Logger('mailer');
-        $log->pushHandler(new StreamHandler($this->rootDir . '/var/log/mailer.log', Logger::DEBUG));
-
-        $res = -1;
-
-        foreach ($email_list as $locale => $emails) {
-            foreach ($emails as $token => $email) {
-                try {
-                    $log->info('Mail to ' . $email . ' created');
-                    $link = $token ? $this->router->generate('newsletter_unsub', ['token' => $token], $this->router::ABSOLUTE_URL) : $this->router->generate('newsletter_unsub_auto', [], $this->router::ABSOLUTE_URL);
-
-                    $html = $this->templating->render($this->modelProvider->getTemplate($newsletter->getModel()), [
-                        'object' => $newsletter,
-                        'locale' => $newsletter->isSendInAllLocales() ? $this->locales : [$locale],
-                        'unsub' => $link
-                    ]);
-
-                    $trackingToken = md5(uniqid('', true));
-
-                    $html = $this->injectTrackerOpening($html, $trackingToken);
-                    $html = $this->injectLinkTracker($html, $trackingToken);
-
-                    // Determine whether to send via Messenger or Swift Mailer
-                    $res = $this->createEmail($newsletter, $email, $html, $locale, $link, $trackingToken);
-
-
-                } catch (Exception $e) {
-                    $log->error('Mail to ' . $email . ' error');
-                    $flashBag?->add('error', "Le mail à l'adresse " . $email . " n'a pas été envoyé suite à une erreur. (" . $e->getMessage() . ')');
-                    $res = -1;
-                }
-            }
+    public function processNewsletter($newsletter, $emails){
+        $flashBag = $this->getFlashBag();
+        try {
+            $res = $this->sendNewsletter($newsletter, $emails, $flashBag);
+        } catch (\Exception $e) {
+            $res = 0;
         }
 
-        return $res;
+        if ($res) {
+            $flashBag?->add('success',
+                'La newsletter va être envoyée');
+            $newsletter->setIsSent(true);
+            $newsletter->setSentAt(new \DateTime('now'));
+        } else {
+            $flashBag?->add('error', "La newsletter n'a pas été envoyée");
+            $newsletter->setIsSent(false);
+        }
+
+        $this->em->flush();
+
     }
 
-    public function createEmail(Newsletter $newsletter, $email, $html, $locale, $link, $trackingToken): int
+    private function getFlashBag(): ?FlashBagInterface
     {
-        if ($this->parameterBag->get('wd_newsletter.send_by_messenger')) {
-            $message = new EmailMessage();
-            $message->setSubject($newsletter->getTitle());
-            $message->setFrom([$this->from['email'] => $this->from['name']]);
-            $message->setTo($email);
-            $message->setBody($html);
-            $message->setBodyTxt($this->templating->render($this->modelProvider->getTxt($newsletter->getModel()), [
-                'object' => $newsletter,
-                'locale' => $newsletter->isSendInAllLocales() ? $this->locales : [$locale],
-                'unsub' => $link
-            ]));
-
-            if ($this->reply && isset($this->reply['email']) && isset($this->reply['name'])) {
-                $message->setReplyTo([$this->reply['email'] => $this->reply['name']]);
-            }
-
-            $message->setTrackingToken($trackingToken);
-            $message->setTrackingLink($link);
-            $message->setNewsletterId($newsletter->getId());
-
-            $envelope = new Envelope($message);
-
-            // Dispatch the message using the provided MessageBusInterface
-            $this->messageBus->dispatch($envelope);
-            $res = 1;
-
-        } else {
-            $message = (new Swift_Message($newsletter->getTitle()))
-                ->setFrom([$this->from['email'] => $this->from['name']])
-                ->setTo($email)
-                ->setBody(
-                    $html, 'text/html'
-                )
-                ->addPart(
-                    $this->templating->render($this->modelProvider->getTxt($newsletter->getModel()), [
-                        'object' => $newsletter,
-                        'locale' => $newsletter->isSendInAllLocales() ? $this->locales : [$locale],
-                        'unsub' => $link
-                    ]), 'text/plain'
-                );
-
-            if ($this->reply && isset($this->reply['email']) && isset($this->reply['name'])) {
-                $message->setReplyTo([$this->reply['email'] => $this->reply['name']]);
-            }
-
-            if ($this->enableLog) {
-                $message->getHeaders()->addTextHeader('X-Mailer-Hash', $trackingToken);
-                $message->getHeaders()->has('X-No-Track') ? $message->getHeaders()->remove('X-No-Track') : null;
-            }
-
-            $res = $this->mailer->send($message);
-            $this->eventDispatcher->dispatch(new MailSentEvent($message, $trackingToken, $newsletter->getId()), MailSentEvent::NAME);
-        }
-        return $res;
+        return $this->requestStack->getCurrentRequest()?->getSession()?->getFlashBag();
     }
 }

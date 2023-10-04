@@ -74,6 +74,26 @@ class Newsletter
      */
     protected mixed $sentAt;
 
+    /**
+     * @ORM\Column(type="boolean", options={"default": false})
+     */
+    protected bool $isScheduled = false;
+
+    /**
+     * @return bool
+     */
+    public function getIsScheduled(): bool
+    {
+        return $this->isScheduled;
+    }
+
+    /**
+     * @param bool $isScheduled
+     */
+    public function setIsScheduled(bool $isScheduled): void
+    {
+        $this->isScheduled = $isScheduled;
+    }
 
     #[Pure] public function __toString()
     {

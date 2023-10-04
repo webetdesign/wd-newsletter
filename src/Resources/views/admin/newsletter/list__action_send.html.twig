@@ -1,4 +1,4 @@
-{% if not object.isSent  %}
+{% if not object.isSent and not object.isScheduled  %}
     {% set total = count_users(object) %}
     {% if total > 0 %}
         <a

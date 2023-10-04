@@ -12,7 +12,6 @@ use Sonata\AdminBundle\Route\RouteCollection;
 use Sonata\AdminBundle\Show\ShowMapper;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
-use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
@@ -85,12 +84,6 @@ class NewsletterNewsletterAdmin extends AbstractAdmin
             ->add('sentAtFormatted', null, [
                 'label' => 'Date d\'envoi',
             ])
-//            ->add('sender', null, [
-//                'label' => "Nom de l'expéditeur",
-//            ])
-//            ->add('email', null, [
-//                'label' => 'Email de retour',
-//            ])
             ->add('_action', null, [
                 'actions' => [
                     'show' => [],
@@ -119,7 +112,6 @@ class NewsletterNewsletterAdmin extends AbstractAdmin
 
         $roleAdmin = $this->canManageContent();
 
-        //region Général
         $form
             ->tab('Général', ['box_class' => '']);
 
@@ -132,19 +124,9 @@ class NewsletterNewsletterAdmin extends AbstractAdmin
                 'label' => 'Modèle',
             ]);
 
-//        if ($this->isCurrentRoute('edit') || $this->getRequest()->isXmlHttpRequest()) {
-//            $form
-//                ->add('sender', TextType::class, [
-//                    'label' => "Nom de l'expéditeur",
-//                ])
-//                ->add('email', EmailType::class, [
-//                    'label' => 'Email de retour',
-//                ]);
-//        }
         $form
             ->end()
             ->end();
-        //endregion
 
 
         if ($this->isCurrentRoute('edit') || $this->getRequest()->isXmlHttpRequest()) {
@@ -172,8 +154,7 @@ class NewsletterNewsletterAdmin extends AbstractAdmin
             $form
                 ->end()
                 ->end();
-            //endregion
-            //region Contenus
+
             $form
                 ->tab('Contenus', ['box_class' => 'header_none', 'class' => 'col-xs-12'])
                 ->with('', ['box_class' => 'header_none'])
@@ -184,7 +165,7 @@ class NewsletterNewsletterAdmin extends AbstractAdmin
                 ])
                 ->end();
 
-            //endregion
+
 
         }
     }

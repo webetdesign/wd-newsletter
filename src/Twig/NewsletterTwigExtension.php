@@ -4,9 +4,9 @@ namespace WebEtDesign\NewsletterBundle\Twig;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
-use Liip\ImagineBundle\Exception\Config\Filter\NotFoundException;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\Routing\RouterInterface;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 use WebEtDesign\MediaBundle\Services\WDMediaService;
@@ -25,7 +25,8 @@ class NewsletterTwigExtension extends AbstractExtension
         private ContainerInterface $container,
         private RequestStack $requestStack,
         private EntityManagerInterface $em,
-        private WDMediaService $mediaService
+        private WDMediaService $mediaService,
+        private RouterInterface $router
     )
     {
         $this->modelProvider = new ModelProvider($this->container->getParameter('wd_newsletter.models'));
@@ -65,7 +66,7 @@ class NewsletterTwigExtension extends AbstractExtension
                         $locale = 'fr';
                     }
 
-                    $base = $this->requestStack->getCurrentRequest()->getSchemeAndHttpHost();
+                    $base = $this->router->getContext()->getBaseUrl();
 
                     return preg_replace('~(?:src|action|href)=[\'"]\K/(?!/)[^\'"]*~',"$base$0", $content->translate($locale)->getValue());
                 case NewsletterContentTypeEnum::DOCUMENTS:
