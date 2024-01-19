@@ -21,12 +21,12 @@ class Newsletter
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
      */
-    private ?int $id;
+    private ?int $id = null;
 
     /**
      * @ORM\Column(type="text")
      */
-    private ?string $title;
+    private ?string $title = '';
 
     /**
      * @ORM\Column(type="text")
@@ -283,16 +283,6 @@ class Newsletter
     public function setSendInAllLocales(bool $sendInAllLocales): void
     {
         $this->sendInAllLocales = $sendInAllLocales;
-    }
-
-    public function getMessengerMessage(): ?MessengerMessage
-    {
-        return $this->messengerMessage;
-    }
-
-    public function setMessengerMessage(?MessengerMessage $messengerMessage): void
-    {
-        $this->messengerMessage = $messengerMessage;
     }
 
 }
