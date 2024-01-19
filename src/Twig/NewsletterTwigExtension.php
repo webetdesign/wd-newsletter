@@ -100,7 +100,8 @@ class NewsletterTwigExtension extends AbstractExtension
                 return null;
             }
 
-            return $this->requestStack->getCurrentRequest()->getSchemeAndHttpHost() . $this->mediaService->getMediaPath($content->getMedia());
+            $baseurl = sprintf('%s://%s', $this->router->getContext()->getScheme(), $this->router->getContext()->getHost());
+            return $baseurl . $this->mediaService->getMediaPath($content->getMedia());
         }
 
         return null;
