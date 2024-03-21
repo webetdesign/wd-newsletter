@@ -2,12 +2,26 @@
 
 namespace WebEtDesign\NewsletterBundle\Factory;
 
+use Symfony\Component\DependencyInjection\ServiceLocator;
+use WebEtDesign\CmsBundle\CMS\ConfigurationInterface;
 use WebEtDesign\CmsBundle\CmsTemplate\TemplateInterface;
 use WebEtDesign\CmsBundle\Factory\AbstractTemplateFactory;
+use WebEtDesign\CmsBundle\Registry\TemplateRegistry;
 use WebEtDesign\NewsletterBundle\Attribute\AbstractModel;
 
-class NewsletterFactory extends AbstractTemplateFactory
+class NewsletterFactory extends TemplateRegistry
 {
+    private ServiceLocator          $serviceLocator;
+    private array                   $configs;
+    private ?ConfigurationInterface $configuration = null;
+
+    public function __construct(ServiceLocator $templates, array $configs)
+    {
+        $this->serviceLocator = $templates;
+        $this->configs        = $configs;
+        parent::__construct($templates, $configs);
+    }
+    
     protected function mount($code): TemplateInterface
     {
         $config = $this->getConfig($code);

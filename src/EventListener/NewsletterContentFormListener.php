@@ -6,14 +6,14 @@ use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\Extension\Core\EventListener\ResizeFormListener;
 use Symfony\Component\Form\FormEvent;
 use WebEtDesign\CmsBundle\Entity\CmsContent;
-use WebEtDesign\CmsBundle\Factory\TemplateFactoryInterface;
+use WebEtDesign\CmsBundle\Registry\TemplateRegistry;
 use WebEtDesign\NewsletterBundle\Entity\Content;
 
 class NewsletterContentFormListener extends ResizeFormListener
 {
 
     public function __construct(
-        private TemplateFactoryInterface $templateFactory,
+        private TemplateRegistry $templateFactory,
         string $type,
         array $options = []
     ) {

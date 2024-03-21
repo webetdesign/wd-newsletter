@@ -23,6 +23,9 @@ services:
   # MISCELLANEOUS
   # ===============================================
 
+  WebEtDesign\NewsletterBundle\EventListener\NewsletterContentFormListener:
+    autoconfigure: false
+
   sonata.admin.request.fetcher:
     class: Sonata\AdminBundle\Request\AdminFetcher
     public: true
@@ -52,12 +55,12 @@ services:
 #    tags:
 #      - { name: form.type }
 #
-#  WebEtDesign\NewsletterBundle\Form\AdminNewsletterType:
-#    arguments:
-#      - '@WebEtDesign\CmsBundle\Registry\BlockRegistryInterface'
-#      - '%wd_newsletter.locales%'
-#    tags:
-#      - { name: form.type }
+  WebEtDesign\NewsletterBundle\Form\AdminNewsletterType:
+    arguments:
+      - '@WebEtDesign\CmsBundle\Registry\BlockRegistryInterface'
+      - '%wd_newsletter.locales%'
+    tags:
+      - { name: form.type }
 #
 #  WebEtDesign\NewsletterBundle\Form\NewsletterContentType:
 #    arguments:
@@ -97,12 +100,11 @@ services:
 #    class: WebEtDesign\NewsletterBundle\Form\Transformer\ContentCollectionTransformer
 #    public: true
 
-#  newsletter.sent_subscriber:
-#    class: WebEtDesign\NewsletterBundle\Subscriber\NewsletterSentSubscriber
-#    public: true
-#    tags:
-#      - { name: kernel.event_subscriber }
-#    arguments:
-#      - '@doctrine.orm.default_entity_manager'
-#      - '%wd_newsletter.enable_log%'
-#      - '%wd_newsletter.entity.user%'
+  WebEtDesign\NewsletterBundle\Subscriber\NewsletterSentSubscriber:
+    public: true
+    tags:
+      - { name: kernel.event_subscriber }
+    arguments:
+      - '@doctrine.orm.default_entity_manager'
+      - '%wd_newsletter.enable_log%'
+      - '%wd_newsletter.entity.user%'

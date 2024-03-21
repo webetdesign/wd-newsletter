@@ -14,13 +14,18 @@ use WebEtDesign\NewsletterBundle\Event\MailSentEvent;
 class NewsletterSentSubscriber implements EventSubscriberInterface
 {
 
-    public function __construct(private EntityManagerInterface $em, private bool $log = false, private string $userClass)
-    {
+    public function __construct(
+        private EntityManagerInterface $em,
+        private bool $log = false,
+        private string $userClass
+    ) {
     }
 
     #[NoReturn] public function onMailSentEvent(MailSentEvent $event)
     {
-        if (!$this->log) return;
+        if (!$this->log) {
+            return;
+        }
 
         $user = $this->em->getRepository($this->userClass)->findOneBy(['email' => array_key_first($event->getMessage()->getTo())]);
 
@@ -40,9 +45,9 @@ class NewsletterSentSubscriber implements EventSubscriberInterface
     }
 
     #[ArrayShape([MailSentEvent::NAME => "string"])] public static function getSubscribedEvents(): array
-   {
-       return [
-           MailSentEvent::NAME => 'onMailSentEvent',
-       ];
-   }
+    {
+        return [
+            MailSentEvent::NAME => 'onMailSentEvent',
+        ];
+    }
 }

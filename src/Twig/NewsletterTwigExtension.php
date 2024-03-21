@@ -4,6 +4,7 @@ namespace WebEtDesign\NewsletterBundle\Twig;
 
 use Exception;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
@@ -20,13 +21,12 @@ class NewsletterTwigExtension extends AbstractExtension
 {
     public function __construct(
         private EmailService $emailService,
-        private ContainerInterface $container,
+        private ParameterBagInterface $parameterBag,
         private RequestStack $requestStack,
         private WDMediaService $mediaService,
         private NewsletterFactory $newsletterFactory,
         private CmsBlockTransformer $cmsBlockTransformer
-    )
-    {
+    ) {
     }
 
     public function getFunctions(): array
@@ -49,25 +49,25 @@ class NewsletterTwigExtension extends AbstractExtension
 
     public function renderContent($object, $content_code, $locale = 'fr'): array|string|null
     {
-        if ($object instanceof Newsletter){
+        if ($object instanceof Newsletter) {
             $content = $object->getContent($content_code);
-            if (!$content){
+            if (!$content) {
                 return null;
             }
-            switch ($content->getType()){
+            switch ($content->getType()) {
                 case NewsletterContentTypeEnum::WYSYWYG;
                 case NewsletterContentTypeEnum::TEXT;
                 case NewsletterContentTypeEnum::TEXTAREA;
                 case NewsletterContentTypeEnum::COLOR;
-                    if (!$content->getCanTranslate()){
+                    if (!$content->getCanTranslate()) {
                         $locale = 'fr';
                     }
 
                     $base = $this->requestStack->getCurrentRequest()->getSchemeAndHttpHost();
 
-                    return preg_replace('~(?:src|action|href)=[\'"]\K/(?!/)[^\'"]*~',"$base$0", $content->translate($locale)->getValue());
+                    return preg_replace('~(?:src|action|href)=[\'"]\K/(?!/)[^\'"]*~', "$base$0", $content->translate($locale)->getValue());
                 case DynamicBlock::code:
-                    return array_map(function (array $row){
+                    return array_map(function (array $row) {
                         return $row['value'];
                     }, $this->cmsBlockTransformer->transform($content->translate($locale)->getValue()));
             }
@@ -79,10 +79,10 @@ class NewsletterTwigExtension extends AbstractExtension
 
     public function renderMedia($object, $content_code): ?string
     {
-        if ($object instanceof Newsletter){
+        if ($object instanceof Newsletter) {
             /** @var Content|null $content */
             $content = $object->getContent($content_code);
-            if (!$content || $content->getType() !== NewsletterContentTypeEnum::MEDIA || !$content->getMedia()){
+            if (!$content || $content->getType() !== NewsletterContentTypeEnum::MEDIA || !$content->getMedia()) {
                 return null;
             }
 
@@ -96,7 +96,7 @@ class NewsletterTwigExtension extends AbstractExtension
     {
         $total = 0;
 
-        if ($object instanceof Newsletter){
+        if ($object instanceof Newsletter) {
             $emails = $this->emailService->getEmails($object);
             foreach ($emails as $locale) {
                 $total += count($locale);
@@ -106,20 +106,22 @@ class NewsletterTwigExtension extends AbstractExtension
         return $total;
     }
 
-    public function getModelTitle($model){
+    public function getModelTitle($model)
+    {
         return $this->newsletterFactory->get($model)->getLabel();
     }
 
     /**
      * @throws Exception
      */
-    public function getTemplate($model){
+    public function getTemplate($model)
+    {
         return $this->newsletterFactory->get($model)->getTemplate();
     }
 
     public function getLocales(): array
     {
-        return $this->container->getParameter('wd_newsletter.locales');
+        return $this->parameterBag->getParameter('wd_newsletter.locales');
     }
 
 }

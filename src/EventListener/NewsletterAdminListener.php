@@ -6,6 +6,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use WebEtDesign\CmsBundle\CmsBlock\DynamicBlock;
 use WebEtDesign\CmsBundle\Factory\TemplateFactoryInterface;
+use WebEtDesign\CmsBundle\Registry\TemplateRegistryInterface;
 use WebEtDesign\NewsletterBundle\Attribute\AbstractModel;
 use WebEtDesign\NewsletterBundle\Entity\Content;
 use WebEtDesign\NewsletterBundle\Entity\ContentTranslation;
@@ -15,7 +16,7 @@ use WebEtDesign\NewsletterBundle\Entity\NewsletterContentTypeEnum;
 class NewsletterAdminListener
 {
     public function __construct(
-        private TemplateFactoryInterface $templateFactory,
+        private TemplateRegistryInterface $templateFactory,
         private EntityManagerInterface $em,
         private array $locales = ['fr']
     ) {}
