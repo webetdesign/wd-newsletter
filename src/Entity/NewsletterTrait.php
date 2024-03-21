@@ -2,13 +2,12 @@
 
 
 namespace WebEtDesign\NewsletterBundle\Entity;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 trait NewsletterTrait
 {
-    /**
-     * @ORM\Column(type="text", nullable=true)
-     */
+    #[ORM\Column(type: Types::STRING, nullable: true)]
     private ?string $newsletterToken;
 
     public function getNewsletterToken(): ?string
