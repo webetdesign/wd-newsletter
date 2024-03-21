@@ -3,6 +3,7 @@
 namespace WebEtDesign\NewsletterBundle\Subscriber;
 
 use App\Entity\User;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use WebEtDesign\NewsletterBundle\Entity\NewsletterLog;
 use Doctrine\ORM\EntityManagerInterface;
 use JetBrains\PhpStorm\ArrayShape;

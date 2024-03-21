@@ -12,6 +12,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use WebEtDesign\CmsBundle\CmsBlock\DynamicBlock;
 use WebEtDesign\CmsBundle\Factory\BlockFactory;
 use WebEtDesign\CmsBundle\Form\Content\AdminCmsBlockType;
+use WebEtDesign\CmsBundle\Registry\BlockRegistryInterface;
 use WebEtDesign\MediaBundle\Blocks\MediaBlock;
 use WebEtDesign\NewsletterBundle\Entity\Content;
 use WebEtDesign\NewsletterBundle\Entity\ContentTranslation;
@@ -20,10 +21,9 @@ class AdminNewsletterType extends AbstractType
 {
 
     public function __construct(
-        private BlockFactory $blockFactory,
-        private array        $locales
-    )
-    {
+        private BlockRegistryInterface $blockFactory,
+        private array $locales
+    ) {
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options)
@@ -35,13 +35,13 @@ class AdminNewsletterType extends AbstractType
                 $builder->add('media', $block->getFormType());
             } else {
                 $builder->add('translations', TranslationsFormsType::class, [
-                    'label' => false,
-                    'locales' => $this->locales,
+                    'label'        => false,
+                    'locales'      => $this->locales,
                     'form_options' => [
                         'data_class' => ContentTranslation::class,
-                        'config' => $options['config']
+                        'config'     => $options['config']
                     ],
-                    'form_type' => NewsletterContentType::class
+                    'form_type'    => NewsletterContentType::class
                 ]);
             }
 
@@ -49,24 +49,28 @@ class AdminNewsletterType extends AbstractType
     }
 
     public
-    function buildView(FormView $view, FormInterface $form, array $options)
-    {
+    function buildView(
+        FormView $view,
+        FormInterface $form,
+        array $options
+    ) {
         if ($options['config']) {
-            $block = $this->blockFactory->get($options['config']);
+            $block                    = $this->blockFactory->get($options['config']);
             $view->vars['block_code'] = $block->getCode();
-            $view->vars['block'] = $block;
+            $view->vars['block']      = $block;
         }
 
     }
 
 
     public
-    function configureOptions(OptionsResolver $resolver)
-    {
+    function configureOptions(
+        OptionsResolver $resolver
+    ) {
         $resolver->setDefaults([
             'data_class' => Content::class,
-            'block' => null,
-            'config' => null,
+            'block'      => null,
+            'config'     => null,
         ]);
 
     }

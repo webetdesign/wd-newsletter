@@ -15,7 +15,7 @@ class Configuration implements ConfigurationInterface
 {
     public function getConfigTreeBuilder(): TreeBuilder
     {
-        $treeBuilder = new TreeBuilder('wd-newsletter');
+        $treeBuilder = new TreeBuilder('wd_newsletter');
         $rootNode = $treeBuilder->getRootNode();
 
         $rootNode

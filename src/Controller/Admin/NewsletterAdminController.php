@@ -16,20 +16,13 @@ use WebEtDesign\NewsletterBundle\Services\EmailService;
 
 class NewsletterAdminController extends CRUDController
 {
-
-    /**
-     * NewsletterAdminController constructor.
-     * @param EmailService $emailService
-     * @param EntityManagerInterface $em
-     * @param FlashBagInterface $flashBag
-     * @param RequestStack $requestStack
-     */
     public function __construct(
-        private EmailService           $emailService,
-        private EntityManagerInterface $em,
-        private FlashBagInterface      $flashBag,
-        private RequestStack $requestStack
-    ){}
+        private readonly EmailService $emailService,
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack
+    )
+    {
+    }
 
 
     public function sendAction($id = null): RedirectResponse
@@ -52,7 +45,7 @@ class NewsletterAdminController extends CRUDController
         $emails = $this->emailService->getEmails($newsletter);
 
         try {
-            $res = $this->emailService->sendNewsletter($newsletter, $emails, $this->flashBag);
+            $res = $this->emailService->sendNewsletter($newsletter, $emails, $this->requestStack->getSession()->getBag('flash'));
         } catch (\Exception|TransportExceptionInterface $e) {
             $res = 0;
             $this->addFlash('error', $e->getMessage());

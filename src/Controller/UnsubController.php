@@ -48,7 +48,7 @@ class UnsubController extends AbstractController
      */
     public function auto(): RedirectResponse
     {
-        $this->addFlash('error', "Vous avez ajouté par l'administrateur à cette newsletter, vous n'êtes pas sur notre liste de diffusion.");
+        $this->addFlash('error', "Vous avez été ajouté par l'administrateur à cette newsletter, vous n'êtes pas sur notre liste de diffusion.");
         return $this->redirectToRoute($this->home);
     }
 

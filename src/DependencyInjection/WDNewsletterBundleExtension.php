@@ -32,8 +32,7 @@ class WDNewsletterBundleExtension extends Extension
     public function load(array $configs, ContainerBuilder $container)
     {
         $configuration = new Configuration();
-        $processor     = new Processor();
-        $config        = $processor->processConfiguration($configuration, $configs);
+        $config        = $this->processConfiguration($configuration, $configs);
 
         $loader = new YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
 
@@ -77,6 +76,6 @@ class WDNewsletterBundleExtension extends Extension
 
     public function getAlias(): string
     {
-        return 'wd-newsletter';
+        return 'wd_newsletter';
     }
 }
