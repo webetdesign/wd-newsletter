@@ -1,9 +1,13 @@
 services:
+  _defaults:
+    autowire:      true
+    autoconfigure: true
+
   newsletter.admin.newsletter:
     class: WebEtDesign\NewsletterBundle\Admin\NewsletterNewsletterAdmin
-    arguments:
-      - '@security.token_storage'
-      - '@WebEtDesign\NewsletterBundle\Factory\NewsletterFactory'
+#    arguments:
+#      - '@security.token_storage'
+#      - '@WebEtDesign\NewsletterBundle\Factory\NewsletterFactory'
     tags:
       - { name: sonata.admin, manager_type: orm, group: newsletter, model_class: '%wd_newsletter.entity.newsletter%',  label: Newsletter, controller: WebEtDesign\NewsletterBundle\Controller\Admin\NewsletterAdminController }
     public: true

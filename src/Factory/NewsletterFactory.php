@@ -4,13 +4,19 @@ namespace WebEtDesign\NewsletterBundle\Factory;
 
 use Symfony\Component\DependencyInjection\ServiceLocator;
 use WebEtDesign\CmsBundle\CMS\ConfigurationInterface;
+use WebEtDesign\CmsBundle\CMS\Template\ComponentInterface;
 use WebEtDesign\CmsBundle\CmsTemplate\TemplateInterface;
 use WebEtDesign\CmsBundle\Factory\AbstractTemplateFactory;
 use WebEtDesign\CmsBundle\Registry\TemplateRegistry;
+use WebEtDesign\CmsBundle\Registry\TemplateRegistryInterface;
+use WebEtDesign\CmsBundle\Vars\CmsVarsBag;
+use WebEtDesign\CmsBundle\Vars\Compiler;
 use WebEtDesign\NewsletterBundle\Attribute\AbstractModel;
 
-class NewsletterFactory extends TemplateRegistry
+class NewsletterFactory implements TemplateRegistryInterface
 {
+    const TYPE_NEWSLETTER   = 'TYPE_NEWSLETTER';
+
     private ServiceLocator          $serviceLocator;
     private array                   $configs;
     private ?ConfigurationInterface $configuration = null;
@@ -19,38 +25,103 @@ class NewsletterFactory extends TemplateRegistry
     {
         $this->serviceLocator = $templates;
         $this->configs        = $configs;
-        parent::__construct($templates, $configs);
     }
-    
-    protected function mount($code): TemplateInterface
+
+    public function get(string $code): ComponentInterface
     {
         $config = $this->getConfig($code);
 
-        return $this->getServices($code);
+        $service = $this->serviceLocator->get($config['id']);
+
+        $service->setVarsBag(new CmsVarsBag(new Compiler()));
+        $service->configureVars($service->getVarsBag());
+
+        $service->setCode($code);
+
+        return $service;
     }
 
-    protected function getConfig($code): array
+    private function getConfig(string $code)
     {
-        if (!isset($this->configs[$code])) {
-            throw new \InvalidArgumentException(sprintf('Unknown model config "%s". The registered model configs are: %s',
-                $code, implode(', ', array_keys($this->configs))));
-        };
-
         return $this->configs[$code];
     }
 
-    public function getConfigsList (): array
+    private function getConfigById(): array
+    {
+        $configs = [];
+        foreach ($this->configs as $config) {
+            $configs[$config['id']] = $config;
+        }
+
+        return $configs;
+    }
+
+    public function getList(string $type, string $collection = null): array
+    {
+        $configs = $this->getConfigById();
+
+        $templates = [];
+        foreach ($this->serviceLocator->getProvidedServices() as $id) {
+            $config = $configs[$id];
+            if (!$config) {
+                continue;
+            }
+
+            $tpl = $this->get($config['code']);
+
+            if (!$tpl) {
+                continue;
+            }
+
+            $goodType       = $type === $config['type'];
+            $goodCollection =
+                $collection === null ||
+                $tpl->getCollections() === null ||
+                in_array($collection, $tpl->getCollections());
+
+            if (!$goodType || !$goodCollection) {
+                continue;
+            }
+
+            if (!empty($tpl->getCollections()) && $collection === null) {
+                $colString = implode(', ', $tpl->getCollections());
+            }
+
+
+            $templates[$config['code']] = (!empty($colString) ? "[$colString] — " : '') . $tpl->getLabel();
+        }
+
+        return $templates;
+    }
+
+    public function getChoiceList(string $type, string $collection = null): array
+    {
+        return array_flip($this->getList($type, $collection));
+    }
+
+    /**
+     * @return array
+     */
+    public function getConfigs(): array
     {
         return $this->configs;
     }
 
-    protected function getServices(string $code): TemplateInterface
+    /**
+     * @param ConfigurationInterface|null $configuration
+     * @return TemplateRegistry
+     */
+    public function setConfiguration(?ConfigurationInterface $configuration): TemplateRegistry
     {
-        if (!$this->serviceLocator->has($code)) {
-            throw new \InvalidArgumentException(sprintf('Unknown model "%s". The registered model are: %s',
-                $code, implode(', ', array_keys($this->serviceLocator->getProvidedServices()))));
-        };
+        $this->configuration = $configuration;
+        return $this;
+    }
 
-        return $this->serviceLocator->get($code);
+    /**
+     * @return ConfigurationInterface|null
+     */
+    public function getConfiguration(): ?ConfigurationInterface
+    {
+        return $this->configuration;
     }
 }

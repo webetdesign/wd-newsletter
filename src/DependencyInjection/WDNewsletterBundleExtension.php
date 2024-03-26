@@ -60,16 +60,15 @@ class WDNewsletterBundleExtension extends Extension
             $container->registerAttributeForAutoconfiguration(AsNewsletterModel::class,
                 static function (ChildDefinition $definition, AsNewsletterModel $attribute) {
                     $definition->addTag('wd_newsletter.model', array_filter([
-                        'key'       => $attribute->code,
+                        'key'  => $attribute->code,
+                        'type' => $attribute->type,
                     ]));
                 }
             );
         }
 
         $container->getDefinition(NewsletterFactory::class)->setArguments([
-            new ServiceLocatorArgument(new TaggedIteratorArgument('wd_newsletter.model', 'key',
-                null, true)),
-            []
+            new ServiceLocatorArgument(new TaggedIteratorArgument('wd_newsletter.model', null, null, true))
         ]);
 
     }

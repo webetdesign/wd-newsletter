@@ -32,7 +32,7 @@ class AdminNewsletterType extends AbstractType
             $block = $this->blockFactory->get($options['config']);
 
             if ($block instanceof MediaBlock) {
-                $builder->add('media', $block->getFormType());
+                $builder->add('media', $block->getFormType(), $options['config']->getFormOptions());
             } else {
                 $builder->add('translations', TranslationsFormsType::class, [
                     'label'        => false,

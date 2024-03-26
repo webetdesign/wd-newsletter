@@ -3,19 +3,21 @@
 namespace WebEtDesign\NewsletterBundle\Attribute;
 
 use JetBrains\PhpStorm\Pure;
-use WebEtDesign\CmsBundle\CmsTemplate\TemplateInterface;
-use WebEtDesign\CmsBundle\DependencyInjection\Models\BlockDefinition;
+use WebEtDesign\CmsBundle\CMS\Template\ComponentInterface;
+use WebEtDesign\CmsBundle\Vars\CmsVarsBag;
+use WebEtDesign\CmsBundle\CMS\Configuration\BlockDefinition;
 
-abstract class AbstractModel implements TemplateInterface
+abstract class AbstractModel implements ComponentInterface
 {
     protected const CODE = '';
 
-    protected ?string $name =  null;
-    protected ?string $help =  null;
-    protected ?string $sender =  null;
-    protected ?string $email =  null;
-    protected ?string $template =  null;
-    protected ?string $txt =  null;
+    protected ?string     $name     = null;
+    protected ?string     $help     = null;
+    protected ?string     $sender   = null;
+    protected ?string     $email    = null;
+    protected ?string     $template = null;
+    protected ?string     $txt      = null;
+    protected ?CmsVarsBag $varsBag  = null;
 
     #[Pure] public function __toString(): string
     {
@@ -107,7 +109,7 @@ abstract class AbstractModel implements TemplateInterface
         return null;
     }
 
-    public function getCode (): string
+    public function getCode(): string
     {
         return self::CODE;
     }
@@ -119,13 +121,31 @@ abstract class AbstractModel implements TemplateInterface
 
     public function getLabel(): string
     {
-        return $this->getName();
+        return $this->__toString();
     }
 
-    public function setCode(?string $code): TemplateInterface
+    public function setCode(?string $code): AbstractModel
     {
         return $this;
     }
 
+    public function configureVars(CmsVarsBag $varsBag): void { }
 
+    /**
+     * @return CmsVarsBag|null
+     */
+    public function getVarsBag(): ?CmsVarsBag
+    {
+        return $this->varsBag;
+    }
+
+    /**
+     * @param CmsVarsBag|null $varsBag
+     * @return AbstractComponent
+     */
+    public function setVarsBag(?CmsVarsBag $varsBag): AbstractModel
+    {
+        $this->varsBag = $varsBag;
+        return $this;
+    }
 }

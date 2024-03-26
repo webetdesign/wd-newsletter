@@ -8,7 +8,7 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
-use WebEtDesign\CmsBundle\CmsBlock\DynamicBlock;
+use WebEtDesign\CmsBundle\CMS\Block\DynamicBlock;
 use WebEtDesign\CmsBundle\Form\Transformer\CmsBlockTransformer;
 use WebEtDesign\MediaBundle\Services\WDMediaService;
 use WebEtDesign\NewsletterBundle\Entity\Content;
@@ -108,6 +108,7 @@ class NewsletterTwigExtension extends AbstractExtension
 
     public function getModelTitle($model)
     {
+        dump($this->newsletterFactory->get($model));
         return $this->newsletterFactory->get($model)->getLabel();
     }
 

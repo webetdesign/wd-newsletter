@@ -11,15 +11,15 @@ class NewsletterTemplatePass implements CompilerPassInterface
 
     public function process(ContainerBuilder $container)
     {
-        $templateConfig            = [];
+        $templateConfig = [];
 
         foreach ($container->findTaggedServiceIds('wd_newsletter.model') as $id => $tags) {
-            $definition = $container->findDefinition($id);
-
-            $definition->setPublic(true);
-
             foreach ($tags as $tag) {
-                $templateConfig[$tag['key']] = array_filter(['code' => $tag['key']]);
+                $templateConfig[$tag['key']] = [
+                    'id'   => $id,
+                    'code' => $tag['key'],
+                    'type' => $tag['type']
+                ];
             }
         }
 

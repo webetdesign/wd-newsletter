@@ -10,16 +10,14 @@ use WebEtDesign\NewsletterBundle\Factory\NewsletterFactory;
 
 class NewsletterModelType extends AbstractType
 {
-    public function __construct(private NewsletterFactory $factory) {}
+    public function __construct(private readonly NewsletterFactory $factory) { }
 
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(
             [
                 'placeholder' => 'Choisir',
-                'choices' => array_flip(array_map(function (AbstractModel $model){
-                    return $model->getName();
-                }, $this->factory->getTemplateList())),
+                'choices'     => $this->factory->getChoiceList(NewsletterFactory::TYPE_NEWSLETTER),
             ]
         );
     }

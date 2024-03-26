@@ -13,6 +13,7 @@ use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use WebEtDesign\CmsBundle\Form\Content\AdminCmsBlockCollectionType;
+use WebEtDesign\CmsBundle\Registry\BlockRegistry;
 use WebEtDesign\NewsletterBundle\EventListener\NewsletterContentFormListener;
 use WebEtDesign\NewsletterBundle\Factory\NewsletterFactory;
 use WebEtDesign\NewsletterBundle\Form\AdminNewsletterType;
@@ -27,10 +28,10 @@ class NewsletterNewsletterAdmin extends AbstractAdmin
     ];
 
     public function __construct(
-        private TokenStorageInterface $tokenStorage,
-        private NewsletterFactory     $factory
-    )
-    {
+        protected readonly TokenStorageInterface $tokenStorage,
+        protected readonly NewsletterFactory $factory,
+        protected readonly BlockRegistry $blockRegistry
+    ) {
         parent::__construct();
     }
 
@@ -65,19 +66,18 @@ class NewsletterNewsletterAdmin extends AbstractAdmin
                 'label' => 'Titre',
             ])
             ->add('model', null, [
-                'label' => 'Modèle',
+                'label'    => 'Modèle',
                 'template' => '@WDNewsletter/admin/newsletter/model_type.html.twig'
-            ])
-        ;
+            ]);
 
         if ($this->canManageContent()) {
             $list->add('isSent', null, [
-                'label' => 'Envoyée',
+                'label'    => 'Envoyée',
                 'editable' => true
             ]);
         } else {
             $list->add('isSent', null, [
-                'label' => 'Envoyée',
+                'label'    => 'Envoyée',
                 'editable' => false
             ]);
         }
@@ -86,23 +86,23 @@ class NewsletterNewsletterAdmin extends AbstractAdmin
             ->add('sentAtFormatted', null, [
                 'label' => 'Date d\'envoi',
             ])
-//            ->add('sender', null, [
-//                'label' => "Nom de l'expéditeur",
-//            ])
-//            ->add('email', null, [
-//                'label' => 'Email de retour',
-//            ])
+            //            ->add('sender', null, [
+            //                'label' => "Nom de l'expéditeur",
+            //            ])
+            //            ->add('email', null, [
+            //                'label' => 'Email de retour',
+            //            ])
             ->add(ListMapper::NAME_ACTIONS, null, [
                 'actions' => [
-                    'show' => [],
-                    'edit' => [],
-                    'copy' => [
+                    'show'   => [],
+                    'edit'   => [],
+                    'copy'   => [
                         'template' => '@WDNewsletter/admin/newsletter/list__action_copy.html.twig'
                     ],
                     'delete' => [
                         'template' => '@WDNewsletter/admin/newsletter/list__action_delete.html.twig'
                     ],
-                    'send' => [
+                    'send'   => [
                         'template' => '@WDNewsletter/admin/newsletter/list__action_send.html.twig'
                     ],
                 ]
@@ -113,8 +113,8 @@ class NewsletterNewsletterAdmin extends AbstractAdmin
     {
         $this->setFormTheme(array_merge($this->getFormTheme(), [
             "@WebEtDesignCms/admin/form/cms_block.html.twig",
-            '@WebEtDesignCms/form/cms_global_vars_type.html.twig',
             '@WebEtDesignCms/admin/form/dynamic_block.html.twig',
+            '@WebEtDesignCms/admin/form/admin_cms_vars_section.html.twig',
         ]));
 
         //region Général
@@ -141,11 +141,11 @@ class NewsletterNewsletterAdmin extends AbstractAdmin
             $form
                 ->with('', ['box_class' => 'header_none'])
                 ->add('emailsMore', TextareaType::class, [
-                    'label' => "Liste d'e-mails complémentaires",
+                    'label'    => "Liste d'e-mails complémentaires",
                     'required' => false,
                 ])
                 ->add('sendInAllLocales', CheckboxType::class, [
-                    'label' => "Envoyer dans toutes les langues",
+                    'label'    => "Envoyer dans toutes les langues",
                     'required' => false,
                 ]);
             $form
@@ -157,10 +157,11 @@ class NewsletterNewsletterAdmin extends AbstractAdmin
                 ->tab('Contenus', ['box_class' => 'header_none', 'class' => 'col-xs-12'])
                 ->with('', ['box_class' => 'header_none'])
                 ->add('contents', AdminCmsBlockCollectionType::class, [
-                    'label' => false,
+                    'label'           => false,
                     'templateFactory' => $this->factory,
-                    'listener' => new NewsletterContentFormListener(
+                    'listener'        => new NewsletterContentFormListener(
                         templateFactory: $this->factory,
+                        blockRegistry: $this->blockRegistry,
                         type: AdminNewsletterType::class
                     )
                 ])
