@@ -67,9 +67,11 @@ class NewsletterTwigExtension extends AbstractExtension
 
                     return preg_replace('~(?:src|action|href)=[\'"]\K/(?!/)[^\'"]*~', "$base$0", $content->translate($locale)->getValue());
                 case DynamicBlock::code:
-                    return array_map(function (array $row) {
+                default:
+                    $data = array_map(function (array $row) {
                         return $row['value'];
                     }, $this->cmsBlockTransformer->transform($content->translate($locale)->getValue()));
+                    return $data;
             }
 
         }
