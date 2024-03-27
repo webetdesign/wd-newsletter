@@ -110,7 +110,6 @@ class NewsletterTwigExtension extends AbstractExtension
 
     public function getModelTitle($model)
     {
-        dump($this->newsletterFactory->get($model));
         return $this->newsletterFactory->get($model)->getLabel();
     }
 

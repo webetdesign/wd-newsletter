@@ -3,6 +3,7 @@
 namespace WebEtDesign\NewsletterBundle\Services;
 
 
+use App\Entity\User\User;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use Monolog\Handler\StreamHandler;
@@ -23,25 +24,25 @@ use WebEtDesign\CmsBundle\Factory\TemplateFactoryInterface;
 use WebEtDesign\NewsletterBundle\Entity\Newsletter;
 use WebEtDesign\NewsletterBundle\Event\MailSentEvent;
 use WebEtDesign\NewsletterBundle\Factory\NewsletterFactory;
+use WebEtDesign\UserBundle\Entity\WDUser;
 
 class EmailService
 {
 
     public function __construct(
-        private MessageBusInterface      $bus,
-        private Environment              $templating,
-        private NewsletterFactory        $newsletterFactory,
-        private EntityManagerInterface   $em,
+        private MessageBusInterface $bus,
+        private Environment $templating,
+        private NewsletterFactory $newsletterFactory,
+        private EntityManagerInterface $em,
         private EventDispatcherInterface $eventDispatcher,
-        private ?array                   $from,
-        private ?array                   $reply,
-        private RouterInterface          $router,
-        private array                    $locales,
-        private string                   $rootDir,
-        private bool                     $enableLog,
-        private string                   $userClass
-    )
-    {
+        private ?array $from,
+        private ?array $reply,
+        private RouterInterface $router,
+        private array $locales,
+        private string $rootDir,
+        private bool $enableLog,
+        private string $userClass
+    ) {
     }
 
     /**
@@ -61,12 +62,13 @@ class EmailService
             foreach ($emails as $token => $email) {
                 try {
                     $log->info('Mail to ' . $email . ' created');
-                    $link = $token ? $this->router->generate('newsletter_unsub', ['token' => $token], $this->router::ABSOLUTE_URL) : $this->router->generate('newsletter_unsub_auto', [], $this->router::ABSOLUTE_URL);
+                    $link = $token ? $this->router->generate('newsletter_unsub', ['token' => $token],
+                        $this->router::ABSOLUTE_URL) : $this->router->generate('newsletter_unsub_auto', [], $this->router::ABSOLUTE_URL);
 
                     $html = $this->templating->render($config->getTemplate(), [
                         'object' => $newsletter,
                         'locale' => $newsletter->isSendInAllLocales() ? $this->locales : [$locale],
-                        'unsub' => $link
+                        'unsub'  => $link
                     ]);
 
                     $trackingToken = md5(uniqid('', true));
@@ -85,7 +87,7 @@ class EmailService
                             $this->templating->render($config->getTxt(), [
                                 'object' => $newsletter,
                                 'locale' => $newsletter->isSendInAllLocales() ? $this->locales : [$locale],
-                                'unsub' => $link
+                                'unsub'  => $link
                             ]), 'text/plain'
                         );
 
@@ -116,21 +118,38 @@ class EmailService
     {
         $emails = [];
 
-        $qb = $this->em->getRepository($this->userClass)->createQueryBuilder('u');
+        if ($newsletter->getGroups()->count() > 0) {
+            $qb = $this->em->getRepository(User::class)->createQueryBuilder('u');
 
-        $qb->andWhere("u.newsletter = 1");
-
-        $users = $qb->getQuery()->getResult();
-
-        foreach ($users as $u) {
-            if (!$u->getNewsletterToken()) {
-                $u->setNewsletterToken(md5(uniqid()));
+            $or  = '(';
+            $cpt = 0;
+            foreach ($newsletter->getGroups() as $group) {
+                $or .= ':group_' . $cpt . ' MEMBER OF u.groups OR ';
+                $qb->setParameter('group_' . $cpt, $group);
+                $cpt++;
             }
-            $locale = method_exists($u, 'getLocale') ? $u->getLocale() : 'fr';
-            $locale = $locale !== '' && $locale !== null ? $locale : 'fr';
-            $emails[$locale][$u->getNewsletterToken()] = $u->getEmail();
+            $or = substr($or, 0, strlen($or) - 3) . ')';
+
+            if (strlen($or) > 5) {
+                $qb->andWhere($or);
+            }
+
+            $qb->andWhere("u.newsletter = 1");
+
+            $users = $qb->getQuery()->getResult();
+            
+            foreach ($users as $u) {
+                if (!$u->getNewsletterToken()) {
+                    $u->setNewsletterToken(md5(uniqid()));
+                }
+
+                $locale = method_exists($u, 'getLocale') ? $u->getLocale() : 'fr';
+                $locale = $locale !== '' && $locale !== null ? $locale : 'fr';
+
+                $emails[$locale][$u->getNewsletterToken()] = $u->getEmail();
+            }
+            $this->em->flush();
         }
-        $this->em->flush();
 
         $more = $newsletter->getEmailsMoreArray();
 
@@ -154,10 +173,11 @@ class EmailService
     private function injectTrackerOpening(string $html, string $trackingToken): string
     {
         if ($this->enableLog) {
-            $tracker = "<img border=0 width=1 alt='' height=1  src='" . $this->router->generate('newsletter_track_opening', ['token' => $trackingToken], UrlGeneratorInterface::ABSOLUTE_URL) . "'>";
+            $tracker = "<img border=0 width=1 alt='' height=1  src='" . $this->router->generate('newsletter_track_opening', ['token' => $trackingToken],
+                    UrlGeneratorInterface::ABSOLUTE_URL) . "'>";
 
             $linebreak = ByteString::fromRandom(32)->toString();
-            $html = str_replace("\n", $linebreak, $html);
+            $html      = str_replace("\n", $linebreak, $html);
 
             if (preg_match("/^(.*<body[^>]*>)(.*)$/", $html, $matches)) {
                 $html = $matches[1] . $matches[2] . $tracker;
@@ -181,10 +201,10 @@ class EmailService
                         $url = str_replace('&amp;', '&', $matches[2]);
 
                         $link = $this->router->generate('newsletter_track_link', [
-                            'url' => openssl_encrypt($url, 'AES-256-CBC', $_ENV['APP_SECRET'], 0, substr(hash('sha256', $_ENV['NEWSLETTER_IV']), 0, 16)),
+                            'url'   => openssl_encrypt($url, 'AES-256-CBC', $_ENV['APP_SECRET'], 0, substr(hash('sha256', $_ENV['NEWSLETTER_IV']), 0, 16)),
                             'token' => $hash
                         ], UrlGeneratorInterface::ABSOLUTE_URL);
-                        $url = str_replace($matches[2], $link, $matches[1]);
+                        $url  = str_replace($matches[2], $link, $matches[1]);
                     }
                     return $url;
                 },

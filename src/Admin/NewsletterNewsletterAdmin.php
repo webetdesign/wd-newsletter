@@ -2,12 +2,14 @@
 
 namespace WebEtDesign\NewsletterBundle\Admin;
 
+use App\Entity\User\Group;
 use Sonata\AdminBundle\Admin\AbstractAdmin;
 use Sonata\AdminBundle\Datagrid\DatagridMapper;
 use Sonata\AdminBundle\Datagrid\ListMapper;
 use Sonata\AdminBundle\Form\FormMapper;
 use Sonata\AdminBundle\Route\RouteCollectionInterface;
 use Sonata\AdminBundle\Show\ShowMapper;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -68,6 +70,9 @@ class NewsletterNewsletterAdmin extends AbstractAdmin
             ->add('model', null, [
                 'label'    => 'Modèle',
                 'template' => '@WDNewsletter/admin/newsletter/model_type.html.twig'
+            ])
+            ->add('groups', null, [
+                'label' => 'Destinataires',
             ]);
 
         if ($this->canManageContent()) {
@@ -140,6 +145,13 @@ class NewsletterNewsletterAdmin extends AbstractAdmin
                 ->tab("Options d'envoi", ['box_class' => '']);
             $form
                 ->with('', ['box_class' => 'header_none'])
+                ->add('groups', EntityType::class, [
+                    'label' => "Destinataires",
+                    'class' => Group::class,
+                    'required' => false,
+                    'expanded' => true,
+                    'multiple' => true
+                ])
                 ->add('emailsMore', TextareaType::class, [
                     'label'    => "Liste d'e-mails complémentaires",
                     'required' => false,

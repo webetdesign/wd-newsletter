@@ -8,7 +8,7 @@ use WebEtDesign\NewsletterBundle\Repository\NewsletterRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use App\Entity\User\Group; 
+use App\Entity\User\Group;
 /**
  * @ORM\Entity(repositoryClass="WebEtDesign\NewsletterBundle\Repository\NewsletterRepository", repositoryClass=NewsletterRepository::class)
  * @ORM\Table(name="newsletter__newsletter")
@@ -53,6 +53,16 @@ class Newsletter
      */
     private ?string $emailsMore;
 
+    /** @var Collection
+     * @ORM\ManyToMany(targetEntity=Group::class)
+     * @ORM\JoinTable(name="newsletter__newsletter_has_group",
+     *      joinColumns={@ORM\JoinColumn(name="newsletter_id", referencedColumnName="id", onDelete="CASCADE")},
+     *      inverseJoinColumns={@ORM\JoinColumn(name="group_id", referencedColumnName="id", onDelete="CASCADE")}
+     * )
+     */
+    private Collection $groups;
+
+
     /**
      * @ORM\Column(type="boolean", nullable=true)
      */
@@ -76,6 +86,7 @@ class Newsletter
     #[Pure] public function __construct()
     {
         $this->contents = new ArrayCollection();
+        $this->groups = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -197,6 +208,29 @@ class Newsletter
         }
 
         return $cpt != 0 ? $more : [];
+    }
+
+    public function getGroups(): Collection
+    {
+        return $this->groups;
+    }
+
+    public function addGroup(Group $group): self
+    {
+        if (!$this->groups->contains($group)) {
+            $this->groups[] = $group;
+        }
+
+        return $this;
+    }
+
+    public function removeGroup(Group $group): self
+    {
+        if ($this->groups->contains($group)) {
+            $this->groups->removeElement($group);
+        }
+
+        return $this;
     }
 
     public function getIsSent(): bool

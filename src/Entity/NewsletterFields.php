@@ -5,7 +5,7 @@ namespace WebEtDesign\NewsletterBundle\Entity;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
-trait NewsletterTrait
+trait NewsletterFields
 {
     #[ORM\Column(type: Types::STRING, nullable: true)]
     private ?string $newsletterToken;

@@ -64,11 +64,11 @@ MESSENGER_TRANSPORT_DSN=doctrine://default
 ```php
 <?php 
 
-use WebEtDesign\NewsletterBundle\Entity\NewsletterTrait;
+use WebEtDesign\NewsletterBundle\Entity\NewsletterFields;
 
 class User {
 
-    use NewsletterTrait;
+    use NewsletterFields;
 
 }
 ```
