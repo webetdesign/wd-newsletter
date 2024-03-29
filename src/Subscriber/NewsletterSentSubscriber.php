@@ -16,8 +16,8 @@ class NewsletterSentSubscriber implements EventSubscriberInterface
 
     public function __construct(
         private EntityManagerInterface $em,
-        private bool $log = false,
-        private string $userClass
+        private string $userClass,
+        private bool $log = false
     ) {
     }
 

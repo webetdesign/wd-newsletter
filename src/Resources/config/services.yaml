@@ -106,5 +106,5 @@ services:
       - { name: kernel.event_subscriber }
     arguments:
       - '@doctrine.orm.default_entity_manager'
-      - '%wd_newsletter.enable_log%'
       - '%wd_newsletter.entity.user%'
+      - '%wd_newsletter.enable_log%'
