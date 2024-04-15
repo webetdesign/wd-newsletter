@@ -67,7 +67,7 @@ class NewsletterMailSubscriber implements EventSubscriberInterface
         }
 
         $newsletter
-//            ->setIsSent(true)
+            ->setIsSent(true)
             ->setSentAt(new DateTime());
 
         $this->em->persist($newsletter);
