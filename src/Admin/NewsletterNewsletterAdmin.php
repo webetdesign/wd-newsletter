@@ -4,6 +4,7 @@ namespace WebEtDesign\NewsletterBundle\Admin;
 
 use App\Entity\User\Group;
 use Sonata\AdminBundle\Admin\AbstractAdmin;
+use Sonata\AdminBundle\Datagrid\DatagridInterface;
 use Sonata\AdminBundle\Datagrid\DatagridMapper;
 use Sonata\AdminBundle\Datagrid\ListMapper;
 use Sonata\AdminBundle\Form\FormMapper;
@@ -23,12 +24,6 @@ use WebEtDesign\NewsletterBundle\Form\NewsletterModelType;
 
 class NewsletterNewsletterAdmin extends AbstractAdmin
 {
-    protected array $datagridValues = [
-        '_page'       => 1,
-        '_sort_order' => 'DESC',
-        '_sort_by'    => 'id',
-    ];
-
     public function __construct(
         protected readonly TokenStorageInterface $tokenStorage,
         protected readonly NewsletterFactory $factory,
@@ -42,6 +37,18 @@ class NewsletterNewsletterAdmin extends AbstractAdmin
         $filter
             ->add('id')
             ->add('title');
+    }
+
+    protected function configureDefaultSortValues(array &$sortValues): void
+    {
+        // display the first page (default = 1)
+        $sortValues[DatagridInterface::PAGE] = 1;
+
+        // reverse order (default = 'ASC')
+        $sortValues[DatagridInterface::SORT_ORDER] = 'DESC';
+
+        // name of the ordered field (default = the model's id field, if any)
+        $sortValues[DatagridInterface::SORT_BY] = 'id';
     }
 
     protected function configureRoutes(RouteCollectionInterface $collection): void
@@ -64,7 +71,7 @@ class NewsletterNewsletterAdmin extends AbstractAdmin
     {
 
         $list
-            ->add('title', null, [
+            ->addIdentifier('title', null, [
                 'label' => 'Titre',
             ])
             ->add('model', null, [

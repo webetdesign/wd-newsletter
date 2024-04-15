@@ -35,12 +35,12 @@ class EmailService
         private NewsletterFactory $newsletterFactory,
         private EntityManagerInterface $em,
         private EventDispatcherInterface $eventDispatcher,
-        private ?array $from,
-        private ?array $reply,
+        public ?array $from,
+        public ?array $reply,
         private RouterInterface $router,
-        private array $locales,
-        private string $rootDir,
-        private bool $enableLog,
+        public array $locales,
+        public string $rootDir,
+        public bool $enableLog,
         private string $userClass
     ) {
     }
@@ -52,8 +52,10 @@ class EmailService
      * @return int
      * @throws Exception|TransportExceptionInterface
      */
-    public function sendNewsletter(Newsletter $newsletter, $email_list, FlashBagInterface $flashBag = null): int
+    public function sendNewsletter(Newsletter $newsletter, FlashBagInterface $flashBag = null): int
     {
+        $email_list = $this->emailService->getEmails($newsletter);
+        
         $log = new Logger('mailer');
         $log->pushHandler(new StreamHandler($this->rootDir . '/var/log/mailer.log', Logger::DEBUG));
         $config = $this->newsletterFactory->get($newsletter->getModel());
@@ -170,7 +172,7 @@ class EmailService
         return $total;
     }
 
-    private function injectTrackerOpening(string $html, string $trackingToken): string
+    public function injectTrackerOpening(string $html, string $trackingToken): string
     {
         if ($this->enableLog) {
             $tracker = "<img border=0 width=1 alt='' height=1  src='" . $this->router->generate('newsletter_track_opening', ['token' => $trackingToken],
@@ -190,7 +192,7 @@ class EmailService
         return $html;
     }
 
-    private function injectLinkTracker($html, $hash)
+    public function injectLinkTracker($html, $hash)
     {
         if ($this->enableLog && isset($_ENV['NEWSLETTER_IV']) && strlen($_ENV['NEWSLETTER_IV']) > 0) {
             $html = preg_replace_callback(

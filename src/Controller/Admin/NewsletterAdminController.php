@@ -6,12 +6,15 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
 use Sonata\AdminBundle\Controller\CRUDController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use WebEtDesign\NewsletterBundle\Entity\Content;
 use WebEtDesign\NewsletterBundle\Entity\ContentTranslation;
 use WebEtDesign\NewsletterBundle\Entity\Newsletter;
+use WebEtDesign\NewsletterBundle\Event\SendNewsletterEvent;
 use WebEtDesign\NewsletterBundle\Services\EmailService;
 
 class NewsletterAdminController extends CRUDController
@@ -19,17 +22,14 @@ class NewsletterAdminController extends CRUDController
     public function __construct(
         private readonly EmailService $emailService,
         private readonly EntityManagerInterface $em,
-        private readonly RequestStack $requestStack
-    )
-    {
+        private readonly EventDispatcherInterface $eventDispatcher
+    ) {
     }
 
 
-    public function sendAction($id = null): RedirectResponse
+    public function sendAction(Request $request, $id = null): RedirectResponse
     {
-        $request = $this->requestStack->getCurrentRequest();
-
-        $id = $request->get($this->admin->getIdParameter());
+        $id         = $request->get($this->admin->getIdParameter());
         $newsletter = $this->admin->getObject($id);
 
         if (!$newsletter) {
@@ -42,34 +42,16 @@ class NewsletterAdminController extends CRUDController
             return $this->redirect($this->admin->generateObjectUrl('list', $newsletter, []));
         }
 
-        $emails = $this->emailService->getEmails($newsletter);
+        $event = new SendNewsletterEvent($newsletter);
+        $this->eventDispatcher->dispatch($event, SendNewsletterEvent::class);
 
-        try {
-            $res = $this->emailService->sendNewsletter($newsletter, $emails, $this->requestStack->getSession()->getBag('flash'));
-        } catch (\Exception|TransportExceptionInterface $e) {
-            $res = 0;
-            $this->addFlash('error', $e->getMessage());
-        }
-
-        if ($res) {
-            $this->addFlash('success',
-                'La newsletter va être envoyée');
-            $newsletter->setIsSent(true);
-            $newsletter->setSentAt(new \DateTime('now'));
-        } else {
-            $this->addFlash('error', "La newsletter n'a pas été envoyée");
-            $newsletter->setIsSent(false);
-        }
-
-        $this->em->flush();
+        $this->addFlash('success', 'La newsletter va être envoyée');
 
         return $this->redirect($this->admin->generateObjectUrl('list', $newsletter, []));
     }
 
-    public function copyAction($id = null): RedirectResponse
+    public function copyAction(Request $request, $id = null): RedirectResponse
     {
-        $request = $this->requestStack->getCurrentRequest();
-
         $id = $request->get($this->admin->getIdParameter());
         /** @var Newsletter $old */
         $old = $this->admin->getObject($id);

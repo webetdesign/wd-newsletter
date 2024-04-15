@@ -68,9 +68,10 @@ class NewsletterTwigExtension extends AbstractExtension
                     return preg_replace('~(?:src|action|href)=[\'"]\K/(?!/)[^\'"]*~', "$base$0", $content->translate($locale)->getValue());
                 case DynamicBlock::code:
                 default:
-                    $data = array_map(function (array $row) {
-                        return $row['value'];
-                    }, $this->cmsBlockTransformer->transform($content->translate($locale)->getValue()));
+                    $data = $this->cmsBlockTransformer->transform($content->translate($locale)->getValue());
+                    if (is_array($data)) {
+                        $data = array_map(function (array $row) { return $row['value']; }, $data);
+                    }
                     return $data;
             }
 
@@ -88,7 +89,7 @@ class NewsletterTwigExtension extends AbstractExtension
                 return null;
             }
 
-            return $this->requestStack->getCurrentRequest()->getSchemeAndHttpHost() . $this->mediaService->getMediaPath($content->getMedia());
+            return $this->mediaService->getMediaPath($content->getMedia());
         }
 
         return null;
