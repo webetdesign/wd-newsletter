@@ -12,7 +12,7 @@
         "php": "^7.4|^8.0",
         "sonata-project/admin-bundle": "4.* || ^3.45",
         "sonata-project/block-bundle": "^3.21|^4.3",
-        "webetdesign/wd-media-bundle": "4.0.*||dev-sf6",
+        "webetdesign/wd-media-bundle": "4.*||dev-sf6",
         "gedmo/doctrine-extensions": "^3.0",
         "a2lix/translation-form-bundle": "^3.0",
         "doctrine/doctrine-bundle": "^1.12 || ^2.0",
