@@ -63,7 +63,11 @@ class NewsletterTwigExtension extends AbstractExtension
                         $locale = 'fr';
                     }
 
-                    $base = $this->requestStack->getCurrentRequest()->getSchemeAndHttpHost();
+                    $base = $this->requestStack->getCurrentRequest()?->getSchemeAndHttpHost();
+
+                    if($base === null){
+                        $base = $_ENV['ROUTER_REQUEST_CONTEXT_SCHEME'].'://'.$_ENV['ROUTER_REQUEST_CONTEXT_HOST'];
+                    }
 
                     return preg_replace('~(?:src|action|href)=[\'"]\K/(?!/)[^\'"]*~', "$base$0", $content->translate($locale)->getValue());
                 case DynamicBlock::code:
