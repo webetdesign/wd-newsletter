@@ -196,7 +196,7 @@ class EmailService
     {
         if ($this->enableLog && isset($_ENV['NEWSLETTER_IV']) && strlen($_ENV['NEWSLETTER_IV']) > 0) {
             $html = preg_replace_callback(
-                "/(<a[^>]*href=[\"](.+)[\"])/",
+                "/(<a[^>]*href=\"([^\"]*)\")/",
                 function ($matches) use ($hash) {
                     $url = "";
                     if (!empty($matches[2]) && strlen($matches[2]) > 0) {
