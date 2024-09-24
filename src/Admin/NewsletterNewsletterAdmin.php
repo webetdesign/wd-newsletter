@@ -62,7 +62,7 @@ class NewsletterNewsletterAdmin extends AbstractAdmin
     protected function configureBatchActions(array $actions): array
     {
         $actions = parent::configureBatchActions($actions);
-        unset($actions['delete']);
+//        unset($actions['delete']);
         return $actions;
     }
 

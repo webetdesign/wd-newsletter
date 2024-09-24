@@ -1,10 +1,8 @@
-{% if not object.isSent %}
-    <a
-            href="{{ admin.generateObjectUrl('delete', object, actions.link_parameters|default([])) }}"
-            class="btn btn-sm btn-danger"
-            title="{{ 'action_delete'|trans({}, 'SonataAdminBundle') }}"
-    >
-        <i class="fa fa-trash" aria-hidden="true"></i>
-        Supprimer
-    </a>
-{% endif %}
+<a
+    href="{{ admin.generateObjectUrl('delete', object, actions.link_parameters|default([])) }}"
+    class="btn btn-sm btn-danger"
+    title="{{ 'action_delete'|trans({}, 'SonataAdminBundle') }}"
+>
+    <i class="fa fa-trash" aria-hidden="true"></i>
+    Supprimer
+</a>
