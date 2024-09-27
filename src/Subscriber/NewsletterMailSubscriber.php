@@ -13,8 +13,8 @@ use WebEtDesign\NewsletterBundle\Services\EmailService;
 
 class NewsletterMailSubscriber implements EventSubscriberInterface
 {
-    const BATCH_INTERVAL_SECOND = 15;
-    const BATCH_SIZE            = 50;
+    const BATCH_INTERVAL_SECOND = 60;
+    const BATCH_SIZE            = 25;
 
     public function __construct(
         protected readonly MessageBusInterface $bus,
