@@ -82,6 +82,8 @@ class NewsletterMailHandler implements MessageHandlerInterface
             $email->getHeaders()->has('X-No-Track') ? $email->getHeaders()->remove('X-No-Track') : null;
         }
 
+        $email->getHeaders()->addTextHeader('List-Unsubscribe', '<mailto:'.$this->emailService->from['email'].'?subject=unsubscribe>');
+
         $this->mailer->send($email);
         $this->eventDispatcher->dispatch(new MailSentEvent($email, $trackingToken, $newsletter->getId()), MailSentEvent::NAME);
     }
