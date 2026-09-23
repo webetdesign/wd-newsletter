@@ -56,12 +56,6 @@ services:
     tags:
       - { name: form.type }
 
-  WebEtDesign\NewsletterBundle\Form\NewsletterContentCollectionType:
-    arguments:
-#      - '@newsletter.content_collection_transformer'
-    tags:
-      - { name: form.type }
-
   newsletter.twig.extension:
     class: WebEtDesign\NewsletterBundle\Twig\NewsletterTwigExtension
     tags:
