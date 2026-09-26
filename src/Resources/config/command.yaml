@@ -1,12 +1,8 @@
 services:
-  _defaults:
-    autowire: true
-    
   WebEtDesign\NewsletterBundle\Command\NewsletterSyncContentCommand:
     arguments:
-      - ~
       - '@doctrine.orm.default_entity_manager'
       - '@WebEtDesign\NewsletterBundle\Repository\NewsletterRepository'
-      - '@WebEtDesign\NewsletterBundle\Factory\NewsletterFactory'
+      - '@WebEtDesign\NewsletterBundle\Services\NewsletterContentSynchronizer'
     tags:
       - { name: 'console.command', command: 'newsletter:sync-contents' }

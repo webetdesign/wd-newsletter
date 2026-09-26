@@ -1,9 +1,13 @@
 services:
-  newsletter.admin.newsletter_listener:
-    class: WebEtDesign\NewsletterBundle\EventListener\NewsletterAdminListener
+  WebEtDesign\NewsletterBundle\Services\NewsletterContentSynchronizer:
     arguments:
       - '@WebEtDesign\NewsletterBundle\Factory\NewsletterFactory'
       - '@doctrine.orm.default_entity_manager'
       - '%wd_newsletter.locales%'
+
+  newsletter.admin.newsletter_listener:
+    class: WebEtDesign\NewsletterBundle\EventListener\NewsletterAdminListener
+    arguments:
+      - '@WebEtDesign\NewsletterBundle\Services\NewsletterContentSynchronizer'
     tags:
       - { name: doctrine.event_listener, event: prePersist }

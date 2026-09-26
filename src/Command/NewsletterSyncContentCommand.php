@@ -9,8 +9,8 @@ use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use WebEtDesign\CmsBundle\Factory\TemplateFactoryInterface;
 use WebEtDesign\NewsletterBundle\Repository\NewsletterRepository;
+use WebEtDesign\NewsletterBundle\Services\NewsletterContentSynchronizer;
 
 #[AsCommand(
 
@@ -20,9 +20,9 @@ use WebEtDesign\NewsletterBundle\Repository\NewsletterRepository;
 class NewsletterSyncContentCommand extends Command
 {
     public function __construct(
-        private EntityManagerInterface          $em,
-        private NewsletterRepository            $repository,
-        private TemplateFactoryInterface $templateFactory
+        private EntityManagerInterface        $em,
+        private NewsletterRepository          $repository,
+        private NewsletterContentSynchronizer $synchronizer
     )
     {
         parent::__construct();
@@ -38,10 +38,7 @@ class NewsletterSyncContentCommand extends Command
         foreach ($newsletters as $newsletter) {
             $progress->advance();
             try {
-                $config = $this->templateProvider->getConfigurationFor($newsletter->getModel());
-                if ($config && isset($config['contents'])) {
-                    $this->contentCreatorService->createNewsletterContents($config, $newsletter);
-                }
+                $this->synchronizer->synchronize($newsletter);
             } catch (\Exception $e) {
                 $io->error($e->getMessage());
             }
@@ -52,6 +49,6 @@ class NewsletterSyncContentCommand extends Command
         $progress->finish();
         $io->success('Contenus synchronisés');
 
-        return 0;
+        return Command::SUCCESS;
     }
 }
