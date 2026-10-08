@@ -5,7 +5,7 @@ namespace WebEtDesign\NewsletterBundle\Controller;
 use Doctrine\ORM\EntityManagerInterface as EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 class UnsubController extends AbstractController
 {
@@ -21,13 +21,7 @@ class UnsubController extends AbstractController
         $this->home = array_key_exists('home', $routes) ? $routes['home'] : 'index';
     }
 
-    /**
-     * @param string $token
-     *
-     * @Route(path="/newsletter/unsub/{token}", name="newsletter_unsub")
-     *
-     * @return RedirectResponse
-     */
+    #[Route(path: '/newsletter/unsub/{token}', name: 'newsletter_unsub')]
     public function token(string $token): RedirectResponse
     {
         $user = $this->em->getRepository($this->userClass)->findOneBy([
@@ -43,9 +37,7 @@ class UnsubController extends AbstractController
         return $this->redirectToRoute($this->home);
     }
 
-    /**
-     * @Route(path="/newsletter/unsub/auto", name="newsletter_unsub_auto")
-     */
+    #[Route(path: '/newsletter/unsub/auto', name: 'newsletter_unsub_auto')]
     public function auto(): RedirectResponse
     {
         $this->addFlash('error', "Vous avez été ajouté par l'administrateur à cette newsletter, vous n'êtes pas sur notre liste de diffusion.");

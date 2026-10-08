@@ -1,7 +1,7 @@
 newsletter:
   resource: '../../Controller/UnsubController.php'
-  type: annotation
+  type: attribute
 
 admin_newsletter:
   resource: '../../Controller/NewsletterContentController.php'
-  type: annotation
+  type: attribute

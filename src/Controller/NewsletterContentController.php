@@ -8,7 +8,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 use WebEtDesign\NewsletterBundle\Entity\NewsletterLog;
 use WebEtDesign\NewsletterBundle\Http\TransparentPixelResponse;
 use WebEtDesign\NewsletterBundle\Repository\ContentCollectionRepositoryInterface;
@@ -17,9 +17,7 @@ class NewsletterContentController extends AbstractController
 {
     public function __construct(private EntityManagerInterface $em){}
 
-    /**
-     * @Route(path="/admin/newsletter/content/collection", name="newsletter_content_collection")
-     */
+    #[Route(path: '/admin/newsletter/content/collection', name: 'newsletter_content_collection')]
     public function content(Request $request): JsonResponse
     {
         /** @var ContentCollectionRepositoryInterface $er */
@@ -38,9 +36,7 @@ class NewsletterContentController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route(path="/newsletter/track/opening/{token}/image.png", name="newsletter_track_opening")
-     */
+    #[Route(path: '/newsletter/track/opening/{token}/image.png', name: 'newsletter_track_opening')]
     public function trackOpening (?string $token): Response
     {
         $newsletterLog = $this->em->getRepository(NewsletterLog::class)->findOneBy(['token' => $token]);
@@ -53,9 +49,7 @@ class NewsletterContentController extends AbstractController
         return new TransparentPixelResponse();
     }
 
-    /**
-     * @Route(path="/newsletter/track/link/{token}", name="newsletter_track_link")
-     */
+    #[Route(path: '/newsletter/track/link/{token}', name: 'newsletter_track_link')]
     public function trackLink (?string $token, Request $request): RedirectResponse
     {
         $newsletterLog = $this->em->getRepository(NewsletterLog::class)->findOneBy(['token' => $token]);
