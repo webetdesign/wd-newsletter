@@ -1,0 +1,793 @@
+{
+    "Content": {
+        "associationMappings": {
+            "media": {
+                "cascade": [],
+                "fetch": 2,
+                "fieldName": "media",
+                "inversedBy": null,
+                "isCascadeDetach": false,
+                "isCascadeMerge": false,
+                "isCascadePersist": false,
+                "isCascadeRefresh": false,
+                "isCascadeRemove": false,
+                "isOwningSide": true,
+                "joinColumnFieldNames": {
+                    "media_id": "media_id"
+                },
+                "joinColumns": [
+                    {
+                        "name": "media_id",
+                        "referencedColumnName": "id"
+                    }
+                ],
+                "mappedBy": null,
+                "orphanRemoval": false,
+                "sourceEntity": "WebEtDesign\\NewsletterBundle\\Entity\\Content",
+                "sourceToTargetKeyColumns": {
+                    "media_id": "id"
+                },
+                "targetEntity": "WebEtDesign\\MediaBundle\\Entity\\Media",
+                "targetToSourceKeyColumns": {
+                    "id": "media_id"
+                },
+                "type": 2
+            },
+            "newsletter": {
+                "cascade": [],
+                "fetch": 2,
+                "fieldName": "newsletter",
+                "inversedBy": "contents",
+                "isCascadeDetach": false,
+                "isCascadeMerge": false,
+                "isCascadePersist": false,
+                "isCascadeRefresh": false,
+                "isCascadeRemove": false,
+                "isOwningSide": true,
+                "joinColumnFieldNames": {
+                    "newsletter_id": "newsletter_id"
+                },
+                "joinColumns": [
+                    {
+                        "columnDefinition": null,
+                        "name": "newsletter_id",
+                        "nullable": false,
+                        "onDelete": null,
+                        "referencedColumnName": "id",
+                        "unique": false
+                    }
+                ],
+                "mappedBy": null,
+                "orphanRemoval": false,
+                "sourceEntity": "WebEtDesign\\NewsletterBundle\\Entity\\Content",
+                "sourceToTargetKeyColumns": {
+                    "newsletter_id": "id"
+                },
+                "targetEntity": "WebEtDesign\\NewsletterBundle\\Entity\\Newsletter",
+                "targetToSourceKeyColumns": {
+                    "id": "newsletter_id"
+                },
+                "type": 2
+            },
+            "translations": {
+                "cascade": [
+                    "persist",
+                    "remove"
+                ],
+                "fetch": 2,
+                "fieldName": "translations",
+                "indexBy": "locale",
+                "inversedBy": null,
+                "isCascadeDetach": false,
+                "isCascadeMerge": false,
+                "isCascadePersist": true,
+                "isCascadeRefresh": false,
+                "isCascadeRemove": true,
+                "isOwningSide": false,
+                "mappedBy": "translatable",
+                "orphanRemoval": true,
+                "sourceEntity": "WebEtDesign\\NewsletterBundle\\Entity\\Content",
+                "targetEntity": "WebEtDesign\\NewsletterBundle\\Entity\\ContentTranslation",
+                "type": 4
+            }
+        },
+        "cache": null,
+        "changeTrackingPolicy": 1,
+        "columnNames": {
+            "canTranslate": "canTranslate",
+            "code": "code",
+            "help": "help",
+            "id": "id",
+            "label": "label",
+            "position": "position",
+            "type": "type"
+        },
+        "containsEnumIdentifier": false,
+        "containsForeignIdentifier": false,
+        "customGeneratorDefinition": null,
+        "customRepositoryClassName": "WebEtDesign\\NewsletterBundle\\Repository\\ContentRepository",
+        "discriminatorColumn": null,
+        "discriminatorMap": [],
+        "discriminatorValue": null,
+        "embeddedClasses": [],
+        "entityListeners": [],
+        "fieldMappings": {
+            "canTranslate": {
+                "columnName": "canTranslate",
+                "fieldName": "canTranslate",
+                "length": null,
+                "nullable": true,
+                "precision": null,
+                "scale": null,
+                "type": "text",
+                "unique": false
+            },
+            "code": {
+                "columnName": "code",
+                "fieldName": "code",
+                "length": null,
+                "nullable": false,
+                "precision": null,
+                "scale": null,
+                "type": "text",
+                "unique": false
+            },
+            "help": {
+                "columnName": "help",
+                "fieldName": "help",
+                "length": null,
+                "nullable": true,
+                "precision": null,
+                "scale": null,
+                "type": "text",
+                "unique": false
+            },
+            "id": {
+                "columnName": "id",
+                "fieldName": "id",
+                "id": true,
+                "length": null,
+                "nullable": false,
+                "precision": null,
+                "scale": null,
+                "type": "integer",
+                "unique": false
+            },
+            "label": {
+                "columnName": "label",
+                "fieldName": "label",
+                "length": null,
+                "nullable": true,
+                "precision": null,
+                "scale": null,
+                "type": "text",
+                "unique": false
+            },
+            "position": {
+                "columnName": "position",
+                "fieldName": "position",
+                "length": null,
+                "nullable": true,
+                "precision": null,
+                "scale": null,
+                "type": "integer",
+                "unique": false
+            },
+            "type": {
+                "columnName": "type",
+                "fieldName": "type",
+                "length": null,
+                "nullable": false,
+                "precision": null,
+                "scale": null,
+                "type": "text",
+                "unique": false
+            }
+        },
+        "fieldNames": {
+            "canTranslate": "canTranslate",
+            "code": "code",
+            "help": "help",
+            "id": "id",
+            "label": "label",
+            "position": "position",
+            "type": "type"
+        },
+        "generatorType": 1,
+        "idGenerator": null,
+        "identifier": [
+            "id"
+        ],
+        "inheritanceType": 1,
+        "isEmbeddedClass": false,
+        "isIdentifierComposite": false,
+        "isMappedSuperclass": false,
+        "isReadOnly": false,
+        "isVersioned": false,
+        "lifecycleCallbacks": [],
+        "name": "WebEtDesign\\NewsletterBundle\\Entity\\Content",
+        "namedNativeQueries": [],
+        "namedQueries": [],
+        "namespace": "WebEtDesign\\NewsletterBundle\\Entity",
+        "parentClasses": [],
+        "requiresFetchAfterChange": false,
+        "rootEntityName": "WebEtDesign\\NewsletterBundle\\Entity\\Content",
+        "sequenceGeneratorDefinition": null,
+        "sqlResultSetMappings": [],
+        "subClasses": [],
+        "table": {
+            "name": "newsletter__content"
+        },
+        "tableGeneratorDefinition": null,
+        "versionField": null
+    },
+    "ContentTranslation": {
+        "associationMappings": {
+            "translatable": {
+                "cascade": [
+                    "persist"
+                ],
+                "fetch": 2,
+                "fieldName": "translatable",
+                "inversedBy": "translations",
+                "isCascadeDetach": false,
+                "isCascadeMerge": false,
+                "isCascadePersist": true,
+                "isCascadeRefresh": false,
+                "isCascadeRemove": false,
+                "isOwningSide": true,
+                "joinColumnFieldNames": {
+                    "translatable_id": "translatable_id"
+                },
+                "joinColumns": [
+                    {
+                        "name": "translatable_id",
+                        "onDelete": "CASCADE",
+                        "referencedColumnName": "id"
+                    }
+                ],
+                "mappedBy": null,
+                "orphanRemoval": false,
+                "sourceEntity": "WebEtDesign\\NewsletterBundle\\Entity\\ContentTranslation",
+                "sourceToTargetKeyColumns": {
+                    "translatable_id": "id"
+                },
+                "targetEntity": "WebEtDesign\\NewsletterBundle\\Entity\\Content",
+                "targetToSourceKeyColumns": {
+                    "id": "translatable_id"
+                },
+                "type": 2
+            }
+        },
+        "cache": null,
+        "changeTrackingPolicy": 1,
+        "columnNames": {
+            "id": "id",
+            "locale": "locale",
+            "value": "value"
+        },
+        "containsEnumIdentifier": false,
+        "containsForeignIdentifier": false,
+        "customGeneratorDefinition": null,
+        "customRepositoryClassName": null,
+        "discriminatorColumn": null,
+        "discriminatorMap": [],
+        "discriminatorValue": null,
+        "embeddedClasses": [],
+        "entityListeners": [],
+        "fieldMappings": {
+            "id": {
+                "columnName": "id",
+                "fieldName": "id",
+                "id": true,
+                "length": null,
+                "nullable": false,
+                "precision": null,
+                "scale": null,
+                "type": "integer",
+                "unique": false
+            },
+            "locale": {
+                "columnName": "locale",
+                "fieldName": "locale",
+                "length": 5,
+                "type": "string"
+            },
+            "value": {
+                "columnName": "value",
+                "fieldName": "value",
+                "length": null,
+                "nullable": true,
+                "precision": null,
+                "scale": null,
+                "type": "text",
+                "unique": false
+            }
+        },
+        "fieldNames": {
+            "id": "id",
+            "locale": "locale",
+            "value": "value"
+        },
+        "generatorType": 1,
+        "idGenerator": null,
+        "identifier": [
+            "id"
+        ],
+        "inheritanceType": 1,
+        "isEmbeddedClass": false,
+        "isIdentifierComposite": false,
+        "isMappedSuperclass": false,
+        "isReadOnly": false,
+        "isVersioned": false,
+        "lifecycleCallbacks": [],
+        "name": "WebEtDesign\\NewsletterBundle\\Entity\\ContentTranslation",
+        "namedNativeQueries": [],
+        "namedQueries": [],
+        "namespace": "WebEtDesign\\NewsletterBundle\\Entity",
+        "parentClasses": [],
+        "requiresFetchAfterChange": false,
+        "rootEntityName": "WebEtDesign\\NewsletterBundle\\Entity\\ContentTranslation",
+        "sequenceGeneratorDefinition": null,
+        "sqlResultSetMappings": [],
+        "subClasses": [],
+        "table": {
+            "name": "newsletter__content_translation",
+            "uniqueConstraints": {
+                "newsletter__content_translation_unique_translation": {
+                    "columns": [
+                        "translatable_id",
+                        "locale"
+                    ]
+                }
+            }
+        },
+        "tableGeneratorDefinition": null,
+        "versionField": null
+    },
+    "Newsletter": {
+        "associationMappings": {
+            "contents": {
+                "cascade": [
+                    "persist",
+                    "remove"
+                ],
+                "fetch": 2,
+                "fieldName": "contents",
+                "inversedBy": null,
+                "isCascadeDetach": false,
+                "isCascadeMerge": false,
+                "isCascadePersist": true,
+                "isCascadeRefresh": false,
+                "isCascadeRemove": true,
+                "isOwningSide": false,
+                "mappedBy": "newsletter",
+                "orderBy": {
+                    "position": "ASC"
+                },
+                "orphanRemoval": true,
+                "sourceEntity": "WebEtDesign\\NewsletterBundle\\Entity\\Newsletter",
+                "targetEntity": "WebEtDesign\\NewsletterBundle\\Entity\\Content",
+                "type": 4
+            },
+            "groups": {
+                "cascade": [],
+                "fetch": 2,
+                "fieldName": "groups",
+                "inversedBy": null,
+                "isCascadeDetach": false,
+                "isCascadeMerge": false,
+                "isCascadePersist": false,
+                "isCascadeRefresh": false,
+                "isCascadeRemove": false,
+                "isOnDeleteCascade": true,
+                "isOwningSide": true,
+                "joinTable": {
+                    "inverseJoinColumns": [
+                        {
+                            "columnDefinition": null,
+                            "name": "group_id",
+                            "nullable": true,
+                            "onDelete": "CASCADE",
+                            "referencedColumnName": "id",
+                            "unique": false
+                        }
+                    ],
+                    "joinColumns": [
+                        {
+                            "columnDefinition": null,
+                            "name": "newsletter_id",
+                            "nullable": true,
+                            "onDelete": "CASCADE",
+                            "referencedColumnName": "id",
+                            "unique": false
+                        }
+                    ],
+                    "name": "newsletter__newsletter_has_group",
+                    "schema": null
+                },
+                "joinTableColumns": [
+                    "newsletter_id",
+                    "group_id"
+                ],
+                "mappedBy": null,
+                "orphanRemoval": false,
+                "relationToSourceKeyColumns": {
+                    "newsletter_id": "id"
+                },
+                "relationToTargetKeyColumns": {
+                    "group_id": "id"
+                },
+                "sourceEntity": "WebEtDesign\\NewsletterBundle\\Entity\\Newsletter",
+                "targetEntity": "App\\Entity\\User\\Group",
+                "type": 8
+            }
+        },
+        "cache": null,
+        "changeTrackingPolicy": 1,
+        "columnNames": {
+            "email": "email",
+            "emailsMore": "emailsMore",
+            "id": "id",
+            "isSent": "isSent",
+            "model": "model",
+            "sendInAllLocales": "sendInAllLocales",
+            "sender": "sender",
+            "sentAt": "sentAt",
+            "title": "title"
+        },
+        "containsEnumIdentifier": false,
+        "containsForeignIdentifier": false,
+        "customGeneratorDefinition": null,
+        "customRepositoryClassName": "WebEtDesign\\NewsletterBundle\\Repository\\NewsletterRepository",
+        "discriminatorColumn": null,
+        "discriminatorMap": [],
+        "discriminatorValue": null,
+        "embeddedClasses": [],
+        "entityListeners": [],
+        "fieldMappings": {
+            "email": {
+                "columnName": "email",
+                "fieldName": "email",
+                "length": null,
+                "nullable": false,
+                "precision": null,
+                "scale": null,
+                "type": "text",
+                "unique": false
+            },
+            "emailsMore": {
+                "columnName": "emailsMore",
+                "fieldName": "emailsMore",
+                "length": null,
+                "nullable": true,
+                "precision": null,
+                "scale": null,
+                "type": "text",
+                "unique": false
+            },
+            "id": {
+                "columnName": "id",
+                "fieldName": "id",
+                "id": true,
+                "length": null,
+                "nullable": false,
+                "precision": null,
+                "scale": null,
+                "type": "integer",
+                "unique": false
+            },
+            "isSent": {
+                "columnName": "isSent",
+                "fieldName": "isSent",
+                "length": null,
+                "nullable": true,
+                "precision": null,
+                "scale": null,
+                "type": "boolean",
+                "unique": false
+            },
+            "model": {
+                "columnName": "model",
+                "fieldName": "model",
+                "length": null,
+                "nullable": false,
+                "precision": null,
+                "scale": null,
+                "type": "text",
+                "unique": false
+            },
+            "sendInAllLocales": {
+                "columnName": "sendInAllLocales",
+                "fieldName": "sendInAllLocales",
+                "length": null,
+                "nullable": true,
+                "precision": null,
+                "scale": null,
+                "type": "boolean",
+                "unique": false
+            },
+            "sender": {
+                "columnName": "sender",
+                "fieldName": "sender",
+                "length": null,
+                "nullable": false,
+                "precision": null,
+                "scale": null,
+                "type": "text",
+                "unique": false
+            },
+            "sentAt": {
+                "columnName": "sentAt",
+                "fieldName": "sentAt",
+                "length": null,
+                "nullable": true,
+                "precision": null,
+                "scale": null,
+                "type": "datetime",
+                "unique": false
+            },
+            "title": {
+                "columnName": "title",
+                "fieldName": "title",
+                "length": null,
+                "nullable": false,
+                "precision": null,
+                "scale": null,
+                "type": "text",
+                "unique": false
+            }
+        },
+        "fieldNames": {
+            "email": "email",
+            "emailsMore": "emailsMore",
+            "id": "id",
+            "isSent": "isSent",
+            "model": "model",
+            "sendInAllLocales": "sendInAllLocales",
+            "sender": "sender",
+            "sentAt": "sentAt",
+            "title": "title"
+        },
+        "generatorType": 1,
+        "idGenerator": null,
+        "identifier": [
+            "id"
+        ],
+        "inheritanceType": 1,
+        "isEmbeddedClass": false,
+        "isIdentifierComposite": false,
+        "isMappedSuperclass": false,
+        "isReadOnly": false,
+        "isVersioned": false,
+        "lifecycleCallbacks": [],
+        "name": "WebEtDesign\\NewsletterBundle\\Entity\\Newsletter",
+        "namedNativeQueries": [],
+        "namedQueries": [],
+        "namespace": "WebEtDesign\\NewsletterBundle\\Entity",
+        "parentClasses": [],
+        "requiresFetchAfterChange": false,
+        "rootEntityName": "WebEtDesign\\NewsletterBundle\\Entity\\Newsletter",
+        "sequenceGeneratorDefinition": null,
+        "sqlResultSetMappings": [],
+        "subClasses": [],
+        "table": {
+            "name": "newsletter__newsletter"
+        },
+        "tableGeneratorDefinition": null,
+        "versionField": null
+    },
+    "NewsletterLog": {
+        "associationMappings": {
+            "user": {
+                "cascade": [],
+                "fetch": 2,
+                "fieldName": "user",
+                "inversedBy": null,
+                "isCascadeDetach": false,
+                "isCascadeMerge": false,
+                "isCascadePersist": false,
+                "isCascadeRefresh": false,
+                "isCascadeRemove": false,
+                "isOwningSide": true,
+                "joinColumnFieldNames": {
+                    "user_id": "user_id"
+                },
+                "joinColumns": [
+                    {
+                        "columnDefinition": null,
+                        "name": "user_id",
+                        "nullable": true,
+                        "onDelete": null,
+                        "referencedColumnName": "id",
+                        "unique": false
+                    }
+                ],
+                "mappedBy": null,
+                "orphanRemoval": false,
+                "sourceEntity": "WebEtDesign\\NewsletterBundle\\Entity\\NewsletterLog",
+                "sourceToTargetKeyColumns": {
+                    "user_id": "id"
+                },
+                "targetEntity": "App\\Entity\\User\\User",
+                "targetToSourceKeyColumns": {
+                    "id": "user_id"
+                },
+                "type": 2
+            }
+        },
+        "cache": null,
+        "changeTrackingPolicy": 1,
+        "columnNames": {
+            "body": "body",
+            "clicked": "clicked",
+            "createdAt": "createdAt",
+            "id": "id",
+            "newsletterId": "newsletterId",
+            "receiver": "receiver",
+            "title": "title",
+            "token": "token",
+            "updatedAt": "updatedAt",
+            "viewed": "viewed"
+        },
+        "containsEnumIdentifier": false,
+        "containsForeignIdentifier": false,
+        "customGeneratorDefinition": null,
+        "customRepositoryClassName": "WebEtDesign\\NewsletterBundle\\Repository\\NewsletterLogRepository",
+        "discriminatorColumn": null,
+        "discriminatorMap": [],
+        "discriminatorValue": null,
+        "embeddedClasses": [],
+        "entityListeners": [],
+        "fieldMappings": {
+            "body": {
+                "columnName": "body",
+                "fieldName": "body",
+                "length": null,
+                "nullable": true,
+                "precision": null,
+                "scale": null,
+                "type": "text",
+                "unique": false
+            },
+            "clicked": {
+                "columnName": "clicked",
+                "fieldName": "clicked",
+                "length": null,
+                "nullable": true,
+                "precision": null,
+                "scale": null,
+                "type": "boolean",
+                "unique": false
+            },
+            "createdAt": {
+                "columnName": "createdAt",
+                "fieldName": "createdAt",
+                "length": null,
+                "nullable": false,
+                "precision": null,
+                "scale": null,
+                "type": "datetime",
+                "unique": false
+            },
+            "id": {
+                "columnName": "id",
+                "fieldName": "id",
+                "id": true,
+                "length": null,
+                "nullable": false,
+                "precision": null,
+                "scale": null,
+                "type": "integer",
+                "unique": false
+            },
+            "newsletterId": {
+                "columnName": "newsletterId",
+                "fieldName": "newsletterId",
+                "length": null,
+                "nullable": true,
+                "precision": null,
+                "scale": null,
+                "type": "integer",
+                "unique": false
+            },
+            "receiver": {
+                "columnName": "receiver",
+                "fieldName": "receiver",
+                "length": null,
+                "nullable": true,
+                "precision": null,
+                "scale": null,
+                "type": "text",
+                "unique": false
+            },
+            "title": {
+                "columnName": "title",
+                "fieldName": "title",
+                "length": null,
+                "nullable": true,
+                "precision": null,
+                "scale": null,
+                "type": "text",
+                "unique": false
+            },
+            "token": {
+                "columnName": "token",
+                "fieldName": "token",
+                "length": null,
+                "nullable": true,
+                "precision": null,
+                "scale": null,
+                "type": "text",
+                "unique": false
+            },
+            "updatedAt": {
+                "columnName": "updatedAt",
+                "fieldName": "updatedAt",
+                "length": null,
+                "nullable": false,
+                "precision": null,
+                "scale": null,
+                "type": "datetime",
+                "unique": false
+            },
+            "viewed": {
+                "columnName": "viewed",
+                "fieldName": "viewed",
+                "length": null,
+                "nullable": true,
+                "precision": null,
+                "scale": null,
+                "type": "boolean",
+                "unique": false
+            }
+        },
+        "fieldNames": {
+            "body": "body",
+            "clicked": "clicked",
+            "createdAt": "createdAt",
+            "id": "id",
+            "newsletterId": "newsletterId",
+            "receiver": "receiver",
+            "title": "title",
+            "token": "token",
+            "updatedAt": "updatedAt",
+            "viewed": "viewed"
+        },
+        "generatorType": 1,
+        "idGenerator": null,
+        "identifier": [
+            "id"
+        ],
+        "inheritanceType": 1,
+        "isEmbeddedClass": false,
+        "isIdentifierComposite": false,
+        "isMappedSuperclass": false,
+        "isReadOnly": false,
+        "isVersioned": false,
+        "lifecycleCallbacks": [],
+        "name": "WebEtDesign\\NewsletterBundle\\Entity\\NewsletterLog",
+        "namedNativeQueries": [],
+        "namedQueries": [],
+        "namespace": "WebEtDesign\\NewsletterBundle\\Entity",
+        "parentClasses": [],
+        "requiresFetchAfterChange": false,
+        "rootEntityName": "WebEtDesign\\NewsletterBundle\\Entity\\NewsletterLog",
+        "sequenceGeneratorDefinition": null,
+        "sqlResultSetMappings": [],
+        "subClasses": [],
+        "table": {
+            "name": "newsletter__log"
+        },
+        "tableGeneratorDefinition": null,
+        "versionField": null
+    },
+    "gedmo": {
+        "create": [
+            "createdAt"
+        ],
+        "update": [
+            "updatedAt"
+        ]
+    }
+}

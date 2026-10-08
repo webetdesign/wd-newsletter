@@ -9,59 +9,39 @@ use Symfony\Component\PropertyAccess\PropertyAccess;
 use WebEtDesign\NewsletterBundle\Repository\ContentRepository;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity(repositoryClass=ContentRepository::class)
- * @ORM\Table(name="newsletter__content")
- */
+#[ORM\Entity(repositoryClass: ContentRepository::class)]
+#[ORM\Table(name: 'newsletter__content')]
 class Content implements TranslatableInterface
 {
     use TranslatableTrait;
 
-    /**
-     * @ORM\Id()
-     * @ORM\GeneratedValue()
-     * @ORM\Column(type="integer")
-     */
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
     private ?int $id;
 
-    /**
-     * @ORM\ManyToOne(targetEntity=Newsletter::class, inversedBy="contents")
-     * @ORM\JoinColumn(nullable=false)
-     */
+    #[ORM\ManyToOne(targetEntity: Newsletter::class, inversedBy: 'contents')]
+    #[ORM\JoinColumn(nullable: false)]
     private ?Newsletter $newsletter;
 
-    /**
-     * @ORM\Column(type="text")
-     */
+    #[ORM\Column(type: 'text')]
     private ?string $type = '';
 
-    /**
-     * @ORM\Column(type="text", nullable=true)
-     */
+    #[ORM\Column(type: 'text', nullable: true)]
     private ?string $label = '';
 
-    /**
-     * @ORM\Column(type="text")
-     */
+    #[ORM\Column(type: 'text')]
     private ?string $code = '';
 
-    /**
-     * @ORM\Column(type="text", nullable=true)
-     */
+    #[ORM\Column(type: 'text', nullable: true)]
     private ?string $help;
 
-    /**
-     * @ORM\ManyToOne(targetEntity=Media::class)
-     */
+    #[ORM\ManyToOne(targetEntity: Media::class)]
     private ?Media $media;
 
-    /**
-     * @ORM\Column(type="text", nullable=true)
-     */
+    #[ORM\Column(type: 'text', nullable: true)]
     private ?string $canTranslate;
-    /**
-     * @ORM\Column(type="integer", nullable=true)
-     */
+    #[ORM\Column(type: 'integer', nullable: true)]
     private ?int $position;
 
     public function getMedia(): ?Media

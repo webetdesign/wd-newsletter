@@ -16,7 +16,7 @@
         "gedmo/doctrine-extensions": "^3.0",
         "a2lix/translation-form-bundle": "^3.0",
         "doctrine/doctrine-bundle": "^1.12 || ^2.0",
-        "doctrine/orm": "^2.6.4 || ^3.0",
+        "doctrine/orm": "^2.20 || ^3.3",
         "knplabs/doctrine-behaviors": "^3.0",
         "symfony/asset": "^7.4",
         "symfony/config": "^7.4",

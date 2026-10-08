@@ -9,73 +9,51 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use App\Entity\User\Group;
-/**
- * @ORM\Entity(repositoryClass="WebEtDesign\NewsletterBundle\Repository\NewsletterRepository", repositoryClass=NewsletterRepository::class)
- * @ORM\Table(name="newsletter__newsletter")
- */
+#[ORM\Entity(repositoryClass: NewsletterRepository::class)]
+#[ORM\Table(name: 'newsletter__newsletter')]
 class Newsletter
 {
-    /**
-     * @ORM\Id()
-     * @ORM\GeneratedValue()
-     * @ORM\Column(type="integer")
-     */
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
     private ?int $id;
 
-    /**
-     * @ORM\Column(type="text")
-     */
+    #[ORM\Column(type: 'text')]
     private ?string $title;
 
-    /**
-     * @ORM\Column(type="text")
-     */
+    #[ORM\Column(type: 'text')]
     private ?string $model = '';
 
-    /**
-     * @ORM\Column(type="text")
-     */
+    #[ORM\Column(type: 'text')]
     private ?string $sender = '';
 
-    /**
-     * @ORM\Column(type="text")
-     */
+    #[ORM\Column(type: 'text')]
     private ?string $email = '';
 
-    /**
-     * @ORM\OneToMany(targetEntity=Content::class, mappedBy="newsletter", orphanRemoval=true, cascade={"persist", "remove"})
-     * @ORM\OrderBy({"position" = "ASC"})
-     */
+    #[ORM\OneToMany(targetEntity: Content::class, mappedBy: 'newsletter', orphanRemoval: true, cascade: ['persist', 'remove'])]
+    #[ORM\OrderBy(['position' => 'ASC'])]
     private Collection $contents;
 
-    /**
-     * @ORM\Column(type="text", nullable=true)
-     */
+    #[ORM\Column(type: 'text', nullable: true)]
     private ?string $emailsMore;
 
-    /** @var Collection
-     * @ORM\ManyToMany(targetEntity=Group::class)
-     * @ORM\JoinTable(name="newsletter__newsletter_has_group",
-     *      joinColumns={@ORM\JoinColumn(name="newsletter_id", referencedColumnName="id", onDelete="CASCADE")},
-     *      inverseJoinColumns={@ORM\JoinColumn(name="group_id", referencedColumnName="id", onDelete="CASCADE")}
-     * )
-     */
+    /** @var Collection */
+    #[ORM\ManyToMany(targetEntity: Group::class)]
+    #[ORM\JoinTable(
+        name: 'newsletter__newsletter_has_group',
+        joinColumns: [new ORM\JoinColumn(name: 'newsletter_id', referencedColumnName: 'id', onDelete: 'CASCADE')],
+        inverseJoinColumns: [new ORM\JoinColumn(name: 'group_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
+    )]
     private Collection $groups;
 
 
-    /**
-     * @ORM\Column(type="boolean", nullable=true)
-     */
+    #[ORM\Column(type: 'boolean', nullable: true)]
     private bool $isSent = false;
 
-    /**
-     * @ORM\Column(type="boolean", nullable=true)
-     */
+    #[ORM\Column(type: 'boolean', nullable: true)]
     private bool $sendInAllLocales = false;
 
-    /**
-     * @ORM\Column(type="datetime", nullable=true)
-     */
+    #[ORM\Column(type: 'datetime', nullable: true)]
     protected mixed $sentAt;
 
     #[Pure] public function __toString()
